@@ -8,6 +8,11 @@ import type { Square } from "chess.js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+import wQ from 'react-chessground/dist/images/pieces/merida/wQ.svg';
+import wR from 'react-chessground/dist/images/pieces/merida/wR.svg';
+import wN from 'react-chessground/dist/images/pieces/merida/wN.svg';
+import wB from 'react-chessground/dist/images/pieces/merida/wB.svg'
+
 type PromotionPiece = "q" | "r" | "n" | "b";
 
 export default function ChessBoard() {
@@ -75,7 +80,7 @@ export default function ChessBoard() {
         <CardTitle>Interactive Chess Board</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center">
-        <div className="mb-4">
+        <div className="relative mb-4">
           <Chessground
             width="400px"
             height="400px"
@@ -89,24 +94,51 @@ export default function ChessBoard() {
               dests: calcMovable(chess),
             }}
           />
-        </div>
+          
+          {selectVisible && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded shadow-md z-10">
+              <div className="flex gap-4">
+                <div
+                  className="w-12 h-12 flex justify-center items-center cursor-pointer"
+                  onClick={() => promotion("q")}
+                >
+                  <img
+                    src={wQ}
+                    alt="White Queen"
+                  />
+                </div>
+                <div
+                  className="w-12 h-12 flex justify-center items-center cursor-pointer"
+                  onClick={() => promotion("r")}
+                >
+                  <img
+                    src={wR}
+                    alt="White Rook"
+                  />
+                </div>
+                <div
+                  className="w-12 h-12 flex justify-center items-center cursor-pointer"
+                  onClick={() => promotion("n")}
+                >
+                  <img
+                    src={wN}
+                    alt="White Knight"
+                  />
+                </div>
+                <div
+                  className="w-12 h-12 flex justify-center items-center cursor-pointer"
+                  onClick={() => promotion("b")}
+                >
+                  <img
+                    src={wB}
+                    alt="White Bishop"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
-        {selectVisible && (
-          <div className="flex gap-2 mb-4">
-            <Button variant="default" onClick={() => promotion("q")}>
-              Queen
-            </Button>
-            <Button variant="default" onClick={() => promotion("r")}>
-              Rook
-            </Button>
-            <Button variant="default" onClick={() => promotion("n")}>
-              Knight
-            </Button>
-            <Button variant="default" onClick={() => promotion("b")}>
-              Bishop
-            </Button>
-          </div>
-        )}
+        </div>
 
         <div className="flex gap-2">
           <Button variant="outline" onClick={reset}>
