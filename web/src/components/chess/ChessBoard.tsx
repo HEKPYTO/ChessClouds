@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Chessground from "react-chessground";
 import "react-chessground/dist/styles/chessground.css";
 import { Chess } from "chess.js";
@@ -11,18 +11,39 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import wQ from 'react-chessground/dist/images/pieces/merida/wQ.svg';
 import wR from 'react-chessground/dist/images/pieces/merida/wR.svg';
 import wN from 'react-chessground/dist/images/pieces/merida/wN.svg';
-import wB from 'react-chessground/dist/images/pieces/merida/wB.svg'
+import wB from 'react-chessground/dist/images/pieces/merida/wB.svg';
+import bQ from 'react-chessground/dist/images/pieces/merida/bQ.svg';
+import bR from 'react-chessground/dist/images/pieces/merida/bR.svg';
+import bN from 'react-chessground/dist/images/pieces/merida/bN.svg';
+import bB from 'react-chessground/dist/images/pieces/merida/bB.svg';
 
 type PromotionPiece = "q" | "r" | "n" | "b";
 
-export default function ChessBoard() {
+const pieceImages: Record<"w" | "b", Record<PromotionPiece, string>> = {
+  w: { q: wQ, r: wR, n: wN, b: wB },
+  b: { q: bQ, r: bR, n: bN, b: bB }
+};
+
+type ChessBoardProps = {
+  playingAs: "w" | "b";
+};
+
+export default function ChessBoard({ playingAs }: ChessBoardProps) {
   const [chess] = useState(new Chess());
   const [fen, setFen] = useState(chess.fen());
   const [lastMove, setLastMove] = useState<[Square, Square] | undefined>();
   const [selectVisible, setSelectVisible] = useState(false);
   const [pendingMove, setPendingMove] = useState<[Square, Square] | undefined>();
 
+  useEffect(() => {
+    if (playingAs === "b" && chess.turn() !== "b" && !chess.isGameOver()) {
+      setTimeout(randomMove, 500);
+    }
+  }, [playingAs, chess]);
+
   const onMove = (from: Square, to: Square) => {
+    if (chess.turn() !== playingAs) return;
+
     const moves = chess.moves({ verbose: true });
     const move = moves.find((m) => m.from === from && m.to === to);
 
@@ -39,7 +60,10 @@ export default function ChessBoard() {
   };
 
   const randomMove = () => {
-    const moves = chess.moves({ verbose: true });
+    const opponentColor = playingAs === "w" ? "b" : "w";
+    const moves = chess.moves({ verbose: true }).filter(
+      (m: any) => m.color === opponentColor
+    );
     if (moves.length > 0 && !chess.isGameOver()) {
       const move = moves[Math.floor(Math.random() * moves.length)];
       chess.move(move);
@@ -50,7 +74,6 @@ export default function ChessBoard() {
 
   const promotion = (e: PromotionPiece) => {
     if (!pendingMove) return;
-
     const [from, to] = pendingMove;
     chess.move({ from, to, promotion: e });
     setFen(chess.fen());
@@ -88,9 +111,10 @@ export default function ChessBoard() {
             onMove={onMove}
             lastMove={lastMove}
             turnColor={chess.turn() === "w" ? "white" : "black"}
+            orientation={playingAs === "w" ? "white" : "black"}
             movable={{
               free: false,
-              color: chess.turn() === "w" ? "white" : "black",
+              color: chess.turn() === playingAs ? (playingAs === "w" ? "white" : "black") : undefined,
               dests: calcMovable(chess),
             }}
           />
@@ -98,46 +122,22 @@ export default function ChessBoard() {
           {selectVisible && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded shadow-md z-10">
               <div className="flex gap-4">
-                <div
-                  className="w-12 h-12 flex justify-center items-center cursor-pointer"
-                  onClick={() => promotion("q")}
-                >
-                  <img
-                    src={wQ}
-                    alt="White Queen"
-                  />
-                </div>
-                <div
-                  className="w-12 h-12 flex justify-center items-center cursor-pointer"
-                  onClick={() => promotion("r")}
-                >
-                  <img
-                    src={wR}
-                    alt="White Rook"
-                  />
-                </div>
-                <div
-                  className="w-12 h-12 flex justify-center items-center cursor-pointer"
-                  onClick={() => promotion("n")}
-                >
-                  <img
-                    src={wN}
-                    alt="White Knight"
-                  />
-                </div>
-                <div
-                  className="w-12 h-12 flex justify-center items-center cursor-pointer"
-                  onClick={() => promotion("b")}
-                >
-                  <img
-                    src={wB}
-                    alt="White Bishop"
-                  />
-                </div>
+                {(["q", "r", "n", "b"] as PromotionPiece[]).map((piece) => (
+                  <div
+                    key={piece}
+                    className="w-12 h-12 flex justify-center items-center cursor-pointer"
+                    onClick={() => promotion(piece)}
+                  >
+                    <img
+                      src={pieceImages[chess.turn() as "w" | "b"][piece]}
+                      alt={`${chess.turn() === "w" ? "White" : "Black"} ${piece.toUpperCase()}`}
+                      className="w-8 h-8"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           )}
-
         </div>
 
         <div className="flex gap-2">
@@ -155,7 +155,6 @@ export default function ChessBoard() {
 
 function calcMovable(chess: Chess) {
   const dests = new Map<Square, Square[]>();
-
   for (const row of chess.board()) {
     for (const piece of row) {
       if (piece) {
@@ -164,6 +163,5 @@ function calcMovable(chess: Chess) {
       }
     }
   }
-
   return dests;
 }
