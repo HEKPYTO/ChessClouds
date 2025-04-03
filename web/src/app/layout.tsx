@@ -16,9 +16,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="stylesheet" href="https://unpkg.com/react-chessground@1.5.0/dist/styles/chessground.css" />
-      </head>
       <body className={inter.className}>
         {children}
       </body>
