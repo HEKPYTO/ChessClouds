@@ -50,7 +50,7 @@ export function MoveViewer({
           </li>
         ))}
       </ol>
-      <div className="mt-4 flex justify-between gap-2">
+      <div className="mt-4 flex justify-center gap-2">
         <Button variant="outline" onClick={handleResetGame}>
           Reset
         </Button>
