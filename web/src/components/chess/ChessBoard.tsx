@@ -35,10 +35,14 @@ export default function ChessBoard({ playingAs }: ChessBoardProps) {
   const [selectVisible, setSelectVisible] = useState(false);
   const [pendingMove, setPendingMove] = useState<[Square, Square] | undefined>();
 
-  useEffect(() => {
+  const move = () => {
     if (playingAs === "b" && chess.turn() !== "b" && !chess.isGameOver()) {
       setTimeout(randomMove, 500);
     }
+  }
+
+  useEffect(() => {
+    move();
   }, [playingAs, chess]);
 
   const onMove = (from: Square, to: Square) => {
@@ -86,6 +90,7 @@ export default function ChessBoard({ playingAs }: ChessBoardProps) {
     chess.reset();
     setFen(chess.fen());
     setLastMove(undefined);
+    move();
   };
 
   const undo = () => {
