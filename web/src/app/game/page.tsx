@@ -1,5 +1,6 @@
 import Pane from "@/components/chess/GamePane";
 
+
 export default function Game() {
 
   return (
