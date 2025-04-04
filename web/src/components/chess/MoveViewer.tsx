@@ -38,12 +38,28 @@ export function MoveViewer({
           <li key={idx} className="mb-1 flex gap-2 items-center">
             <span className="w-6 font-bold">{pair.moveNumber}.</span>
             {pair.whiteMove && (
-              <Button variant="ghost" className="p-1" onClick={() => previewMove(pair.whiteIndex)}>
+              <Button
+                variant="ghost"
+                className={`p-1 ${
+                  previewIndex === pair.whiteIndex || (previewIndex === null && fullHistoryLength - 1 === pair.whiteIndex - 1)
+                    ? "bg-gray-200"
+                    : ""
+                }`}
+                onClick={() => previewMove(pair.whiteIndex)}
+              >
                 {pair.whiteMove}
               </Button>
             )}
             {pair.blackMove && (
-              <Button variant="ghost" className="p-1" onClick={() => previewMove(pair.blackIndex)}>
+              <Button
+                variant="ghost"
+                className={`p-1 ${
+                  previewIndex === pair.blackIndex || (previewIndex === null && fullHistoryLength - 1 === pair.blackIndex - 1)
+                    ? "bg-gray-200"
+                    : ""
+                }`}
+                onClick={() => previewMove(pair.blackIndex)}
+              >
                 {pair.blackMove}
               </Button>
             )}
