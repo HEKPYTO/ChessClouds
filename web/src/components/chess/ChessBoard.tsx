@@ -140,7 +140,7 @@ export default function ChessBoardWithHistory({ playingAs }: ChessBoardWithHisto
               <div className="flex gap-4">
                 {(["q", "r", "n", "b"] as PromotionPiece[]).map((piece) => (
                   <div key={piece} className="w-12 h-12 flex justify-center items-center cursor-pointer" onClick={() => promotion(piece)}>
-                    <img src={pieceImages[chess.turn() as "w" | "b"][piece]} alt={`${chess.turn() === "w" ? "White" : "Black"} ${piece.toUpperCase()}`} className="w-8 h-8" />
+                    <img src={pieceImages[chess.turn() as "w" | "b"][piece]} alt={`${chess.turn() === "w" ? "White" : "Black"} ${piece.toUpperCase()}`} className="w-16 h-16" />
                   </div>
                 ))}
               </div>
