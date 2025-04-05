@@ -1,15 +1,20 @@
 name: Code check and build
 
 on:
-  pull_request:
-    branches: ['*']
   push:
-    branches: ['*']
+    paths:
+      - 'web/**'
+  pull_request:
+    paths:
+      - 'web/**'
 
 jobs:
   lint:
     name: Check linting
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
@@ -21,6 +26,9 @@ jobs:
   build:
     name: Production build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
@@ -32,6 +40,9 @@ jobs:
   secrets_scan:
     name: GitLeaks Secret Scan
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
