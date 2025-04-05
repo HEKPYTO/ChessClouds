@@ -31,7 +31,7 @@ declare module 'react-chessground' {
       dests?: Map<Square, Square[]>
       showDests?: boolean
       events?: {
-        after?: (orig: Square, dest: Square, metadata: any) => void
+        after?: (orig: Square, dest: Square, metadata: unknown) => void
       }
     }
     premovable?: {
@@ -39,7 +39,7 @@ declare module 'react-chessground' {
       showDests?: boolean
       castle?: boolean
       events?: {
-        set?: (orig: Square, dest: Square, metadata: any) => void
+        set?: (orig: Square, dest: Square, metadata: unknown) => void
         unset?: () => void
       }
     }
@@ -48,19 +48,19 @@ declare module 'react-chessground' {
       visible?: boolean
       defaultSnapToValidMove?: boolean
       eraseOnClick?: boolean
-      shapes?: any[]
-      autoShapes?: any[]
-      brushes?: any
+      shapes?: unknown[]
+      autoShapes?: unknown[]
+      brushes?: unknown
       pieces?: {
         baseUrl?: string
       }
-      onChange?: (shapes: any[]) => void
+      onChange?: (shapes: unknown[]) => void
     }
     onMove?: (from: Square, to: Square) => void
     onSelect?: (square: Square) => void
     onMouseOverSquare?: (square: Square) => void
     onMouseOutSquare?: (square: Square) => void
-    [key: string]: any
+    [key: string]: unknown
   }
 
   const Chessground: FC<ChessgroundProps>
