@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Chess } from "chess.js";
+import { Chess, type Move } from "chess.js";
 import type { Square } from "chess.js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChessBoard } from "./ChessBoard";
@@ -24,13 +24,14 @@ function getGameStatus(chess: Chess): string {
 }
 
 export default function Pane({ playingAs }: PaneProps) {
-  const [chess, setChess] = useState(new Chess());
+  const [chess] = useState(new Chess());
   const [fen, setFen] = useState(chess.fen());
   const [lastMove, setLastMove] = useState<[Square, Square] | undefined>();
   const [selectVisible, setSelectVisible] = useState(false);
   const [pendingMove, setPendingMove] = useState<[Square, Square] | undefined>();
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fullHistory = useMemo(() => chess.history({ verbose: true }), [fen]);
 
   const previewFen = useMemo(() => {
@@ -69,7 +70,7 @@ export default function Pane({ playingAs }: PaneProps) {
 
   const randomMove = () => {
     const opponentColor = playingAs === "w" ? "b" : "w";
-    const moves = chess.moves({ verbose: true }).filter((m: any) => m.color === opponentColor);
+    const moves = chess.moves({ verbose: true }).filter((m: Move) => m.color === opponentColor);
     if (moves.length > 0 && !chess.isGameOver()) {
       const random = moves[Math.floor(Math.random() * moves.length)];
       chess.move(random);

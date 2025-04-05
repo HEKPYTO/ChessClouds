@@ -4,6 +4,7 @@ import Chessground from "react-chessground";
 import "react-chessground/dist/styles/chessground.css";
 import { Chess } from "chess.js";
 import type { Square } from "chess.js";
+import Image from "next/image";
 
 import wQ from "react-chessground/dist/images/pieces/merida/wQ.svg";
 import wR from "react-chessground/dist/images/pieces/merida/wR.svg";
@@ -91,11 +92,12 @@ export function ChessBoard({
                 className="w-12 h-12 flex justify-center items-center cursor-pointer"
                 onClick={() => promotion(piece)}
               >
-                <img
-                  src={pieceImages[chess.turn() as "w" | "b"][piece]}
-                  alt={`${chess.turn() === "w" ? "White" : "Black"} ${piece.toUpperCase()}`}
-                  className="w-16 h-16"
-                />
+              <Image
+                src={pieceImages[chess.turn() as "w" | "b"][piece]}
+                alt={`${chess.turn() === "w" ? "White" : "Black"} ${piece.toUpperCase()}`}
+                width={64} 
+                height={64}
+              />
               </div>
             ))}
           </div>
