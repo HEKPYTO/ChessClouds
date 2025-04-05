@@ -1,0 +1,92 @@
+name: Website Building Checks
+
+on:
+  pull_request:
+    branches: ['*']
+  push:
+    branches: ['*']
+
+jobs:
+  lint:
+    name: Linting Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.bun
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb') }}
+
+      - name: Install dependencies with Bun
+        run: bun install
+
+      - name: Run Lint
+        run: bun lint
+
+  build:
+    name: Production Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.bun
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb') }}
+
+      - name: Install dependencies with Bun
+        run: bun install
+
+      - name: Build production assets
+        run: bun run build
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.bun
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb') }}
+
+      - name: Install dependencies with Bun
+        run: bun install
+
+      - name: Run Tests
+        run: bun test
+
+  secrets_scan:
+    name: GitLeaks Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run GitLeaks scan
+        uses: zricethezav/gitleaks-action@v1.6.1
+        with:
+          args: --path=. --verbose
