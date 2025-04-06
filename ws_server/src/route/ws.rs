@@ -75,7 +75,8 @@ async fn handle_socket(socket: WebSocket, state: GameStateMap) {
     ));
     let write_task = tokio::spawn(handle_socket_write(writer, rx_broadcast, rx_local));
 
-    let _ = tokio::join!(read_task, write_task);
+    let _ = write_task.await;
+    read_task.abort();
 
     tracing::info!("socket closing");
     // TODO: clean up things
@@ -204,7 +205,6 @@ async fn handle_socket_read(
                             .send(ServerMessage::GameEnd(outcome))
                             .unwrap();
                         tracing::info!("game ended {} {}", connection_info.game_id, outcome);
-                        break;
                     }
                 }
                 _ => {
