@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
 export interface MovePair {
   moveNumber: number;
@@ -41,9 +41,11 @@ export function MoveViewer({
               <Button
                 variant="ghost"
                 className={`p-1 ${
-                  previewIndex === pair.whiteIndex || (previewIndex === null && fullHistoryLength - 1 === pair.whiteIndex - 1)
-                    ? "bg-gray-200"
-                    : ""
+                  previewIndex === pair.whiteIndex ||
+                  (previewIndex === null &&
+                    fullHistoryLength - 1 === pair.whiteIndex - 1)
+                    ? 'bg-gray-200'
+                    : ''
                 }`}
                 onClick={() => previewMove(pair.whiteIndex)}
               >
@@ -54,9 +56,11 @@ export function MoveViewer({
               <Button
                 variant="ghost"
                 className={`p-1 ${
-                  previewIndex === pair.blackIndex || (previewIndex === null && fullHistoryLength - 1 === pair.blackIndex - 1)
-                    ? "bg-gray-200"
-                    : ""
+                  previewIndex === pair.blackIndex ||
+                  (previewIndex === null &&
+                    fullHistoryLength - 1 === pair.blackIndex - 1)
+                    ? 'bg-gray-200'
+                    : ''
                 }`}
                 onClick={() => previewMove(pair.blackIndex)}
               >
@@ -73,10 +77,18 @@ export function MoveViewer({
         <Button variant="outline" onClick={handlePrevious}>
           Previous
         </Button>
-        <Button variant="outline" onClick={handleNext} disabled={previewIndex === null && fullHistoryLength === 0}>
+        <Button
+          variant="outline"
+          onClick={handleNext}
+          disabled={previewIndex === null && fullHistoryLength === 0}
+        >
           Next
         </Button>
-        <Button variant="outline" onClick={handleForward} disabled={previewIndex === null}>
+        <Button
+          variant="outline"
+          onClick={handleForward}
+          disabled={previewIndex === null}
+        >
           Forward
         </Button>
       </div>

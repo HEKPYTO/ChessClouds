@@ -6,9 +6,11 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,scss,md}\""
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@radix-ui/react-separator": "^1.1.2",
     "@radix-ui/react-slot": "^1.1.2",
     "chess.js": "^1.1.0",
@@ -28,9 +30,16 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "eslint": "^9.24.0",
     "eslint-config-next": "15.2.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "prettier": "^2.8.0"
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5"
   }
 }

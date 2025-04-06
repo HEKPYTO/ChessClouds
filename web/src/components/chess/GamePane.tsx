@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import { useState, useMemo, useEffect } from "react";
-import { Chess, type Move } from "chess.js";
-import type { Square } from "chess.js";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChessBoard } from "./ChessBoard";
-import { MoveViewer, MovePair } from "./MoveViewer";
-import { GameDetails } from "./GameDetails";
+import { useState, useMemo, useEffect } from 'react';
+import { Chess, type Move } from 'chess.js';
+import type { Square } from 'chess.js';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChessBoard } from './ChessBoard';
+import { MoveViewer, MovePair } from './MoveViewer';
+import { GameDetails } from './GameDetails';
 
 interface PaneProps {
-  playingAs: "w" | "b";
+  playingAs: 'w' | 'b';
 }
 
 function getGameStatus(chess: Chess): string {
-  if (!chess.isGameOver()) return "On Going";
+  if (!chess.isGameOver()) return 'On Going';
   if (chess.isCheckmate()) {
-    const winner = chess.turn() === "w" ? "Black" : "White";
+    const winner = chess.turn() === 'w' ? 'Black' : 'White';
     return `Completed - ${winner} wins by checkmate`;
   }
-  if (chess.isStalemate()) return "Completed - Stalemate";
-  if (chess.isDraw()) return "Completed - Draw";
-  return "Completed";
+  if (chess.isStalemate()) return 'Completed - Stalemate';
+  if (chess.isDraw()) return 'Completed - Draw';
+  return 'Completed';
 }
 
 export default function Pane({ playingAs }: PaneProps) {
@@ -28,7 +28,9 @@ export default function Pane({ playingAs }: PaneProps) {
   const [fen, setFen] = useState(chess.fen());
   const [lastMove, setLastMove] = useState<[Square, Square] | undefined>();
   const [selectVisible, setSelectVisible] = useState(false);
-  const [pendingMove, setPendingMove] = useState<[Square, Square] | undefined>();
+  const [pendingMove, setPendingMove] = useState<
+    [Square, Square] | undefined
+  >();
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,8 +71,10 @@ export default function Pane({ playingAs }: PaneProps) {
   };
 
   const randomMove = () => {
-    const opponentColor = playingAs === "w" ? "b" : "w";
-    const moves = chess.moves({ verbose: true }).filter((m: Move) => m.color === opponentColor);
+    const opponentColor = playingAs === 'w' ? 'b' : 'w';
+    const moves = chess
+      .moves({ verbose: true })
+      .filter((m: Move) => m.color === opponentColor);
     if (moves.length > 0 && !chess.isGameOver()) {
       const random = moves[Math.floor(Math.random() * moves.length)];
       chess.move(random);
@@ -79,7 +83,7 @@ export default function Pane({ playingAs }: PaneProps) {
     }
   };
 
-  const promotion = (piece: "q" | "r" | "n" | "b") => {
+  const promotion = (piece: 'q' | 'r' | 'n' | 'b') => {
     if (!pendingMove) return;
     const [from, to] = pendingMove;
     chess.move({ from, to, promotion: piece });
@@ -99,14 +103,18 @@ export default function Pane({ playingAs }: PaneProps) {
     setFen(chess.fen());
     setLastMove(undefined);
     setPreviewIndex(null);
-    if (playingAs === "b" && chess.turn() !== "b" && !chess.isGameOver()) {
+    if (playingAs === 'b' && chess.turn() !== 'b' && !chess.isGameOver()) {
       setTimeout(randomMove, 500);
     }
   };
 
   const handlePrevious = () => {
     if (fullHistory.length > 0) {
-      setPreviewIndex(previewIndex === null ? fullHistory.length - 1 : Math.max(previewIndex - 1, 0));
+      setPreviewIndex(
+        previewIndex === null
+          ? fullHistory.length - 1
+          : Math.max(previewIndex - 1, 0)
+      );
     }
   };
 
@@ -156,10 +164,10 @@ export default function Pane({ playingAs }: PaneProps) {
           chess={chess}
         />
         <div className="w-full flex-1 flex flex-col items-center lg:items-start">
-          <GameDetails 
-            playerA="Player A (1600)" 
-            playerB="Player B (1600)" 
-            gameStatus={gameStatus} 
+          <GameDetails
+            playerA="Player A (1600)"
+            playerB="Player B (1600)"
+            gameStatus={gameStatus}
           />
           <MoveViewer
             movePairs={movePairs}
