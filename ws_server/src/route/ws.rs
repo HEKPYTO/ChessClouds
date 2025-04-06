@@ -33,36 +33,53 @@ pub async fn ws_handler(ws: WebSocketUpgrade, State(state): State<GameStateMap>)
     ws.on_upgrade(|socket| handle_socket(socket, state))
 }
 
-async fn handle_socket(mut socket: WebSocket, state: GameStateMap) {
-    let conn_info = match auth_socket(&mut socket, &state).await {
-        Ok(info) => info,
+async fn send_msg(
+    writer: &mut SplitSink<WebSocket, Message>,
+    msg: &ServerMessage,
+) -> std::result::Result<(), axum::Error> {
+    writer
+        .send(Message::Text(Utf8Bytes::from(
+            serde_json::to_string(&msg).unwrap(),
+        )))
+        .await
+}
+
+async fn handle_socket(socket: WebSocket, state: GameStateMap) {
+    let (mut writer, mut reader) = socket.split();
+    let (tx_local, rx_local) = mpsc::channel(MAX_CHANNEL_CAPACITY);
+
+    let conn_info = match auth_socket(&mut reader, &state).await {
+        Ok(info) => {
+            let msg = ServerMessage::AuthSuccess;
+            let _ = send_msg(&mut writer, &msg).await;
+            info
+        }
         Err(err) => {
             let msg = ServerMessage::Error(err);
-            let _ = socket
-                .send(Message::Text(Utf8Bytes::from(
-                    serde_json::to_string(&msg).unwrap(),
-                )))
-                .await;
+            let _ = send_msg(&mut writer, &msg).await;
             return;
         }
     };
 
-    let (writer, reader) = socket.split();
     let rx_broadcast = conn_info.tx_broadcast.subscribe();
-    let (tx_local, rx_local) = mpsc::channel(MAX_CHANNEL_CAPACITY);
 
-    tokio::spawn(handle_socket_read(
+    let read_task = tokio::spawn(handle_socket_read(
         reader,
         state.clone(),
         conn_info,
         tx_local,
     ));
-    tokio::spawn(handle_socket_write(writer, rx_broadcast, rx_local));
-    // TODO: Need to handle socket closing, perhaps upon game end?
+    let write_task = tokio::spawn(handle_socket_write(writer, rx_broadcast, rx_local));
+
+    let _ = tokio::join!(read_task, write_task);
+    // TODO: clean up things
 }
 
-async fn auth_socket(socket: &mut WebSocket, state: &GameStateMap) -> Result<ConnectionInfo> {
-    while let Some(Ok(msg)) = socket.recv().await {
+async fn auth_socket(
+    socket: &mut SplitStream<WebSocket>,
+    state: &GameStateMap,
+) -> Result<ConnectionInfo> {
+    while let Some(Ok(msg)) = socket.next().await {
         if let Message::Text(text) = msg {
             let client_msg: ClientMessage = match serde_json::from_str(text.as_str()) {
                 Ok(msg) => msg,
@@ -175,6 +192,7 @@ async fn handle_socket_read(
                             .tx_broadcast
                             .send(ServerMessage::GameEnd(outcome))
                             .unwrap();
+                        break;
                     }
                 }
                 _ => {
@@ -192,22 +210,18 @@ async fn handle_socket_write(
 ) {
     loop {
         tokio::select! {
-            // refactor maybe?
             Ok(msg) = rx_broadcast.recv() => {
-                let msg = serde_json::to_string(&msg).unwrap();
-                if writer
-                    .send(Message::Text(Utf8Bytes::from(&msg)))
-                    .await
+                if send_msg(&mut writer, &msg).await
                     .is_err()
                 {
                     break;
                 }
+                if msg.is_game_end() {
+                    break;
+                }
             }
             Some(msg) = rx_local.recv() => {
-                let msg = serde_json::to_string(&msg).unwrap();
-                if writer
-                    .send(Message::Text(Utf8Bytes::from(&msg)))
-                    .await
+                if send_msg(&mut writer, &msg).await
                     .is_err()
                 {
                     break;
