@@ -8,6 +8,7 @@ use scc::HashMap;
 use ws_server::{
     game_state::GameStateMap,
     route::{games::get_games, init::post_init, ws::ws_handler},
+    HOST,
 };
 
 #[tokio::main]
@@ -20,6 +21,6 @@ async fn main() {
         .route("/games", get(get_games))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind(HOST).await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
