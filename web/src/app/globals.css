@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -119,4 +119,95 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Chess board theme customization */
+.cg-wrap {
+  background-image: none !important;
+}
+
+/* Board colors */
+.cg-wrap coords {
+  color: #92400e !important; /* amber-800 */
+}
+
+.cg-wrap {
+  --cg-coord-color-white: #fef3c7 !important; /* amber-100 */
+  --cg-coord-color-black: #92400e !important; /* amber-800 */
+  --cg-coord-shadow: none !important;
+}
+
+/* Board squares */
+.brown .cg-wrap {
+  background-image: none !important;
+}
+
+.brown .cg-wrap square.light {
+  background-color: #fef3c7 !important; /* amber-50 or 100 */
+}
+
+.brown .cg-wrap square.dark {
+  background-color: #b45309 !important; /* amber-700 with 80% opacity */
+}
+
+/* Highlights */
+.cg-wrap square.move-dest {
+  background: radial-gradient(rgba(217, 119, 6, 0.4) 19%, transparent 0);
+}
+
+.cg-wrap square.move-dest:hover {
+  background: radial-gradient(rgba(217, 119, 6, 0.7) 19%, transparent 0);
+}
+
+.cg-wrap piece.dragging {
+  cursor: grabbing;
+  z-index: 10;
+}
+
+.cg-wrap piece {
+  cursor: grab;
+}
+
+.cg-wrap square.last-move {
+  background-color: rgba(217, 119, 6, 0.3) !important;
+}
+
+.cg-wrap square.selected {
+  background-color: rgba(217, 119, 6, 0.4) !important;
+}
+
+/* Custom shadow for the board */
+.chess-board-container {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+  border-radius: 0.375rem; /* rounded-md */
+  overflow: hidden;
+}
+
+/* Floating animations */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
 }
