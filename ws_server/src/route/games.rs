@@ -4,6 +4,7 @@ use crate::game_state::GameStateMap;
 
 // for debugging, might remove this later
 pub async fn get_games(State(state): State<GameStateMap>) -> String {
+    tracing::info!("/GET games");
     let mut s = String::new();
     state.scan(|k, v| {
         s = format!(

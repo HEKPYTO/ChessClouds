@@ -1,8 +1,4 @@
-use axum::{
-    extract::State,
-    http::StatusCode,
-    Json,
-};
+use axum::{extract::State, http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
 
 use crate::game_state::{GameState, GameStateMap};
@@ -18,6 +14,7 @@ pub async fn post_init(
     State(state): State<GameStateMap>,
     Json(body): Json<InitBody>,
 ) -> (StatusCode, &'static str) {
+    tracing::info!("/POST init");
     if state
         .insert(
             body.game_id,
@@ -25,6 +22,7 @@ pub async fn post_init(
         )
         .is_err()
     {
+        tracing::error!("Game already exists");
         return (StatusCode::INTERNAL_SERVER_ERROR, "Game already exists");
     }
     (StatusCode::OK, "OK")

@@ -13,6 +13,7 @@ use ws_server::{
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
     let state: GameStateMap = Arc::new(HashMap::new());
 
     let app = Router::new()
