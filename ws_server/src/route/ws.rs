@@ -45,6 +45,8 @@ async fn send_msg(
 }
 
 async fn handle_socket(socket: WebSocket, state: GameStateMap) {
+    tracing::info!("socket connected");
+
     let (mut writer, mut reader) = socket.split();
     let (tx_local, rx_local) = mpsc::channel(MAX_CHANNEL_CAPACITY);
 
@@ -52,11 +54,13 @@ async fn handle_socket(socket: WebSocket, state: GameStateMap) {
         Ok(info) => {
             let msg = ServerMessage::AuthSuccess;
             let _ = send_msg(&mut writer, &msg).await;
+            tracing::info!("auth success: {} {}", info.game_id, info.color);
             info
         }
         Err(err) => {
             let msg = ServerMessage::Error(err);
             let _ = send_msg(&mut writer, &msg).await;
+            tracing::error!("auth failed");
             return;
         }
     };
@@ -72,6 +76,8 @@ async fn handle_socket(socket: WebSocket, state: GameStateMap) {
     let write_task = tokio::spawn(handle_socket_write(writer, rx_broadcast, rx_local));
 
     let _ = tokio::join!(read_task, write_task);
+
+    tracing::info!("socket closing");
     // TODO: clean up things
 }
 
@@ -129,6 +135,7 @@ async fn handle_socket_read(
                     let _ = tx_local
                         .send(ServerMessage::Error(Error::Deserialization))
                         .await;
+                    tracing::error!("deserialization failed");
                     continue;
                 }
             };
@@ -146,6 +153,7 @@ async fn handle_socket_read(
                         let _ = tx_local
                             .send(ServerMessage::Error(Error::InvalidTurn))
                             .await;
+                        tracing::error!("invalid turn");
                         continue;
                     }
 
@@ -155,6 +163,7 @@ async fn handle_socket_read(
                             let _ = tx_local
                                 .send(ServerMessage::Error(Error::InvalidMove))
                                 .await;
+                            tracing::error!("invalid move");
                             continue;
                         }
                     };
@@ -168,6 +177,7 @@ async fn handle_socket_read(
                             let _ = tx_local
                                 .send(ServerMessage::Error(Error::InvalidMove))
                                 .await;
+                            tracing::error!("invalid move");
                             continue;
                         }
                     };
@@ -178,6 +188,7 @@ async fn handle_socket_read(
                         .board
                         .play_unchecked(&m); // move is already validated when calling `san.to_move`
 
+                    tracing::info!("broadcasting move {san_str}");
                     connection_info
                         .tx_broadcast
                         .send(ServerMessage::Move(san_str))
@@ -192,6 +203,7 @@ async fn handle_socket_read(
                             .tx_broadcast
                             .send(ServerMessage::GameEnd(outcome))
                             .unwrap();
+                        tracing::info!("game ended {} {}", connection_info.game_id, outcome);
                         break;
                     }
                 }
@@ -214,6 +226,7 @@ async fn handle_socket_write(
                 if send_msg(&mut writer, &msg).await
                     .is_err()
                 {
+                    tracing::error!("socket send failed");
                     break;
                 }
                 if msg.is_game_end() {
@@ -224,6 +237,7 @@ async fn handle_socket_write(
                 if send_msg(&mut writer, &msg).await
                     .is_err()
                 {
+                    tracing::error!("socket send failed");
                     break;
                 }
             }
