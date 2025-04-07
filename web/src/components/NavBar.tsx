@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import ThemeSwitch from './ThemeSwitch';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -63,8 +64,8 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-200 ${
         scrolled
-          ? 'border-amber-200/20 bg-amber-50/80 backdrop-blur-md'
-          : 'border-amber-200/10 bg-amber-50/90'
+          ? 'border-amber-200/20 bg-amber-50/80 backdrop-blur-md dark:border-slate-700/20 dark:bg-slate-900/80'
+          : 'border-amber-200/10 bg-amber-50/90 dark:border-slate-700/10 dark:bg-slate-900/90'
       }`}
     >
       <div
@@ -82,8 +83,8 @@ export default function Navbar() {
             onClick={() => handleNavClick('/')}
             className="flex items-center cursor-pointer"
           >
-            <div className="h-8 w-8 rounded bg-amber-600 mr-2"></div>
-            <span className="font-semibold text-lg text-amber-900 ml-2">
+            <div className="h-8 w-8 rounded bg-amber-600 dark:bg-amber-500 mr-2"></div>
+            <span className="font-semibold text-lg text-amber-900 dark:text-amber-100 ml-2">
               ChessCloud
             </span>
           </button>
@@ -91,30 +92,30 @@ export default function Navbar() {
           <nav className="hidden md:flex ml-10 space-x-8">
             <button
               onClick={() => handleNavClick('/features')}
-              className="text-sm text-amber-800 hover:text-amber-950 cursor-pointer"
+              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
             >
               Features
             </button>
             <button
               onClick={() => handleNavClick('/tournaments')}
-              className="text-sm text-amber-800 hover:text-amber-950 cursor-pointer"
+              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
             >
               Tournaments
             </button>
             <button
               onClick={() => handleNavClick('/docs')}
-              className="text-sm text-amber-800 hover:text-amber-950 cursor-pointer"
+              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
             >
               Docs
             </button>
             <button
               onClick={() => handleNavClick('/blog')}
-              className="text-sm text-amber-800 hover:text-amber-950 cursor-pointer"
+              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
             >
               Blog
             </button>
             <div className="relative group">
-              <button className="text-sm text-amber-800 hover:text-amber-950 flex items-center cursor-pointer">
+              <button className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 flex items-center cursor-pointer">
                 Resources
                 <svg
                   className="ml-1 h-4 w-4"
@@ -135,13 +136,17 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center space-x-4">
+          <ThemeSwitch />
+
           <Button
             variant="outline"
-            className={`h-9 text-sm border-amber-200 text-amber-800 hover:bg-amber-100/50 transition-all 
+            className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-100/50 transition-all 
             shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+            dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+            dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
             ${
               pressedKey === 's'
-                ? 'transform translate-y-[3px] shadow-none bg-amber-100'
+                ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
                 : ''
             }`}
             onClick={handleSignUpClick}
@@ -150,8 +155,8 @@ export default function Navbar() {
             <span
               className={`ml-1 text-xs px-1 rounded transition-colors ${
                 pressedKey === 's'
-                  ? 'bg-amber-200 text-amber-900'
-                  : 'bg-amber-100'
+                  ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
+                  : 'bg-amber-100 dark:bg-slate-800'
               }`}
             >
               S
@@ -161,9 +166,11 @@ export default function Navbar() {
           <Button
             className={`h-9 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md transition-all 
             shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
+            dark:bg-amber-500 dark:hover:bg-amber-600
+            dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]
             ${
               pressedKey === 'p'
-                ? 'transform translate-y-[3px] shadow-none bg-amber-700'
+                ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
                 : ''
             }`}
             onClick={handlePlayClick}
@@ -171,7 +178,9 @@ export default function Navbar() {
             Play now
             <span
               className={`ml-1 text-xs px-1 rounded transition-colors ${
-                pressedKey === 'p' ? 'bg-amber-800' : 'bg-amber-700'
+                pressedKey === 'p'
+                  ? 'bg-amber-800 dark:bg-amber-700'
+                  : 'bg-amber-700 dark:bg-amber-600'
               }`}
             >
               P
