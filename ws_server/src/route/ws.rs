@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     extract::{
         ws::{Message, Utf8Bytes, WebSocket},
@@ -23,7 +25,7 @@ use futures_util::{
 
 type Result<T> = std::result::Result<T, Error>;
 
-struct ConnectionInfo {
+struct Connection {
     pub game_id: String,
     pub color: Color,
     pub tx_broadcast: broadcast::Sender<ServerMessage>,
@@ -50,12 +52,12 @@ async fn handle_socket(socket: WebSocket, state: GameStateMap) {
     let (mut writer, mut reader) = socket.split();
     let (tx_local, rx_local) = mpsc::channel(MAX_CHANNEL_CAPACITY);
 
-    let conn_info = match auth_socket(&mut reader, &state).await {
+    let connection = match auth_socket(&mut reader, &state).await {
         Ok(info) => {
             let msg = ServerMessage::AuthSuccess;
             let _ = send_msg(&mut writer, &msg).await;
             tracing::info!("auth success: {} {}", info.game_id, info.color);
-            info
+            Arc::new(info)
         }
         Err(err) => {
             let msg = ServerMessage::Error(err);
@@ -65,8 +67,13 @@ async fn handle_socket(socket: WebSocket, state: GameStateMap) {
         }
     };
 
+    state
+        .get(&connection.game_id)
+        .expect("game should exist")
+        .connect(connection.color);
+
     let move_history = state
-        .read(&conn_info.game_id, |_, v| v.moves.clone())
+        .read(&connection.game_id, |_, v| v.moves.clone())
         .expect("game should exist");
     if send_msg(&mut writer, &ServerMessage::MoveHistory(move_history))
         .await
@@ -75,57 +82,61 @@ async fn handle_socket(socket: WebSocket, state: GameStateMap) {
         return;
     }
 
-    let rx_broadcast = conn_info.tx_broadcast.subscribe();
+    let rx_broadcast = connection.tx_broadcast.subscribe();
 
-    let read_task = tokio::spawn(handle_socket_read(
+    let mut read_task = tokio::spawn(handle_socket_read(
         reader,
         state.clone(),
-        conn_info,
+        connection.clone(),
         tx_local,
     ));
-    let write_task = tokio::spawn(handle_socket_write(writer, rx_broadcast, rx_local));
+    let mut write_task = tokio::spawn(handle_socket_write(writer, rx_broadcast, rx_local));
 
-    let _ = write_task.await;
-    read_task.abort();
+    // let _ = write_task.await;
+    // read_task.abort();
+    tokio::select! {
+        _ = &mut read_task => write_task.abort(),
+        _ = &mut write_task => read_task.abort()
+    }
 
-    tracing::info!("socket closing");
+    tracing::info!("socket closing {} {}", connection.game_id, connection.color);
+
+    state
+        .get(&connection.game_id)
+        .expect("game should exist")
+        .disconnect(connection.color);
     // TODO: clean up things
 }
 
 async fn auth_socket(
     socket: &mut SplitStream<WebSocket>,
     state: &GameStateMap,
-) -> Result<ConnectionInfo> {
-    while let Some(Ok(msg)) = socket.next().await {
-        if let Message::Text(text) = msg {
-            let client_msg: ClientMessage = match serde_json::from_str(text.as_str()) {
-                Ok(msg) => msg,
-                Err(_) => return Err(Error::Deserialization),
-            };
+) -> Result<Connection> {
+    while let Some(Ok(Message::Text(text))) = socket.next().await {
+        let client_msg: ClientMessage = match serde_json::from_str(text.as_str()) {
+            Ok(msg) => msg,
+            Err(_) => return Err(Error::Deserialization),
+        };
 
-            match client_msg {
-                ClientMessage::Auth { game_id, user_id } => {
-                    return state
-                        .read(&game_id, |_, v| {
-                            if v.black_user_id == user_id {
-                                return Ok(ConnectionInfo {
-                                    game_id: game_id.clone(),
-                                    color: Color::Black,
-                                    tx_broadcast: v.tx_broadcast.clone(),
-                                });
-                            } else if v.white_user_id == user_id {
-                                return Ok(ConnectionInfo {
-                                    game_id: game_id.clone(),
-                                    color: Color::White,
-                                    tx_broadcast: v.tx_broadcast.clone(),
-                                });
-                            }
-                            Err(Error::Unauthorized)
-                        })
-                        .unwrap_or(Err(Error::Unauthorized));
-                }
-                _ => return Err(Error::Unauthorized),
-            }
+        if let ClientMessage::Auth { game_id, user_id } = client_msg {
+            return state
+                .read(&game_id, |_, v| {
+                    if v.black_user_id == user_id && !v.black_connected {
+                        return Ok(Connection {
+                            game_id: game_id.clone(),
+                            color: Color::Black,
+                            tx_broadcast: v.tx_broadcast.clone(),
+                        });
+                    } else if v.white_user_id == user_id && !v.white_connected {
+                        return Ok(Connection {
+                            game_id: game_id.clone(),
+                            color: Color::White,
+                            tx_broadcast: v.tx_broadcast.clone(),
+                        });
+                    }
+                    Err(Error::Unauthorized)
+                })
+                .unwrap_or(Err(Error::Unauthorized));
         }
     }
 
@@ -135,97 +146,90 @@ async fn auth_socket(
 async fn handle_socket_read(
     mut reader: SplitStream<WebSocket>,
     state: GameStateMap,
-    connection_info: ConnectionInfo,
+    connection: Arc<Connection>,
     #[allow(unused_variables)] tx_local: Sender<ServerMessage>,
 ) {
-    while let Some(Ok(msg)) = reader.next().await {
-        if let Message::Text(text) = msg {
-            let client_msg: ClientMessage = match serde_json::from_str(&text.to_string()) {
-                Ok(msg) => msg,
+    while let Some(Ok(Message::Text(text))) = reader.next().await {
+        let client_msg: ClientMessage = match serde_json::from_str(&text.to_string()) {
+            Ok(msg) => msg,
+            Err(_) => {
+                let _ = tx_local
+                    .send(ServerMessage::Error(Error::Deserialization))
+                    .await;
+                tracing::error!("deserialization failed");
+                continue;
+            }
+        };
+
+        if let ClientMessage::Move(san_str) = client_msg {
+            // check if is current player turn
+            if !state
+                .read(&connection.game_id, |_, v| {
+                    connection.color == v.board.turn()
+                })
+                .expect("game should exist")
+            // game existence is validated from auth step
+            {
+                let _ = tx_local
+                    .send(ServerMessage::Error(Error::InvalidTurn))
+                    .await;
+                tracing::error!("invalid turn");
+                continue;
+            }
+
+            let san: San = match san_str.parse() {
+                Ok(san) => san,
                 Err(_) => {
                     let _ = tx_local
-                        .send(ServerMessage::Error(Error::Deserialization))
+                        .send(ServerMessage::Error(Error::InvalidMove))
                         .await;
-                    tracing::error!("deserialization failed");
+                    tracing::error!("invalid move");
                     continue;
                 }
             };
 
-            match client_msg {
-                ClientMessage::Move(san_str) => {
-                    // check if is current player turn
-                    if !state
-                        .read(&connection_info.game_id, |_, v| {
-                            connection_info.color == v.board.turn()
-                        })
-                        .expect("game should exist")
-                    // game existence is validated from auth step
-                    {
-                        let _ = tx_local
-                            .send(ServerMessage::Error(Error::InvalidTurn))
-                            .await;
-                        tracing::error!("invalid turn");
-                        continue;
-                    }
-
-                    let san: San = match san_str.parse() {
-                        Ok(san) => san,
-                        Err(_) => {
-                            let _ = tx_local
-                                .send(ServerMessage::Error(Error::InvalidMove))
-                                .await;
-                            tracing::error!("invalid move");
-                            continue;
-                        }
-                    };
-
-                    let m = match state
-                        .read(&connection_info.game_id, |_, v| san.to_move(&v.board))
-                        .expect("game should exist")
-                    {
-                        Ok(m) => m,
-                        Err(_) => {
-                            let _ = tx_local
-                                .send(ServerMessage::Error(Error::InvalidMove))
-                                .await;
-                            tracing::error!("invalid move");
-                            continue;
-                        }
-                    };
-
-                    state
-                        .get(&connection_info.game_id)
-                        .expect("game should exist")
-                        .board
-                        .play_unchecked(&m); // move is already validated when calling `san.to_move`
-
-                    tracing::info!("broadcasting move {san_str}");
-                    connection_info
-                        .tx_broadcast
-                        .send(ServerMessage::Move(san_str.clone()))
-                        .unwrap();
-
-                    state
-                        .get(&connection_info.game_id)
-                        .expect("game should exist")
-                        .moves
-                        .push(san_str.clone());
-
-                    let outcome = state
-                        .read(&connection_info.game_id, |_, v| v.board.outcome())
-                        .expect("game should exist");
-
-                    if let Some(outcome) = outcome {
-                        connection_info
-                            .tx_broadcast
-                            .send(ServerMessage::GameEnd(outcome))
-                            .unwrap();
-                        tracing::info!("game ended {} {}", connection_info.game_id, outcome);
-                    }
-                }
-                _ => {
+            let m = match state
+                .read(&connection.game_id, |_, v| san.to_move(&v.board))
+                .expect("game should exist")
+            {
+                Ok(m) => m,
+                Err(_) => {
+                    let _ = tx_local
+                        .send(ServerMessage::Error(Error::InvalidMove))
+                        .await;
+                    tracing::error!("invalid move");
                     continue;
                 }
+            };
+
+            state
+                .get(&connection.game_id)
+                .expect("game should exist")
+                .board
+                .play_unchecked(&m); // move is already validated when calling `san.to_move`
+
+            tracing::info!("broadcasting move {san_str}");
+            connection
+                .tx_broadcast
+                .send(ServerMessage::Move(san_str.clone()))
+                .unwrap();
+
+            state
+                .get(&connection.game_id)
+                .expect("game should exist")
+                .moves
+                .push(san_str.clone());
+
+            let outcome = state
+                .read(&connection.game_id, |_, v| v.board.outcome())
+                .expect("game should exist");
+
+            if let Some(outcome) = outcome {
+                connection
+                    .tx_broadcast
+                    .send(ServerMessage::GameEnd(outcome))
+                    .unwrap();
+                tracing::info!("game ended {} {}", connection.game_id, outcome);
             }
         }
     }

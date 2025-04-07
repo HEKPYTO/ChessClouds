@@ -61,7 +61,7 @@ async fn main() -> anyhow::Result<()> {
     let (socket2, _) = connect_async(&url).await?;
     let (mut writer2, reader2) = socket2.split();
 
-    let handle1 = tokio::spawn(handle_read(reader1, "socket 1"));
+    tokio::spawn(handle_read(reader1, "socket 1"));
     let handle2 = tokio::spawn(handle_read(reader2, "socket 2"));
 
     send_msg(
@@ -88,8 +88,7 @@ async fn main() -> anyhow::Result<()> {
     send_msg(&mut writer2, &ClientMessage::Move("Nc6".to_string())).await?;
 
     // disconnect socket 1
-    drop(writer1);
-    handle1.abort();
+    writer1.close().await?;
 
     let (socket3, _) = connect_async(&url).await?;
     let (mut writer3, reader3) = socket3.split();
