@@ -109,7 +109,7 @@ export default function CustomChessBoard({
 
   return (
     <div className={`chess-board-container ${className}`}>
-      <div className="relative w-full aspect-square overflow-hidden">
+      <div className="relative w-full aspect-square pointer-events-none">
         <Chessground
           width="100%"
           height="100%"

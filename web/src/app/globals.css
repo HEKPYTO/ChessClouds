@@ -121,14 +121,13 @@
   }
 }
 
-/* Chess board theme customization */
-.cg-wrap {
-  background-image: none !important;
-}
-
 /* Board colors */
 .cg-wrap coords {
   color: #92400e !important; /* amber-800 */
+}
+
+.brown .cg-wrap {
+  background-image: none !important;
 }
 
 .cg-wrap {
@@ -137,17 +136,11 @@
   --cg-coord-shadow: none !important;
 }
 
-/* Board squares */
-.brown .cg-wrap {
-  background-image: none !important;
-}
-
 .brown .cg-wrap square.light {
   background-color: #fef3c7 !important; /* amber-50 or 100 */
 }
-
 .brown .cg-wrap square.dark {
-  background-color: #b45309 !important; /* amber-700 with 80% opacity */
+  background-color: #b45309 !important; /* amber-700 */
 }
 
 /* Highlights */
@@ -183,7 +176,6 @@
   overflow: hidden;
 }
 
-/* Floating animations */
 @keyframes float {
   0%,
   100% {
