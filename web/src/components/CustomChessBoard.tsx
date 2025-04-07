@@ -104,11 +104,15 @@ export default function CustomChessBoard({
 
   if (!fen)
     return (
-      <div className={`${className} w-full aspect-square bg-amber-100`}></div>
+      <div
+        className={`${className} w-full aspect-square bg-amber-100 dark:bg-slate-700`}
+      ></div>
     );
 
   return (
-    <div className={`chess-board-container ${className}`}>
+    <div
+      className={`chess-board-container ${className} dark:ring-1 dark:ring-amber-700/30`}
+    >
       <div className="relative w-full aspect-square pointer-events-none">
         <Chessground
           width="100%"
@@ -128,6 +132,7 @@ export default function CustomChessBoard({
             lastMove: true,
             check: true,
           }}
+          className="dark:bg-slate-800"
         />
       </div>
     </div>

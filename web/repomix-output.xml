@@ -1,0 +1,2379 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+<additional_info>
+
+</additional_info>
+
+</file_summary>
+
+<directory_structure>
+public/
+  file.svg
+  globe.svg
+  next.svg
+  vercel.svg
+  window.svg
+src/
+  app/
+    game/
+      page.tsx
+    globals.css
+    layout.tsx
+    page.tsx
+  components/
+    chess/
+      ChessBoard.tsx
+      GameDetails.tsx
+      GamePane.tsx
+      MoveViewer.tsx
+    ui/
+      badge.tsx
+      button.tsx
+      card.tsx
+      separator.tsx
+    ChessNotations.tsx
+    CustomChessBoard.tsx
+    Footer.tsx
+    NavBar.tsx
+    ThemeProvider.tsx
+    ThemeSwitch.tsx
+  lib/
+    utils.ts
+  types/
+    react-chessground.d.ts
+.dockerignore
+.gitignore
+components.json
+Dockerfile
+eslint.config.mjs
+next.config.ts
+package.json
+postcss.config.mjs
+README.md
+tailwind.config.js
+tsconfig.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="public/file.svg">
+<svg fill="none" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 13.5V5.41a1 1 0 0 0-.3-.7L9.8.29A1 1 0 0 0 9.08 0H1.5v13.5A2.5 2.5 0 0 0 4 16h8a2.5 2.5 0 0 0 2.5-2.5m-1.5 0v-7H8v-5H3v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1M9.5 5V2.12L12.38 5zM5.13 5h-.62v1.25h2.12V5zm-.62 3h7.12v1.25H4.5zm.62 3h-.62v1.25h7.12V11z" clip-rule="evenodd" fill="#666" fill-rule="evenodd"/></svg>
+</file>
+
+<file path="public/globe.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><g clip-path="url(#a)"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.27 14.1a6.5 6.5 0 0 0 3.67-3.45q-1.24.21-2.7.34-.31 1.83-.97 3.1M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.48-1.52a7 7 0 0 1-.96 0H7.5a4 4 0 0 1-.84-1.32q-.38-.89-.63-2.08a40 40 0 0 0 3.92 0q-.25 1.2-.63 2.08a4 4 0 0 1-.84 1.31zm2.94-4.76q1.66-.15 2.95-.43a7 7 0 0 0 0-2.58q-1.3-.27-2.95-.43a18 18 0 0 1 0 3.44m-1.27-3.54a17 17 0 0 1 0 3.64 39 39 0 0 1-4.3 0 17 17 0 0 1 0-3.64 39 39 0 0 1 4.3 0m1.1-1.17q1.45.13 2.69.34a6.5 6.5 0 0 0-3.67-3.44q.65 1.26.98 3.1M8.48 1.5l.01.02q.41.37.84 1.31.38.89.63 2.08a40 40 0 0 0-3.92 0q.25-1.2.63-2.08a4 4 0 0 1 .85-1.32 7 7 0 0 1 .96 0m-2.75.4a6.5 6.5 0 0 0-3.67 3.44 29 29 0 0 1 2.7-.34q.31-1.83.97-3.1M4.58 6.28q-1.66.16-2.95.43a7 7 0 0 0 0 2.58q1.3.27 2.95.43a18 18 0 0 1 0-3.44m.17 4.71q-1.45-.12-2.69-.34a6.5 6.5 0 0 0 3.67 3.44q-.65-1.27-.98-3.1" fill="#666"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h16v16H0z"/></clipPath></defs></svg>
+</file>
+
+<file path="public/next.svg">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 394 80"><path fill="#000" d="M262 0h68.5v12.7h-27.2v66.6h-13.6V12.7H262V0ZM149 0v12.7H94v20.4h44.3v12.6H94v21h55v12.6H80.5V0h68.7zm34.3 0h-17.8l63.8 79.4h17.9l-32-39.7 32-39.6h-17.9l-23 28.6-23-28.6zm18.3 56.7-9-11-27.1 33.7h17.8l18.3-22.7z"/><path fill="#000" d="M81 79.3 17 0H0v79.3h13.6V17l50.2 62.3H81Zm252.6-.4c-1 0-1.8-.4-2.5-1s-1.1-1.6-1.1-2.6.3-1.8 1-2.5 1.6-1 2.6-1 1.8.3 2.5 1a3.4 3.4 0 0 1 .6 4.3 3.7 3.7 0 0 1-3 1.8zm23.2-33.5h6v23.3c0 2.1-.4 4-1.3 5.5a9.1 9.1 0 0 1-3.8 3.5c-1.6.8-3.5 1.3-5.7 1.3-2 0-3.7-.4-5.3-1s-2.8-1.8-3.7-3.2c-.9-1.3-1.4-3-1.4-5h6c.1.8.3 1.6.7 2.2s1 1.2 1.6 1.5c.7.4 1.5.5 2.4.5 1 0 1.8-.2 2.4-.6a4 4 0 0 0 1.6-1.8c.3-.8.5-1.8.5-3V45.5zm30.9 9.1a4.4 4.4 0 0 0-2-3.3 7.5 7.5 0 0 0-4.3-1.1c-1.3 0-2.4.2-3.3.5-.9.4-1.6 1-2 1.6a3.5 3.5 0 0 0-.3 4c.3.5.7.9 1.3 1.2l1.8 1 2 .5 3.2.8c1.3.3 2.5.7 3.7 1.2a13 13 0 0 1 3.2 1.8 8.1 8.1 0 0 1 3 6.5c0 2-.5 3.7-1.5 5.1a10 10 0 0 1-4.4 3.5c-1.8.8-4.1 1.2-6.8 1.2-2.6 0-4.9-.4-6.8-1.2-2-.8-3.4-2-4.5-3.5a10 10 0 0 1-1.7-5.6h6a5 5 0 0 0 3.5 4.6c1 .4 2.2.6 3.4.6 1.3 0 2.5-.2 3.5-.6 1-.4 1.8-1 2.4-1.7a4 4 0 0 0 .8-2.4c0-.9-.2-1.6-.7-2.2a11 11 0 0 0-2.1-1.4l-3.2-1-3.8-1c-2.8-.7-5-1.7-6.6-3.2a7.2 7.2 0 0 1-2.4-5.7 8 8 0 0 1 1.7-5 10 10 0 0 1 4.3-3.5c2-.8 4-1.2 6.4-1.2 2.3 0 4.4.4 6.2 1.2 1.8.8 3.2 2 4.3 3.4 1 1.4 1.5 3 1.5 5h-5.8z"/></svg>
+</file>
+
+<file path="public/vercel.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1155 1000"><path d="m577.3 0 577.4 1000H0z" fill="#fff"/></svg>
+</file>
+
+<file path="public/window.svg">
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 2.5h13v10a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1zM0 1h16v11.5a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 0 12.5zm3.75 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5M7 4.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m1.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5" fill="#666"/></svg>
+</file>
+
+<file path="src/app/game/page.tsx">
+import Pane from '@/components/chess/GamePane';
+
+export default function Game() {
+  return (
+    <div className="container mx-auto py-8 px-4">
+      <Pane playingAs="w"></Pane>
+
+      <div className="text-center text-gray-500 text-sm py-10">
+        Built by ChessCloud Group
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/app/globals.css">
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Board colors */
+.cg-wrap coords {
+  color: #92400e !important; /* amber-800 */
+}
+
+.brown .cg-wrap {
+  background-image: none !important;
+}
+
+.cg-wrap {
+  --cg-coord-color-white: #fef3c7 !important; /* amber-100 */
+  --cg-coord-color-black: #92400e !important; /* amber-800 */
+  --cg-coord-shadow: none !important;
+}
+
+.brown .cg-wrap square.light {
+  background-color: #fef3c7 !important; /* amber-50 or 100 */
+}
+.brown .cg-wrap square.dark {
+  background-color: #b45309 !important; /* amber-700 */
+}
+
+/* Highlights */
+.cg-wrap square.move-dest {
+  background: radial-gradient(rgba(217, 119, 6, 0.4) 19%, transparent 0);
+}
+
+.cg-wrap square.move-dest:hover {
+  background: radial-gradient(rgba(217, 119, 6, 0.7) 19%, transparent 0);
+}
+
+.cg-wrap piece.dragging {
+  cursor: grabbing;
+  z-index: 10;
+}
+
+.cg-wrap piece {
+  cursor: grab;
+}
+
+.cg-wrap square.last-move {
+  background-color: rgba(217, 119, 6, 0.3) !important;
+}
+
+.cg-wrap square.selected {
+  background-color: rgba(217, 119, 6, 0.4) !important;
+}
+
+/* Custom shadow for the board */
+.chess-board-container {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+  border-radius: 0.375rem; /* rounded-md */
+  overflow: hidden;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+</file>
+
+<file path="src/app/layout.tsx">
+import './globals.css';
+import type { Metadata } from 'next';
+import { Playfair_Display, Roboto_Mono, Inter } from 'next/font/google';
+import Navbar from '@/components/NavBar';
+import Footer from '@/components/Footer';
+import Script from 'next/script';
+
+// Fonts
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-playfair',
+});
+
+const robotoMono = Roboto_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto-mono',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+export const metadata: Metadata = {
+  title: 'ChessCloud - Next Generation Chess Platform',
+  description:
+    'A next-generation chess platform designed for high-performance gameplay with players worldwide.',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const initThemeScript = `
+    (function() {
+      function getInitialTheme() {
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme === 'dark' || storedTheme === 'light') {
+          return storedTheme;
+        }
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      
+      const theme = getInitialTheme();
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    })()
+  `;
+
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: initThemeScript }} />
+      </head>
+      <body
+        className={`${inter.variable} ${playfair.variable} ${robotoMono.variable} font-sans`}
+      >
+        <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 bg-amber-50 dark:bg-slate-900 relative overflow-hidden">
+          <div className="absolute inset-0 bg-amber-50 dark:bg-slate-900">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: 'url(/noise.png)',
+                backgroundRepeat: 'repeat',
+                opacity: 0.03,
+              }}
+            />
+            <div className="absolute inset-0 grid grid-cols-[repeat(40,minmax(0,1fr))] grid-rows-[repeat(40,minmax(0,1fr))]">
+              {Array(1600)
+                .fill(0)
+                .map((_, i) => (
+                  <div
+                    key={i}
+                    className="border-[0.5px] border-amber-800/5 dark:border-amber-200/5"
+                  />
+                ))}
+            </div>
+          </div>
+
+          <Navbar />
+          <main className="flex-grow pt-16 relative">{children}</main>
+          <Footer />
+        </div>
+      </body>
+    </html>
+  );
+}
+</file>
+
+<file path="src/app/page.tsx">
+'use client';
+
+import { useState, useEffect } from 'react';
+import CustomChessBoard from '@/components/CustomChessBoard';
+import ChessNotations from '@/components/ChessNotations';
+import { Button } from '@/components/ui/button';
+import {
+  ChevronRightIcon,
+  PlayIcon,
+  DocumentDuplicateIcon,
+  BoltIcon,
+  SparklesIcon,
+  UserGroupIcon,
+} from '@heroicons/react/24/outline';
+
+export default function HomePage() {
+  const [pressedKey, setPressedKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 'p') {
+        setPressedKey('p');
+        setTimeout(() => {
+          window.location.href = '/play';
+        }, 150);
+      } else if (e.key.toLowerCase() === 's') {
+        setPressedKey('s');
+        setTimeout(() => {
+          window.location.href = '/signup';
+        }, 150);
+      }
+    };
+
+    const handleKeyUp = () => {
+      setPressedKey(null);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  const handleSignUp = () => {
+    setPressedKey('s');
+    setTimeout(() => {
+      window.location.href = '/signup';
+      setPressedKey(null);
+    }, 150);
+  };
+
+  const handleLearnMore = () => {
+    window.location.href = '/learn';
+  };
+
+  const handlePlayNow = () => {
+    setPressedKey('p');
+    setTimeout(() => {
+      window.location.href = '/play';
+      setPressedKey(null);
+    }, 150);
+  };
+
+  const pgn = '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. O-O Nf6 5. d3 d6';
+
+  return (
+    <>
+      <section className="pt-16 pb-20 md:pt-24 md:pb-28 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-50/70 to-amber-100/50 dark:from-slate-900/70 dark:to-slate-800/50">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'url(/noise.png)',
+              backgroundRepeat: 'repeat',
+              opacity: 0.025,
+            }}
+          />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-amber-900 dark:text-amber-100 max-w-4xl mx-auto leading-tight font-display">
+            The definition of modern chess platform
+          </h1>
+          <p className="mt-6 text-lg text-amber-800 dark:text-amber-200 max-w-2xl mx-auto">
+            ChessCloud is a next-generation chess platform designed for
+            high-performance gameplay with players worldwide.
+          </p>
+
+          <div className="mt-10 flex justify-center space-x-4">
+            <Button
+              className={`h-12 bg-amber-600 hover:bg-amber-700 text-white px-6 rounded-md transition-all 
+              shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e] hover:translate-y-[2px] 
+              dark:bg-amber-500 dark:hover:bg-amber-600
+              dark:shadow-[0_4px_0_0_#92400e] dark:hover:shadow-[0_2px_0_0_#78350f]
+              ${
+                pressedKey === 'p'
+                  ? 'transform translate-y-[4px] shadow-none bg-amber-700 dark:bg-amber-600'
+                  : ''
+              }`}
+              onClick={handlePlayNow}
+            >
+              <PlayIcon className="mr-2 h-5 w-5" /> Play now
+              <span
+                className={`ml-1 text-xs px-1 rounded transition-colors ${
+                  pressedKey === 'p' ? 'bg-amber-800 dark:bg-amber-700' : 'bg-amber-700 dark:bg-amber-600'
+                }`}
+              >
+                P
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              className={`h-12 border-amber-300 text-amber-800 hover:bg-amber-100/50 px-6 rounded-md transition-all 
+              shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+              dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+              dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
+              ${
+                pressedKey === 's'
+                  ? 'transform translate-y-[4px] shadow-none bg-amber-100 dark:bg-slate-800'
+                  : ''
+              }`}
+              onClick={handleSignUp}
+            >
+              <DocumentDuplicateIcon className="mr-2 h-5 w-5" /> Sign up
+              <span
+                className={`ml-1 text-xs px-1 rounded transition-colors ${
+                  pressedKey === 's'
+                    ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
+                    : 'bg-amber-100 dark:bg-slate-800'
+                }`}
+              >
+                S
+              </span>
+            </Button>
+          </div>
+
+          <div className="mt-6 flex justify-center items-center text-sm text-amber-700 dark:text-amber-300">
+            <span className="flex items-center">
+              <svg
+                className="h-4 w-4 mr-1.5 text-amber-600 dark:text-amber-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              Available for Web, iOS, and Android
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 p-8 rounded-lg shadow-md hover:shadow-lg transition-all">
+              <div className="flex items-center mb-4">
+                <div className="h-8 w-8 rounded-full bg-amber-100 dark:bg-amber-700/50 flex items-center justify-center text-amber-600 dark:text-amber-300 mr-3">
+                  <BoltIcon className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-medium text-amber-900 dark:text-amber-100">Fast</h3>
+              </div>
+              <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
+                Written from scratch to efficiently leverage multiple CPU cores
+                and your GPU for lightning-fast gameplay analysis.
+              </p>
+            </div>
+
+            <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 p-8 rounded-lg shadow-md hover:shadow-lg transition-all">
+              <div className="flex items-center mb-4">
+                <div className="h-8 w-8 rounded-full bg-amber-100 dark:bg-amber-700/50 flex items-center justify-center text-amber-600 dark:text-amber-300 mr-3">
+                  <SparklesIcon className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-medium text-amber-900 dark:text-amber-100">
+                  Intelligent
+                </h3>
+              </div>
+              <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
+                Integrate multiple chess engines into your workflow to generate,
+                transform, and analyze strategies.
+              </p>
+            </div>
+
+            <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 p-8 rounded-lg shadow-md hover:shadow-lg transition-all">
+              <div className="flex items-center mb-4">
+                <div className="h-8 w-8 rounded-full bg-amber-100 dark:bg-amber-700/50 flex items-center justify-center text-amber-600 dark:text-amber-300 mr-3">
+                  <UserGroupIcon className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-medium text-amber-900 dark:text-amber-100">
+                  Collaborative
+                </h3>
+              </div>
+              <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
+                Chat with teammates, analyze games together, and share your
+                strategies and projects. All included.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-amber-900 dark:text-amber-100 font-display text-center mb-8">
+            Experience Chess in a New Way
+          </h2>
+          <div className="bg-amber-50 dark:bg-slate-800 backdrop-blur-sm border border-amber-200/40 dark:border-amber-800/30 p-8 rounded-lg shadow-lg relative overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="order-2 md:order-1">
+                <h2 className="text-2xl font-bold text-amber-900 dark:text-amber-100 mb-4 font-display">
+                  Ready for your next move?
+                </h2>
+                <p className="text-amber-800 dark:text-amber-200 mb-6">
+                  Join thousands of players already experiencing the next
+                  generation of online chess. Get started today and elevate your
+                  game.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                  <Button
+                    className={`bg-amber-600 hover:bg-amber-700 text-white transition-all 
+                    shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e] hover:translate-y-[2px]
+                    dark:bg-amber-500 dark:hover:bg-amber-600
+                    dark:shadow-[0_4px_0_0_#92400e] dark:hover:shadow-[0_2px_0_0_#78350f]
+                    ${
+                      pressedKey === 's'
+                        ? 'transform translate-y-[4px] shadow-none bg-amber-700 dark:bg-amber-600'
+                        : ''
+                    }`}
+                    onClick={handleSignUp}
+                  >
+                    Sign up free
+                    <ChevronRightIcon className="ml-2 h-4 w-4" />
+                    <span
+                      className={`ml-1 text-xs px-1 rounded transition-colors ${
+                        pressedKey === 's' ? 'bg-amber-800 dark:bg-amber-700' : 'bg-amber-700 dark:bg-amber-600'
+                      }`}
+                    >
+                      S
+                    </span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-amber-300 text-amber-800 hover:bg-amber-100/50 
+                    shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+                    dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-700/50
+                    dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
+                    onClick={handleLearnMore}
+                  >
+                    Learn more
+                  </Button>
+                </div>
+
+                <div className="hidden md:block">
+                  <ChessNotations pgn={pgn} />
+                </div>
+              </div>
+              <div className="relative flex items-center justify-center order-1 md:order-2">
+                <div className="w-full">
+                  <CustomChessBoard className="shadow-xl dark:shadow-amber-900/20" pgn={pgn} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+</file>
+
+<file path="src/components/chess/ChessBoard.tsx">
+'use client';
+
+import Chessground from 'react-chessground';
+import 'react-chessground/dist/styles/chessground.css';
+import { Chess } from 'chess.js';
+import type { Square } from 'chess.js';
+import Image from 'next/image';
+
+import wQ from 'react-chessground/dist/images/pieces/merida/wQ.svg';
+import wR from 'react-chessground/dist/images/pieces/merida/wR.svg';
+import wN from 'react-chessground/dist/images/pieces/merida/wN.svg';
+import wB from 'react-chessground/dist/images/pieces/merida/wB.svg';
+import bQ from 'react-chessground/dist/images/pieces/merida/bQ.svg';
+import bR from 'react-chessground/dist/images/pieces/merida/bR.svg';
+import bN from 'react-chessground/dist/images/pieces/merida/bN.svg';
+import bB from 'react-chessground/dist/images/pieces/merida/bB.svg';
+
+type PromotionPiece = 'q' | 'r' | 'n' | 'b';
+const pieceImages: Record<'w' | 'b', Record<PromotionPiece, string>> = {
+  w: { q: wQ, r: wR, n: wN, b: wB },
+  b: { q: bQ, r: bR, n: bN, b: bB },
+};
+
+export interface ChessBoardProps {
+  fen: string;
+  onMove: (from: Square, to: Square) => void;
+  lastMove?: [Square, Square];
+  playingAs: 'w' | 'b';
+  selectVisible: boolean;
+  promotion: (piece: PromotionPiece) => void;
+  previewIndex: number | null;
+  chess: Chess;
+}
+
+export function calcMovable(chess: Chess) {
+  const dests = new Map<Square, Square[]>();
+  for (const row of chess.board()) {
+    for (const piece of row) {
+      if (piece && piece.square) {
+        const moves = chess.moves({ square: piece.square, verbose: true }) as {
+          to: Square;
+        }[];
+        if (moves.length)
+          dests.set(
+            piece.square as Square,
+            moves.map((m) => m.to)
+          );
+      }
+    }
+  }
+  return dests;
+}
+
+export function ChessBoard({
+  fen,
+  onMove,
+  lastMove,
+  playingAs,
+  selectVisible,
+  promotion,
+  previewIndex,
+  chess,
+}: ChessBoardProps) {
+  return (
+    <div
+      className={`relative ${
+        previewIndex !== null ? 'border-orange-500' : 'border-transparent'
+      } rounded-sm border-10 w-full max-w-lg mx-auto`}
+    >
+      <div className="relative w-full aspect-square overflow-hidden">
+        <Chessground
+          width="100%"
+          height="100%"
+          fen={fen}
+          onMove={onMove}
+          lastMove={lastMove}
+          turnColor={chess.turn() === 'w' ? 'white' : 'black'}
+          orientation={playingAs === 'w' ? 'white' : 'black'}
+          movable={{
+            free: false,
+            color:
+              chess.turn() === playingAs
+                ? playingAs === 'w'
+                  ? 'white'
+                  : 'black'
+                : undefined,
+            dests: calcMovable(chess),
+          }}
+        />
+      </div>
+      {previewIndex !== null && (
+        <div className="bg-orange-500 text-white text-center pt-2">
+          Preview Mode
+        </div>
+      )}
+      {selectVisible && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded shadow-md z-10">
+          <div className="flex gap-4">
+            {(['q', 'r', 'n', 'b'] as PromotionPiece[]).map((piece) => (
+              <div
+                key={piece}
+                className="w-12 h-12 flex justify-center items-center cursor-pointer"
+                onClick={() => promotion(piece)}
+              >
+                <Image
+                  src={pieceImages[chess.turn() as 'w' | 'b'][piece]}
+                  alt={`${
+                    chess.turn() === 'w' ? 'White' : 'Black'
+                  } ${piece.toUpperCase()}`}
+                  width={64}
+                  height={64}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+</file>
+
+<file path="src/components/chess/GameDetails.tsx">
+'use client';
+
+export interface GameDetailsProps {
+  playerA: string;
+  playerB: string;
+  gameStatus: string;
+}
+
+export function GameDetails({
+  playerA,
+  playerB,
+  gameStatus,
+}: GameDetailsProps) {
+  return (
+    <div className="w-full border p-4 flex flex-col items-center mb-4">
+      <div className="font-bold text-lg">
+        {playerA} - {playerB}
+      </div>
+      <div className="text-sm mt-2">{gameStatus}</div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/components/chess/GamePane.tsx">
+'use client';
+
+import { useState, useMemo, useEffect } from 'react';
+import { Chess, type Move } from 'chess.js';
+import type { Square } from 'chess.js';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChessBoard } from './ChessBoard';
+import { MoveViewer, MovePair } from './MoveViewer';
+import { GameDetails } from './GameDetails';
+
+interface PaneProps {
+  playingAs: 'w' | 'b';
+}
+
+function getGameStatus(chess: Chess): string {
+  if (!chess.isGameOver()) return 'On Going';
+  if (chess.isCheckmate()) {
+    const winner = chess.turn() === 'w' ? 'Black' : 'White';
+    return `Completed - ${winner} wins by checkmate`;
+  }
+  if (chess.isStalemate()) return 'Completed - Stalemate';
+  if (chess.isDraw()) return 'Completed - Draw';
+  return 'Completed';
+}
+
+export default function Pane({ playingAs }: PaneProps) {
+  const [chess] = useState(new Chess());
+  const [fen, setFen] = useState(chess.fen());
+  const [lastMove, setLastMove] = useState<[Square, Square] | undefined>();
+  const [selectVisible, setSelectVisible] = useState(false);
+  const [pendingMove, setPendingMove] = useState<
+    [Square, Square] | undefined
+  >();
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fullHistory = useMemo(() => chess.history({ verbose: true }), [fen]);
+
+  const previewFen = useMemo(() => {
+    if (previewIndex === null) return null;
+    const temp = new Chess();
+    fullHistory.slice(0, previewIndex).forEach((m) => temp.move(m.san));
+    return temp.fen();
+  }, [previewIndex, fullHistory]);
+
+  useEffect(() => {
+    setFen(chess.fen());
+  }, [chess]);
+
+  const onMove = (from: Square, to: Square) => {
+    if (previewIndex !== null) {
+      setPreviewIndex(null);
+      return;
+    }
+    if (chess.turn() !== playingAs) return;
+    const moves = chess.moves({ verbose: true });
+    const moveFound = moves.find((m) => m.from === from && m.to === to);
+    if (!moveFound) return;
+    if (moveFound.promotion) {
+      setPendingMove([from, to]);
+      setSelectVisible(true);
+    } else if (chess.move({ from, to })) {
+      setLastMove([from, to]);
+      updateState();
+      setTimeout(randomMove, 500);
+    }
+  };
+
+  const updateState = () => {
+    setFen(chess.fen());
+  };
+
+  const randomMove = () => {
+    const opponentColor = playingAs === 'w' ? 'b' : 'w';
+    const moves = chess
+      .moves({ verbose: true })
+      .filter((m: Move) => m.color === opponentColor);
+    if (moves.length > 0 && !chess.isGameOver()) {
+      const random = moves[Math.floor(Math.random() * moves.length)];
+      chess.move(random);
+      setLastMove([random.from as Square, random.to as Square]);
+      updateState();
+    }
+  };
+
+  const promotion = (piece: 'q' | 'r' | 'n' | 'b') => {
+    if (!pendingMove) return;
+    const [from, to] = pendingMove;
+    chess.move({ from, to, promotion: piece });
+    setLastMove([from, to]);
+    setSelectVisible(false);
+    updateState();
+    setTimeout(randomMove, 500);
+  };
+
+  const previewMove = (index: number) => {
+    if (index >= fullHistory.length) setPreviewIndex(null);
+    else setPreviewIndex(index);
+  };
+
+  const handleResetGame = () => {
+    chess.reset();
+    setFen(chess.fen());
+    setLastMove(undefined);
+    setPreviewIndex(null);
+    if (playingAs === 'b' && chess.turn() !== 'b' && !chess.isGameOver()) {
+      setTimeout(randomMove, 500);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (fullHistory.length > 0) {
+      setPreviewIndex(
+        previewIndex === null
+          ? fullHistory.length - 1
+          : Math.max(previewIndex - 1, 0)
+      );
+    }
+  };
+
+  const handleNext = () => {
+    if (previewIndex === null) return;
+    if (previewIndex >= fullHistory.length - 1) setPreviewIndex(null);
+    else setPreviewIndex(previewIndex + 1);
+  };
+
+  const handleForward = () => {
+    setPreviewIndex(null);
+  };
+
+  const movePairs: MovePair[] = useMemo(() => {
+    const pairs: MovePair[] = [];
+    for (let i = 0; i < fullHistory.length; i += 2) {
+      const whiteMove = fullHistory[i];
+      const blackMove = fullHistory[i + 1];
+      pairs.push({
+        moveNumber: Math.floor(i / 2) + 1,
+        whiteMove: whiteMove?.san,
+        blackMove: blackMove?.san,
+        whiteIndex: i + 1,
+        blackIndex: i + 2,
+      });
+    }
+    return pairs;
+  }, [fullHistory]);
+
+  const boardFen = previewFen ? previewFen : fen;
+  const gameStatus = getGameStatus(chess);
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Interactive Chess</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col lg:flex-row gap-8 items-center lg:items-start">
+        <ChessBoard
+          fen={boardFen}
+          onMove={onMove}
+          lastMove={lastMove}
+          playingAs={playingAs}
+          selectVisible={selectVisible}
+          promotion={promotion}
+          previewIndex={previewIndex}
+          chess={chess}
+        />
+        <div className="w-full flex-1 flex flex-col items-center lg:items-start">
+          <GameDetails
+            playerA="Player A (1600)"
+            playerB="Player B (1600)"
+            gameStatus={gameStatus}
+          />
+          <MoveViewer
+            movePairs={movePairs}
+            previewIndex={previewIndex}
+            previewMove={previewMove}
+            handleResetGame={handleResetGame}
+            handlePrevious={handlePrevious}
+            handleNext={handleNext}
+            handleForward={handleForward}
+            fullHistoryLength={fullHistory.length}
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+</file>
+
+<file path="src/components/chess/MoveViewer.tsx">
+'use client';
+
+import { Button } from '@/components/ui/button';
+
+export interface MovePair {
+  moveNumber: number;
+  whiteMove?: string;
+  blackMove?: string;
+  whiteIndex: number;
+  blackIndex: number;
+}
+
+export interface MoveViewerProps {
+  movePairs: MovePair[];
+  previewIndex: number | null;
+  previewMove: (index: number) => void;
+  handleResetGame: () => void;
+  handlePrevious: () => void;
+  handleNext: () => void;
+  handleForward: () => void;
+  fullHistoryLength: number;
+}
+
+export function MoveViewer({
+  movePairs,
+  previewIndex,
+  previewMove,
+  handleResetGame,
+  handlePrevious,
+  handleNext,
+  handleForward,
+  fullHistoryLength,
+}: MoveViewerProps) {
+  return (
+    <div className="w-full max-h-96 overflow-y-auto border p-4 flex flex-col">
+      <ol className="list-none p-0 flex-1">
+        {movePairs.map((pair, idx) => (
+          <li key={idx} className="mb-1 flex gap-2 items-center">
+            <span className="w-6 font-bold">{pair.moveNumber}.</span>
+            {pair.whiteMove && (
+              <Button
+                variant="ghost"
+                className={`p-1 ${
+                  previewIndex === pair.whiteIndex ||
+                  (previewIndex === null &&
+                    fullHistoryLength - 1 === pair.whiteIndex - 1)
+                    ? 'bg-gray-200'
+                    : ''
+                }`}
+                onClick={() => previewMove(pair.whiteIndex)}
+              >
+                {pair.whiteMove}
+              </Button>
+            )}
+            {pair.blackMove && (
+              <Button
+                variant="ghost"
+                className={`p-1 ${
+                  previewIndex === pair.blackIndex ||
+                  (previewIndex === null &&
+                    fullHistoryLength - 1 === pair.blackIndex - 1)
+                    ? 'bg-gray-200'
+                    : ''
+                }`}
+                onClick={() => previewMove(pair.blackIndex)}
+              >
+                {pair.blackMove}
+              </Button>
+            )}
+          </li>
+        ))}
+      </ol>
+      <div className="mt-4 flex justify-center gap-2">
+        <Button variant="outline" onClick={handleResetGame}>
+          Reset
+        </Button>
+        <Button variant="outline" onClick={handlePrevious}>
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          onClick={handleNext}
+          disabled={previewIndex === null && fullHistoryLength === 0}
+        >
+          Next
+        </Button>
+        <Button
+          variant="outline"
+          onClick={handleForward}
+          disabled={previewIndex === null}
+        >
+          Forward
+        </Button>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/components/ui/badge.tsx">
+import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import { cn } from '@/lib/utils';
+
+const badgeVariants = cva(
+  'inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden',
+  {
+    variants: {
+      variant: {
+        default:
+          'border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90',
+        secondary:
+          'border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90',
+        destructive:
+          'border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+        outline:
+          'text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
+function Badge({
+  className,
+  variant,
+  asChild = false,
+  ...props
+}: React.ComponentProps<'span'> &
+  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+  const Comp = asChild ? Slot : 'span';
+
+  return (
+    <Comp
+      data-slot="badge"
+      className={cn(badgeVariants({ variant }), className)}
+      {...props}
+    />
+  );
+}
+
+export { Badge, badgeVariants };
+</file>
+
+<file path="src/components/ui/button.tsx">
+import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import { cn } from '@/lib/utils';
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  {
+    variants: {
+      variant: {
+        default:
+          'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90',
+        destructive:
+          'bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+        outline:
+          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+        secondary:
+          'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
+        ghost:
+          'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
+        link: 'text-primary underline-offset-4 hover:underline',
+      },
+      size: {
+        default: 'h-9 px-4 py-2 has-[>svg]:px-3',
+        sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
+        lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
+        icon: 'size-9',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+);
+
+function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}: React.ComponentProps<'button'> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+  }) {
+  const Comp = asChild ? Slot : 'button';
+
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  );
+}
+
+export { Button, buttonVariants };
+</file>
+
+<file path="src/components/ui/card.tsx">
+import * as React from 'react';
+
+import { cn } from '@/lib/utils';
+
+function Card({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="card"
+      className={cn(
+        'bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="card-header"
+      className={cn(
+        '@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="card-title"
+      className={cn('leading-none font-semibold', className)}
+      {...props}
+    />
+  );
+}
+
+function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="card-description"
+      className={cn('text-muted-foreground text-sm', className)}
+      {...props}
+    />
+  );
+}
+
+function CardAction({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="card-action"
+      className={cn(
+        'col-start-2 row-span-2 row-start-1 self-start justify-self-end',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function CardContent({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="card-content"
+      className={cn('px-6', className)}
+      {...props}
+    />
+  );
+}
+
+function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot="card-footer"
+      className={cn('flex items-center px-6 [.border-t]:pt-6', className)}
+      {...props}
+    />
+  );
+}
+
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardAction,
+  CardDescription,
+  CardContent,
+};
+</file>
+
+<file path="src/components/ui/separator.tsx">
+'use client';
+
+import * as React from 'react';
+import * as SeparatorPrimitive from '@radix-ui/react-separator';
+
+import { cn } from '@/lib/utils';
+
+function Separator({
+  className,
+  orientation = 'horizontal',
+  decorative = true,
+  ...props
+}: React.ComponentProps<typeof SeparatorPrimitive.Root>) {
+  return (
+    <SeparatorPrimitive.Root
+      data-slot="separator-root"
+      decorative={decorative}
+      orientation={orientation}
+      className={cn(
+        'bg-border shrink-0 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+export { Separator };
+</file>
+
+<file path="src/components/ChessNotations.tsx">
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Chess } from 'chess.js';
+
+interface ChessNotationsProps {
+  pgn: string;
+}
+
+interface MoveDisplay {
+  number: number;
+  white: {
+    piece: 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king';
+    move: string;
+  } | null;
+  black: {
+    piece: 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king';
+    move: string;
+  } | null;
+}
+
+export default function ChessNotations({ pgn }: ChessNotationsProps) {
+  const [moves, setMoves] = useState<MoveDisplay[]>([]);
+
+  useEffect(() => {
+    if (!pgn) return;
+
+    try {
+      const chess = new Chess();
+      chess.loadPgn(pgn);
+      const history = chess.history({ verbose: true });
+      const formattedMoves: MoveDisplay[] = [];
+
+      for (let i = 0; i < history.length; i += 2) {
+        const moveNumber = Math.floor(i / 2) + 1;
+        const whiteMove = history[i];
+        const blackMove = i + 1 < history.length ? history[i + 1] : null;
+
+        const getPieceType = (
+          piece: string
+        ): 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king' => {
+          switch (piece.toLowerCase()) {
+            case 'p':
+              return 'pawn';
+            case 'n':
+              return 'knight';
+            case 'b':
+              return 'bishop';
+            case 'r':
+              return 'rook';
+            case 'q':
+              return 'queen';
+            case 'k':
+              return 'king';
+            default:
+              return 'pawn';
+          }
+        };
+
+        formattedMoves.push({
+          number: moveNumber,
+          white: whiteMove
+            ? {
+                piece: getPieceType(whiteMove.piece),
+                move: whiteMove.san,
+              }
+            : null,
+          black: blackMove
+            ? {
+                piece: getPieceType(blackMove.piece),
+                move: blackMove.san,
+              }
+            : null,
+        });
+      }
+
+      setMoves(formattedMoves);
+    } catch (error) {
+      console.error('Error parsing PGN:', error);
+    }
+  }, [pgn]);
+
+  const handleRestart = () => {
+    window.location.reload();
+  };
+
+  return (
+    <Card className="p-4 h-full flex flex-col bg-amber-50 border-amber-200 dark:bg-slate-800 dark:border-amber-800/30 overflow-hidden shadow-md">
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="font-medium text-amber-900 dark:text-amber-100">Game Notation</h3>
+      </div>
+
+      <div className="overflow-y-auto flex-grow mb-2 font-mono text-sm">
+        <table className="w-full table-fixed">
+          <thead className="text-left text-amber-700 dark:text-amber-300 border-b border-amber-200/50 dark:border-amber-700/30">
+            <tr>
+              <th className="w-10">#</th>
+              <th className="w-1/2">White</th>
+              <th className="w-1/2">Black</th>
+            </tr>
+          </thead>
+          <tbody>
+            {moves.map((move) => (
+              <tr key={move.number} className="hover:bg-amber-100/50 dark:hover:bg-amber-900/20">
+                <td className="py-1 text-amber-600 dark:text-amber-400">{move.number}.</td>
+                <td className="py-1">
+                  {move.white && (
+                    <div className="flex items-center">
+                      <span className="font-semibold text-amber-800 dark:text-amber-200">{move.white.move}</span>
+                    </div>
+                  )}
+                </td>
+                <td className="py-1">
+                  {move.black && (
+                    <div className="flex items-center">
+                      <span className="font-semibold text-amber-800 dark:text-amber-200">{move.black.move}</span>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="pt-2 border-t border-amber-200/50 dark:border-amber-700/30">
+        <Button
+          variant="outline"
+          className="w-full border-amber-300 text-amber-800 hover:bg-amber-100/70 
+          dark:border-amber-700 dark:text-amber-200 dark:hover:bg-amber-800/30
+          shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+          dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#92400e]"
+          onClick={handleRestart}
+        >
+          Restart Game
+        </Button>
+      </div>
+    </Card>
+  );
+}
+</file>
+
+<file path="src/components/CustomChessBoard.tsx">
+'use client';
+
+import Chessground from 'react-chessground';
+import 'react-chessground/dist/styles/chessground.css';
+import { Chess, type Move } from 'chess.js';
+import type { Square } from 'chess.js';
+import { useState, useEffect, useRef } from 'react';
+
+export interface CustomChessBoardProps {
+  className?: string;
+  initialFen?: string;
+  pgn?: string;
+}
+
+export function calcMovable(chess: Chess) {
+  const dests = new Map<Square, Square[]>();
+  for (const row of chess.board()) {
+    for (const piece of row) {
+      if (piece && piece.square) {
+        const moves = chess.moves({ square: piece.square, verbose: true }) as {
+          to: Square;
+        }[];
+        if (moves.length)
+          dests.set(
+            piece.square as Square,
+            moves.map((m) => m.to)
+          );
+      }
+    }
+  }
+  return dests;
+}
+
+export default function CustomChessBoard({
+  className = '',
+  initialFen,
+  pgn,
+}: CustomChessBoardProps) {
+  const [chess] = useState(() => new Chess());
+  const [fen, setFen] = useState<string>('');
+  const [lastMove, setLastMove] = useState<[Square, Square] | undefined>();
+  const moveIndex = useRef(0);
+  const moves = useRef<Move[]>([]);
+
+  useEffect(() => {
+    chess.reset();
+
+    if (initialFen) {
+      try {
+        chess.load(initialFen);
+      } catch (e) {
+        console.error('Invalid FEN:', e);
+      }
+    }
+
+    if (pgn) {
+      try {
+        chess.loadPgn(pgn);
+        moves.current = chess.history({ verbose: true });
+        chess.reset();
+        if (initialFen) {
+          chess.load(initialFen);
+        }
+      } catch (e) {
+        console.error('Invalid PGN:', e);
+      }
+    }
+
+    setFen(chess.fen());
+
+    if (pgn && moves.current.length > 0) {
+      moveIndex.current = 0;
+      const intervalId = setInterval(() => {
+        if (moveIndex.current < moves.current.length) {
+          const move = moves.current[moveIndex.current];
+          chess.move({
+            from: move.from,
+            to: move.to,
+            promotion: move.promotion,
+          });
+          setLastMove([move.from as Square, move.to as Square]);
+          setFen(chess.fen());
+          moveIndex.current++;
+        } else {
+          clearInterval(intervalId);
+        }
+      }, 1200);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [chess, initialFen, pgn]);
+
+  const onMove = (from: Square, to: Square) => {
+    try {
+      const move = chess.move({ from, to });
+      if (move) {
+        setLastMove([from, to]);
+        setFen(chess.fen());
+      }
+    } catch (error) {
+      console.error('Invalid move:', error);
+    }
+  };
+
+  if (!fen)
+    return (
+      <div className={`${className} w-full aspect-square bg-amber-100 dark:bg-slate-700`}></div>
+    );
+
+  return (
+    <div className={`chess-board-container ${className} dark:ring-1 dark:ring-amber-700/30`}>
+      <div className="relative w-full aspect-square pointer-events-none">
+        <Chessground
+          width="100%"
+          height="100%"
+          fen={fen}
+          onMove={onMove}
+          lastMove={lastMove}
+          turnColor={chess.turn() === 'w' ? 'white' : 'black'}
+          movable={{
+            free: false,
+            color: 'both',
+            dests: calcMovable(chess),
+          }}
+          animation={{ enabled: true, duration: 300 }}
+          coordinates={true}
+          highlight={{
+            lastMove: true,
+            check: true,
+          }}
+          className="dark:bg-slate-800"
+        />
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/components/Footer.tsx">
+import Link from 'next/link';
+
+export default function Footer() {
+  return (
+    <footer className="relative border-t border-amber-200/30 dark:border-slate-700/30 py-12 mt-12 bg-amber-100 dark:bg-slate-800">
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'url(/noise.png)',
+          backgroundRepeat: 'repeat',
+          opacity: 0.025,
+        }}
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="flex items-center">
+            <div className="h-8 w-8 rounded bg-amber-600 dark:bg-amber-500 mr-2"></div>
+            <span className="font-semibold text-amber-900 dark:text-amber-100">ChessCloud</span>
+          </div>
+
+          <div className="mt-4 md:mt-0 flex space-x-6">
+            <Link
+              href="#"
+              className="text-sm text-amber-700 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-100"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="#"
+              className="text-sm text-amber-700 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-100"
+            >
+              Terms
+            </Link>
+            <Link
+              href="#"
+              className="text-sm text-amber-700 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-100"
+            >
+              Contact
+            </Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+</file>
+
+<file path="src/components/NavBar.tsx">
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import ThemeSwitch from './ThemeSwitch';
+
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [pressedKey, setPressedKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 'p') {
+        setPressedKey('p');
+        setTimeout(() => {
+          window.location.href = '/play';
+        }, 150);
+      } else if (e.key.toLowerCase() === 's') {
+        setPressedKey('s');
+        setTimeout(() => {
+          window.location.href = '/signup';
+        }, 150);
+      }
+    };
+
+    const handleKeyUp = () => {
+      setPressedKey(null);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  const handlePlayClick = () => {
+    setPressedKey('p');
+    setTimeout(() => {
+      window.location.href = '/play';
+    }, 150);
+  };
+
+  const handleSignUpClick = () => {
+    setPressedKey('s');
+    setTimeout(() => {
+      window.location.href = '/signup';
+    }, 150);
+  };
+
+  const handleNavClick = (path: string) => {
+    window.location.href = path;
+  };
+
+  return (
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-200 ${
+        scrolled
+          ? 'border-amber-200/20 bg-amber-50/80 backdrop-blur-md dark:border-slate-700/20 dark:bg-slate-900/80'
+          : 'border-amber-200/10 bg-amber-50/90 dark:border-slate-700/10 dark:bg-slate-900/90'
+      }`}
+    >
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'url(/noise.png)',
+          backgroundRepeat: 'repeat',
+          opacity: 0.025,
+          pointerEvents: 'none',
+        }}
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="flex items-center">
+          <button
+            onClick={() => handleNavClick('/')}
+            className="flex items-center cursor-pointer"
+          >
+            <div className="h-8 w-8 rounded bg-amber-600 dark:bg-amber-500 mr-2"></div>
+            <span className="font-semibold text-lg text-amber-900 dark:text-amber-100 ml-2">
+              ChessCloud
+            </span>
+          </button>
+
+          <nav className="hidden md:flex ml-10 space-x-8">
+            <button
+              onClick={() => handleNavClick('/features')}
+              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+            >
+              Features
+            </button>
+            <button
+              onClick={() => handleNavClick('/tournaments')}
+              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+            >
+              Tournaments
+            </button>
+            <button
+              onClick={() => handleNavClick('/docs')}
+              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+            >
+              Docs
+            </button>
+            <button
+              onClick={() => handleNavClick('/blog')}
+              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+            >
+              Blog
+            </button>
+            <div className="relative group">
+              <button className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 flex items-center cursor-pointer">
+                Resources
+                <svg
+                  className="ml-1 h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </nav>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <ThemeSwitch />
+          
+          <Button
+            variant="outline"
+            className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-100/50 transition-all 
+            shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+            dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+            dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
+            ${
+              pressedKey === 's'
+                ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                : ''
+            }`}
+            onClick={handleSignUpClick}
+          >
+            Sign up
+            <span
+              className={`ml-1 text-xs px-1 rounded transition-colors ${
+                pressedKey === 's'
+                  ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
+                  : 'bg-amber-100 dark:bg-slate-800'
+              }`}
+            >
+              S
+            </span>
+          </Button>
+
+          <Button
+            className={`h-9 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md transition-all 
+            shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
+            dark:bg-amber-500 dark:hover:bg-amber-600
+            dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]
+            ${
+              pressedKey === 'p'
+                ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
+                : ''
+            }`}
+            onClick={handlePlayClick}
+          >
+            Play now
+            <span
+              className={`ml-1 text-xs px-1 rounded transition-colors ${
+                pressedKey === 'p' ? 'bg-amber-800 dark:bg-amber-700' : 'bg-amber-700 dark:bg-amber-600'
+              }`}
+            >
+              P
+            </span>
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
+}
+</file>
+
+<file path="src/components/ThemeProvider.tsx">
+'use client';
+
+import React, { createContext, useContext, useEffect, useState } from 'react';
+
+type Theme = 'light' | 'dark';
+
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+}
+
+export default function ThemeProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [theme, setTheme] = useState<Theme>('light');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const storedTheme = localStorage.getItem('theme') as Theme | null;
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (storedTheme) {
+      setTheme(storedTheme);
+      document.documentElement.classList.toggle('dark', storedTheme === 'dark');
+    } else if (prefersDark) {
+      setTheme('dark');
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    localStorage.setItem('theme', newTheme);
+  };
+
+  if (!mounted) {
+    return <>{children}</>;
+  }
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+</file>
+
+<file path="src/components/ThemeSwitch.tsx">
+'use client';
+
+import { useState, useEffect } from 'react';
+import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+import { Button } from './ui/button';
+
+export default function ThemeSwitch() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [mounted, setMounted] = useState(false);
+  const [pressedKey, setPressedKey] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const isDark = document.documentElement.classList.contains('dark');
+    setTheme(isDark ? 'dark' : 'light');
+  }, []);
+
+  const toggleTheme = () => {
+    setPressedKey(true);
+    setTimeout(() => {
+      const newTheme = theme === 'light' ? 'dark' : 'light';
+      setTheme(newTheme);
+      document.documentElement.classList.toggle('dark', newTheme === 'dark');
+      localStorage.setItem('theme', newTheme);
+      setPressedKey(false);
+    }, 150);
+  };
+
+  if (!mounted) {
+    return;
+  }
+
+  return (
+    <Button
+      variant="outline"
+      className={`h-9 w-9 p-0 flex items-center justify-center border-amber-300 text-amber-800 
+      hover:bg-amber-100/50 rounded-md transition-all 
+      shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+      dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+      dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
+      ${
+        pressedKey ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800' : ''
+      }`}
+      onClick={toggleTheme}
+      aria-label="Toggle theme"
+    >
+      {theme === 'light' ? (
+        <MoonIcon className="h-5 w-5" />
+      ) : (
+        <SunIcon className="h-5 w-5" />
+      )}
+    </Button>
+  );
+}
+</file>
+
+<file path="src/lib/utils.ts">
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+</file>
+
+<file path="src/types/react-chessground.d.ts">
+declare module 'react-chessground' {
+  import { FC } from 'react';
+  import { Square } from 'chess.js';
+
+  interface ChessgroundProps {
+    width?: string;
+    height?: string;
+    fen?: string;
+    orientation?: 'white' | 'black';
+    turnColor?: 'white' | 'black';
+    check?: boolean;
+    lastMove?: [Square, Square];
+    selected?: Square;
+    coordinates?: boolean;
+    autoCastle?: boolean;
+    viewOnly?: boolean;
+    disableContextMenu?: boolean;
+    resizable?: boolean;
+    addPieceZIndex?: boolean;
+    highlight?: {
+      lastMove?: boolean;
+      check?: boolean;
+    };
+    animation?: {
+      enabled?: boolean;
+      duration?: number;
+    };
+    movable?: {
+      free?: boolean;
+      color?: 'white' | 'black' | 'both';
+      dests?: Map<Square, Square[]>;
+      showDests?: boolean;
+      events?: {
+        after?: (orig: Square, dest: Square, metadata: unknown) => void;
+      };
+    };
+    premovable?: {
+      enabled?: boolean;
+      showDests?: boolean;
+      castle?: boolean;
+      events?: {
+        set?: (orig: Square, dest: Square, metadata: unknown) => void;
+        unset?: () => void;
+      };
+    };
+    drawable?: {
+      enabled?: boolean;
+      visible?: boolean;
+      defaultSnapToValidMove?: boolean;
+      eraseOnClick?: boolean;
+      shapes?: unknown[];
+      autoShapes?: unknown[];
+      brushes?: unknown;
+      pieces?: {
+        baseUrl?: string;
+      };
+      onChange?: (shapes: unknown[]) => void;
+    };
+    onMove?: (from: Square, to: Square) => void;
+    onSelect?: (square: Square) => void;
+    onMouseOverSquare?: (square: Square) => void;
+    onMouseOutSquare?: (square: Square) => void;
+    [key: string]: unknown;
+  }
+
+  const Chessground: FC<ChessgroundProps>;
+  export default Chessground;
+}
+</file>
+
+<file path=".dockerignore">
+node_modules
+Dockerfile*
+docker-compose*
+.dockerignore
+.git
+.gitignore
+README.md
+LICENSE
+.vscode
+Makefile
+helm-charts
+.env
+.editorconfig
+.idea
+coverage*
+</file>
+
+<file path=".gitignore">
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+</file>
+
+<file path="components.json">
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/app/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "iconLibrary": "lucide"
+}
+</file>
+
+<file path="Dockerfile">
+FROM oven/bun:1
+WORKDIR /app
+COPY . .
+RUN bun install
+ 
+ARG PORT
+EXPOSE ${PORT:-3000}
+ 
+CMD ["bun", "dev"]
+</file>
+
+<file path="eslint.config.mjs">
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { FlatCompat } from '@eslint/eslintrc';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
+const eslintConfig = [
+  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+];
+
+export default eslintConfig;
+</file>
+
+<file path="next.config.ts">
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  /* config options here */
+};
+
+export default nextConfig;
+</file>
+
+<file path="package.json">
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,scss,md}\""
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@radix-ui/react-separator": "^1.1.2",
+    "@radix-ui/react-slot": "^1.1.2",
+    "chess.js": "^1.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.487.0",
+    "next": "15.2.4",
+    "react": "^19.0.0",
+    "react-chessground": "^1.5.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.1.0",
+    "tw-animate-css": "^1.2.5"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9.24.0",
+    "eslint-config-next": "15.2.4",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "prettier": "^2.8.0"
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5"
+  }
+}
+</file>
+
+<file path="postcss.config.mjs">
+const config = {
+  plugins: ['@tailwindcss/postcss'],
+};
+
+export default config;
+</file>
+
+<file path="README.md">
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+</file>
+
+<file path="tailwind.config.js">
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: 'class',
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+</file>
+
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+</file>
+
+</files>
