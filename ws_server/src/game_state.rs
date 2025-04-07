@@ -11,6 +11,7 @@ pub struct GameState {
     pub black_user_id: String,
     pub board: Chess,
     pub tx_broadcast: broadcast::Sender<ServerMessage>,
+    pub moves: Vec<String>,
 }
 
 impl GameState {
@@ -21,6 +22,7 @@ impl GameState {
             black_user_id,
             board: Chess::default(),
             tx_broadcast: tx,
+            moves: Vec::new(),
         }
     }
 }

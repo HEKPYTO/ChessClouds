@@ -65,6 +65,16 @@ async fn handle_socket(socket: WebSocket, state: GameStateMap) {
         }
     };
 
+    let move_history = state
+        .read(&conn_info.game_id, |_, v| v.moves.clone())
+        .expect("game should exist");
+    if send_msg(&mut writer, &ServerMessage::MoveHistory(move_history))
+        .await
+        .is_err()
+    {
+        return;
+    }
+
     let rx_broadcast = conn_info.tx_broadcast.subscribe();
 
     let read_task = tokio::spawn(handle_socket_read(
@@ -192,8 +202,14 @@ async fn handle_socket_read(
                     tracing::info!("broadcasting move {san_str}");
                     connection_info
                         .tx_broadcast
-                        .send(ServerMessage::Move(san_str))
+                        .send(ServerMessage::Move(san_str.clone()))
                         .unwrap();
+
+                    state
+                        .get(&connection_info.game_id)
+                        .expect("game should exist")
+                        .moves
+                        .push(san_str.clone());
 
                     let outcome = state
                         .read(&connection_info.game_id, |_, v| v.board.outcome())

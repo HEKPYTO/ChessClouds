@@ -39,6 +39,7 @@ pub enum ServerMessage {
     GameEnd(#[serde(with = "OutcomeDef")] Outcome),
     Error(Error),
     AuthSuccess,
+    MoveHistory(Vec<String>),
 }
 
 impl ServerMessage {
