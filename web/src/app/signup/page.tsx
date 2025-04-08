@@ -13,12 +13,17 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
+import { HomeIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 
 export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [pressedButton, setPressedButton] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
+    setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'g') {
         setPressedButton('google');
@@ -29,6 +34,17 @@ export default function SignUp() {
         setPressedButton('apple');
         setTimeout(() => {
           window.location.href = '/';
+        }, 150);
+      } else if (e.key.toLowerCase() === 'h') {
+        setPressedButton('home');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 150);
+      } else if (e.key.toLowerCase() === 't') {
+        setPressedButton('theme');
+        setTimeout(() => {
+          toggleTheme();
+          setPressedButton(null);
         }, 150);
       }
     };
@@ -50,7 +66,6 @@ export default function SignUp() {
     setPressedButton('google');
     setIsLoading(true);
 
-    // Simulate API call
     setTimeout(() => {
       window.location.href = '/';
     }, 1500);
@@ -60,10 +75,16 @@ export default function SignUp() {
     setPressedButton('apple');
     setIsLoading(true);
 
-    // Simulate API call
     setTimeout(() => {
       window.location.href = '/';
     }, 1500);
+  };
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    localStorage.setItem('theme', newTheme);
   };
 
   return (
@@ -91,10 +112,56 @@ export default function SignUp() {
 
       <div className="flex-grow flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-xl">
-          <CardHeader className="space-y-1 text-center">
-            <div className="flex justify-center mb-4">
+          <CardHeader className="space-y-1 text-center pb-1 pt-6">
+            <div className="flex justify-between items-center mb-6">
+              <Button
+                variant="outline"
+                className={`h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-100/50
+                shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+                dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+                dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
+                ${
+                  pressedButton === 'home'
+                    ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                    : ''
+                }`}
+                onClick={() => {
+                  setPressedButton('home');
+                  setTimeout(() => window.location.href = '/', 150);
+                }}
+              >
+                <HomeIcon className="h-5 w-5" />
+              </Button>
+              
               <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500"></div>
+              
+              <Button
+                variant="outline"
+                className={`h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-100/50
+                shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+                dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+                dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
+                ${
+                  pressedButton === 'theme'
+                    ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                    : ''
+                }`}
+                onClick={() => {
+                  setPressedButton('theme');
+                  setTimeout(() => {
+                    toggleTheme();
+                    setPressedButton(null);
+                  }, 150);
+                }}
+              >
+                {theme === 'light' ? (
+                  <MoonIcon className="h-5 w-5" />
+                ) : (
+                  <SunIcon className="h-5 w-5" />
+                )}
+              </Button>
             </div>
+            
             <CardTitle className="text-2xl font-bold text-amber-900 dark:text-amber-100 font-display">
               Join ChessCloud
             </CardTitle>

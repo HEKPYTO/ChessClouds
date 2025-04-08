@@ -1,8 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Playfair_Display, Roboto_Mono, Inter } from 'next/font/google';
-import Navbar from '@/components/NavBar';
-import Footer from '@/components/Footer';
+import ClientLayout from '@/components/ClientLayout';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -78,9 +77,7 @@ export default function RootLayout({
             </div>
           </div>
 
-          <Navbar />
-          <main className="flex-grow pt-16 relative">{children}</main>
-          <Footer />
+          <ClientLayout>{children}</ClientLayout>
         </div>
       </body>
     </html>
