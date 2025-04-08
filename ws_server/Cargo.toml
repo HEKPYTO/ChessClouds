@@ -2,8 +2,19 @@
 name = "ws_server"
 version = "0.1.0"
 edition = "2021"
+default-run = "ws_server"
 
 [dependencies]
-axum = "0.8.3"
+anyhow = "1.0.97"
+axum = { version = "0.8.3", features = ["ws"] }
+axum-macros = "0.5.0"
+futures-util = "0.3.31"
+reqwest = { version = "0.12.15", features = ["json"] }
+scc = "2.3.3"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+shakmaty = { version = "0.27.3", features = ["serde"] }
 tokio = { version = "1.44.1", features = ["full"] }
-shakmaty = "0.27.3"
+tokio-tungstenite = "0.26.2"
+tracing = "0.1.41"
+tracing-subscriber = "0.3.19"
