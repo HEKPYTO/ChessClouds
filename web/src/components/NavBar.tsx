@@ -64,7 +64,7 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-200 ${
         scrolled
-          ? 'border-amber-200/20 bg-amber-50/80 backdrop-blur-md dark:border-slate-700/20 dark:bg-slate-900/80'
+          ? 'border-amber-200/20 bg-amber-50/80 backdrop-blur-sm dark:border-slate-700/20 dark:bg-slate-900/80'
           : 'border-amber-200/10 bg-amber-50/90 dark:border-slate-700/10 dark:bg-slate-900/90'
       }`}
     >

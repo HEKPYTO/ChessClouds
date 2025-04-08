@@ -73,6 +73,7 @@ src/
       card.tsx
       separator.tsx
     ChessNotations.tsx
+    ClientLayout.tsx
     CustomChessBoard.tsx
     Footer.tsx
     NavBar.tsx
@@ -134,7 +135,7 @@ export default function Game() {
       <Pane playingAs="w"></Pane>
 
       <div className="text-center text-gray-500 text-sm py-10">
-        Built by ChessCloud Group
+        Built by ChessClouds Group
       </div>
     </div>
   );
@@ -157,12 +158,19 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
+import { HomeIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [pressedButton, setPressedButton] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
+    setTheme(
+      document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+    );
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'g') {
         setPressedButton('google');
@@ -194,7 +202,6 @@ export default function SignIn() {
     setPressedButton('google');
     setIsLoading(true);
 
-    // Simulate API call
     setTimeout(() => {
       window.location.href = '/';
     }, 1500);
@@ -204,43 +211,55 @@ export default function SignIn() {
     setPressedButton('apple');
     setIsLoading(true);
 
-    // Simulate API call
     setTimeout(() => {
       window.location.href = '/';
     }, 1500);
   };
 
-  return (
-    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 bg-amber-50 dark:bg-slate-900 relative overflow-hidden">
-      <div className="absolute inset-0 bg-amber-50 dark:bg-slate-900">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: 'url(/noise.png)',
-            backgroundRepeat: 'repeat',
-            opacity: 0.03,
-          }}
-        />
-        <div className="absolute inset-0 grid grid-cols-[repeat(40,minmax(0,1fr))] grid-rows-[repeat(40,minmax(0,1fr))]">
-          {Array(1600)
-            .fill(0)
-            .map((_, i) => (
-              <div
-                key={i}
-                className="border-[0.5px] border-amber-800/5 dark:border-amber-200/5"
-              />
-            ))}
-        </div>
-      </div>
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    localStorage.setItem('theme', newTheme);
+  };
 
+  return (
+    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden">
       <div className="flex-grow flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-xl">
-          <CardHeader className="space-y-1 text-center">
-            <div className="flex justify-center mb-4">
+          <CardHeader className="space-y-1 text-center pb-1 pt-6">
+            <div className="flex justify-between items-center mb-6">
+              <Button
+                variant="outline"
+                className="h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-100/50
+                shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+                dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+                dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
+                onClick={() => (window.location.href = '/')}
+              >
+                <HomeIcon className="h-5 w-5" />
+              </Button>
+
               <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500"></div>
+
+              <Button
+                variant="outline"
+                className="h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-100/50
+                shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+                dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+                dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
+                onClick={toggleTheme}
+              >
+                {theme === 'light' ? (
+                  <MoonIcon className="h-5 w-5" />
+                ) : (
+                  <SunIcon className="h-5 w-5" />
+                )}
+              </Button>
             </div>
+
             <CardTitle className="text-2xl font-bold text-amber-900 dark:text-amber-100 font-display">
-              Sign in to ChessCloud
+              Sign in to ChessClouds
             </CardTitle>
             <CardDescription className="text-amber-700 dark:text-amber-300">
               Continue with your preferred account
@@ -363,12 +382,19 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
+import { HomeIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 
 export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [pressedButton, setPressedButton] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
+    setTheme(
+      document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+    );
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'g') {
         setPressedButton('google');
@@ -400,7 +426,6 @@ export default function SignUp() {
     setPressedButton('google');
     setIsLoading(true);
 
-    // Simulate API call
     setTimeout(() => {
       window.location.href = '/';
     }, 1500);
@@ -410,43 +435,55 @@ export default function SignUp() {
     setPressedButton('apple');
     setIsLoading(true);
 
-    // Simulate API call
     setTimeout(() => {
       window.location.href = '/';
     }, 1500);
   };
 
-  return (
-    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 bg-amber-50 dark:bg-slate-900 relative overflow-hidden">
-      <div className="absolute inset-0 bg-amber-50 dark:bg-slate-900">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: 'url(/noise.png)',
-            backgroundRepeat: 'repeat',
-            opacity: 0.03,
-          }}
-        />
-        <div className="absolute inset-0 grid grid-cols-[repeat(40,minmax(0,1fr))] grid-rows-[repeat(40,minmax(0,1fr))]">
-          {Array(1600)
-            .fill(0)
-            .map((_, i) => (
-              <div
-                key={i}
-                className="border-[0.5px] border-amber-800/5 dark:border-amber-200/5"
-              />
-            ))}
-        </div>
-      </div>
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    localStorage.setItem('theme', newTheme);
+  };
 
+  return (
+    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden">
       <div className="flex-grow flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-xl">
-          <CardHeader className="space-y-1 text-center">
-            <div className="flex justify-center mb-4">
+          <CardHeader className="space-y-1 text-center pb-1 pt-6">
+            <div className="flex justify-between items-center mb-6">
+              <Button
+                variant="outline"
+                className="h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-100/50
+                shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+                dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+                dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
+                onClick={() => (window.location.href = '/')}
+              >
+                <HomeIcon className="h-5 w-5" />
+              </Button>
+
               <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500"></div>
+
+              <Button
+                variant="outline"
+                className="h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-100/50
+                shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+                dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+                dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
+                onClick={toggleTheme}
+              >
+                {theme === 'light' ? (
+                  <MoonIcon className="h-5 w-5" />
+                ) : (
+                  <SunIcon className="h-5 w-5" />
+                )}
+              </Button>
             </div>
+
             <CardTitle className="text-2xl font-bold text-amber-900 dark:text-amber-100 font-display">
-              Join ChessCloud
+              Join ChessClouds
             </CardTitle>
             <CardDescription className="text-amber-700 dark:text-amber-300">
               Create your account to start playing
@@ -776,21 +813,18 @@ export default function SignUp() {
 import './globals.css';
 import type { Metadata } from 'next';
 import { Playfair_Display, Roboto_Mono, Inter } from 'next/font/google';
-import Navbar from '@/components/NavBar';
-import Footer from '@/components/Footer';
+import ClientLayout from '@/components/ClientLayout';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-playfair',
 });
-
 const robotoMono = Roboto_Mono({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-roboto-mono',
 });
-
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
@@ -798,7 +832,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'ChessCloud - Next Generation Chess Platform',
+  title: 'ChessClouds - Next Generation Chess Platform',
   description:
     'A next-generation chess platform designed for high-performance gameplay with players worldwide.',
 };
@@ -817,10 +851,9 @@ export default function RootLayout({
         }
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
-      
       const theme = getInitialTheme();
       document.documentElement.classList.toggle('dark', theme === 'dark');
-    })()
+    })();
   `;
 
   return (
@@ -831,31 +864,21 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} ${robotoMono.variable} font-sans`}
       >
-        <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 bg-amber-50 dark:bg-slate-900 relative overflow-hidden">
-          <div className="absolute inset-0 bg-amber-50 dark:bg-slate-900">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: 'url(/noise.png)',
-                backgroundRepeat: 'repeat',
-                opacity: 0.03,
-              }}
-            />
-            <div className="absolute inset-0 grid grid-cols-[repeat(40,minmax(0,1fr))] grid-rows-[repeat(40,minmax(0,1fr))]">
-              {Array(1600)
-                .fill(0)
-                .map((_, i) => (
-                  <div
-                    key={i}
-                    className="border-[0.5px] border-amber-800/5 dark:border-amber-200/5"
-                  />
-                ))}
-            </div>
-          </div>
+        <div className="min-h-screen relative bg-amber-50 dark:bg-slate-900">
+          <div
+            className="absolute inset-0 pointer-events-none bg-[url('/noise.png')] bg-repeat"
+            style={{ opacity: 0.03 }}
+          />
+          <div
+            className="
+              absolute inset-0 pointer-events-none
+              [background-image:linear-gradient(90deg,rgba(241,194,125,0.15)_1px,transparent_1px),linear-gradient(180deg,rgba(241,194,125,0.15)_1px,transparent_1px)]
+              dark:[background-image:linear-gradient(90deg,rgba(255,191,0,0.15)_1px,transparent_1px),linear-gradient(180deg,rgba(255,191,0,0.15)_1px,transparent_1px)]
+              [background-size:20px_20px]
+            "
+          />
 
-          <Navbar />
-          <main className="flex-grow pt-16 relative">{children}</main>
-          <Footer />
+          <ClientLayout>{children}</ClientLayout>
         </div>
       </body>
     </html>
@@ -950,7 +973,7 @@ export default function HomePage() {
             The definition of modern chess platform
           </h1>
           <p className="mt-6 text-lg text-amber-800 dark:text-amber-200 max-w-2xl mx-auto">
-            ChessCloud is a next-generation chess platform designed for
+            ChessClouds is a next-generation chess platform designed for
             high-performance gameplay with players worldwide.
           </p>
 
@@ -1980,6 +2003,33 @@ export default function ChessNotations({ pgn }: ChessNotationsProps) {
 }
 </file>
 
+<file path="src/components/ClientLayout.tsx">
+'use client';
+
+import { usePathname } from 'next/navigation';
+import Navbar from '@/components/NavBar';
+import Footer from '@/components/Footer';
+
+export default function ClientLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+  const isAuthPage = pathname === '/signin' || pathname === '/signup';
+
+  return (
+    <>
+      {!isAuthPage && <Navbar />}
+      <main className={`flex-grow ${!isAuthPage ? 'pt-16' : ''} relative`}>
+        {children}
+      </main>
+      {!isAuthPage && <Footer />}
+    </>
+  );
+}
+</file>
+
 <file path="src/components/CustomChessBoard.tsx">
 'use client';
 
@@ -2142,7 +2192,7 @@ export default function Footer() {
           <div className="flex items-center">
             <div className="h-8 w-8 rounded bg-amber-600 dark:bg-amber-500 mr-2"></div>
             <span className="font-semibold text-amber-900 dark:text-amber-100">
-              ChessCloud
+              ChessClouds
             </span>
           </div>
 
@@ -2261,7 +2311,7 @@ export default function Navbar() {
           >
             <div className="h-8 w-8 rounded bg-amber-600 dark:bg-amber-500 mr-2"></div>
             <span className="font-semibold text-lg text-amber-900 dark:text-amber-100 ml-2">
-              ChessCloud
+              ChessClouds
             </span>
           </button>
 
@@ -2633,6 +2683,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+repomix-output.xml
 </file>
 
 <file path="components.json">

@@ -79,27 +79,29 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-100 via-amber-50 to-orange-100 dark:from-slate-900 dark:via-slate-800 dark:to-amber-950">
-        <div className="absolute inset-0 bg-[url('/noise.png')] bg-repeat opacity-[0.03]"></div>
-        <div className="absolute inset-0 grid grid-cols-[repeat(40,1fr)] grid-rows-[repeat(40,1fr)]">
-          {Array.from({ length: 1600 }).map((_, i) => (
-            <div
-              key={i}
-              className="border-[0.5px] border-amber-800/5 dark:border-amber-200/5"
-            />
-          ))}
-        </div>
+    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden bg-gradient-to-tl from-amber-50 via-amber-100/70 to-amber-200/50 dark:from-slate-800 dark:via-amber-900/20 dark:to-slate-900/90 animate-[gradient_15s_ease_infinite]">
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'url(/noise.png)',
+          backgroundRepeat: 'repeat',
+          opacity: 0.025,
+        }}
+      />
+      <div
+        className="
+          absolute inset-0 pointer-events-none
+          [background-image:linear-gradient(90deg,rgba(241,194,125,0.15)_1px,transparent_1px),linear-gradient(180deg,rgba(241,194,125,0.15)_1px,transparent_1px)]
+          dark:[background-image:linear-gradient(90deg,rgba(251,191,36,0.2)_1px,transparent_1px),linear-gradient(180deg,rgba(251,191,36,0.2)_1px,transparent_1px)]
+          [background-size:20px_20px]
+        "
+      />
 
-        <div className="absolute inset-0">
-          <div className="absolute opacity-70 bg-gradient-radial from-amber-400/10 via-transparent to-transparent dark:from-amber-500/15 dark:via-transparent dark:to-transparent animate-[pulse_15s_ease-in-out_infinite] left-[30%] top-[20%] w-[40%] h-[40%]"></div>
-          <div className="absolute opacity-70 bg-gradient-radial from-orange-300/10 via-transparent to-transparent dark:from-amber-600/10 dark:via-transparent dark:to-transparent animate-[pulse_20s_ease-in-out_5s_infinite] left-[60%] top-[60%] w-[50%] h-[50%]"></div>
-          <div className="absolute bg-gradient-radial from-yellow-300/5 via-transparent to-transparent dark:from-amber-400/10 dark:via-transparent dark:to-transparent animate-[float_30s_ease-in-out_10s_infinite] left-[20%] top-[70%] w-[30%] h-[30%]"></div>
-        </div>
-      </div>
+      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-amber-200/20 dark:bg-amber-500/20 rounded-full blur-3xl animate-[float_12s_ease-in-out_infinite]"></div>
+      <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-amber-300/20 dark:bg-amber-600/15 rounded-full blur-3xl animate-[float_9s_ease-in-out_infinite_reverse]"></div>
 
-      <div className="flex-grow flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-xl">
+      <div className="flex-grow flex items-center justify-center p-4 relative z-10">
+        <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-700/40 shadow-xl dark:shadow-amber-900/30">
           <CardHeader className="space-y-1 text-center pb-1 pt-6">
             <div className="flex justify-between items-center mb-6">
               <Button
@@ -113,7 +115,7 @@ export default function SignUp() {
                 <HomeIcon className="h-5 w-5" />
               </Button>
 
-              <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500"></div>
+              <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500 shadow-md dark:shadow-amber-600/20"></div>
 
               <Button
                 variant="outline"
@@ -220,7 +222,7 @@ export default function SignUp() {
               </span>
             </Button>
 
-            <div className="text-xs text-center text-amber-600 dark:text-amber-400">
+            <div className="text-xs text-center text-amber-600 dark:text-amber-400 mt-6">
               By signing up, you agree to our{' '}
               <Link href="#" className="underline underline-offset-2">
                 Terms of Service
@@ -232,7 +234,7 @@ export default function SignUp() {
             </div>
           </CardContent>
           <Separator className="my-1 bg-amber-200/30 dark:bg-amber-700/20" />
-          <CardFooter className="flex flex-col space-y-4 pt-4">
+          <CardFooter className="flex flex-col space-y-4">
             <div className="text-center text-sm text-amber-700 dark:text-amber-300">
               Already have an account?{' '}
               <Link
@@ -245,34 +247,6 @@ export default function SignUp() {
           </CardFooter>
         </Card>
       </div>
-
-      <style jsx global>{`
-        @keyframes float {
-          0%,
-          100% {
-            transform: translate(0, 0);
-          }
-          25% {
-            transform: translate(5px, -5px);
-          }
-          50% {
-            transform: translate(10px, 0);
-          }
-          75% {
-            transform: translate(5px, 5px);
-          }
-        }
-
-        @keyframes pulse {
-          0%,
-          100% {
-            opacity: 0.7;
-          }
-          50% {
-            opacity: 0.9;
-          }
-        }
-      `}</style>
     </div>
   );
 }
