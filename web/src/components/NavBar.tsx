@@ -85,7 +85,7 @@ export default function Navbar() {
           >
             <div className="h-8 w-8 rounded bg-amber-600 dark:bg-amber-500 mr-2"></div>
             <span className="font-semibold text-lg text-amber-900 dark:text-amber-100 ml-2">
-              ChessCloud
+              ChessClouds
             </span>
           </button>
 

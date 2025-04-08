@@ -22,8 +22,10 @@ export default function SignUp() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
-    setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-    
+    setTheme(
+      document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+    );
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'g') {
         setPressedButton('google');
@@ -34,17 +36,6 @@ export default function SignUp() {
         setPressedButton('apple');
         setTimeout(() => {
           window.location.href = '/';
-        }, 150);
-      } else if (e.key.toLowerCase() === 'h') {
-        setPressedButton('home');
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 150);
-      } else if (e.key.toLowerCase() === 't') {
-        setPressedButton('theme');
-        setTimeout(() => {
-          toggleTheme();
-          setPressedButton(null);
         }, 150);
       }
     };
@@ -88,25 +79,22 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 bg-amber-50 dark:bg-slate-900 relative overflow-hidden">
-      <div className="absolute inset-0 bg-amber-50 dark:bg-slate-900">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: 'url(/noise.png)',
-            backgroundRepeat: 'repeat',
-            opacity: 0.03,
-          }}
-        />
-        <div className="absolute inset-0 grid grid-cols-[repeat(40,minmax(0,1fr))] grid-rows-[repeat(40,minmax(0,1fr))]">
-          {Array(1600)
-            .fill(0)
-            .map((_, i) => (
-              <div
-                key={i}
-                className="border-[0.5px] border-amber-800/5 dark:border-amber-200/5"
-              />
-            ))}
+    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-100 via-amber-50 to-orange-100 dark:from-slate-900 dark:via-slate-800 dark:to-amber-950">
+        <div className="absolute inset-0 bg-[url('/noise.png')] bg-repeat opacity-[0.03]"></div>
+        <div className="absolute inset-0 grid grid-cols-[repeat(40,1fr)] grid-rows-[repeat(40,1fr)]">
+          {Array.from({ length: 1600 }).map((_, i) => (
+            <div
+              key={i}
+              className="border-[0.5px] border-amber-800/5 dark:border-amber-200/5"
+            />
+          ))}
+        </div>
+
+        <div className="absolute inset-0">
+          <div className="absolute opacity-70 bg-gradient-radial from-amber-400/10 via-transparent to-transparent dark:from-amber-500/15 dark:via-transparent dark:to-transparent animate-[pulse_15s_ease-in-out_infinite] left-[30%] top-[20%] w-[40%] h-[40%]"></div>
+          <div className="absolute opacity-70 bg-gradient-radial from-orange-300/10 via-transparent to-transparent dark:from-amber-600/10 dark:via-transparent dark:to-transparent animate-[pulse_20s_ease-in-out_5s_infinite] left-[60%] top-[60%] w-[50%] h-[50%]"></div>
+          <div className="absolute bg-gradient-radial from-yellow-300/5 via-transparent to-transparent dark:from-amber-400/10 dark:via-transparent dark:to-transparent animate-[float_30s_ease-in-out_10s_infinite] left-[20%] top-[70%] w-[30%] h-[30%]"></div>
         </div>
       </div>
 
@@ -116,43 +104,24 @@ export default function SignUp() {
             <div className="flex justify-between items-center mb-6">
               <Button
                 variant="outline"
-                className={`h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-100/50
+                className="h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-100/50
                 shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
                 dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-                dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
-                ${
-                  pressedButton === 'home'
-                    ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
-                    : ''
-                }`}
-                onClick={() => {
-                  setPressedButton('home');
-                  setTimeout(() => window.location.href = '/', 150);
-                }}
+                dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
+                onClick={() => (window.location.href = '/')}
               >
                 <HomeIcon className="h-5 w-5" />
               </Button>
-              
+
               <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500"></div>
-              
+
               <Button
                 variant="outline"
-                className={`h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-100/50
+                className="h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-100/50
                 shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
                 dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-                dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
-                ${
-                  pressedButton === 'theme'
-                    ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
-                    : ''
-                }`}
-                onClick={() => {
-                  setPressedButton('theme');
-                  setTimeout(() => {
-                    toggleTheme();
-                    setPressedButton(null);
-                  }, 150);
-                }}
+                dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
+                onClick={toggleTheme}
               >
                 {theme === 'light' ? (
                   <MoonIcon className="h-5 w-5" />
@@ -161,9 +130,9 @@ export default function SignUp() {
                 )}
               </Button>
             </div>
-            
+
             <CardTitle className="text-2xl font-bold text-amber-900 dark:text-amber-100 font-display">
-              Join ChessCloud
+              Join ChessClouds
             </CardTitle>
             <CardDescription className="text-amber-700 dark:text-amber-300">
               Create your account to start playing
@@ -276,6 +245,34 @@ export default function SignUp() {
           </CardFooter>
         </Card>
       </div>
+
+      <style jsx global>{`
+        @keyframes float {
+          0%,
+          100% {
+            transform: translate(0, 0);
+          }
+          25% {
+            transform: translate(5px, -5px);
+          }
+          50% {
+            transform: translate(10px, 0);
+          }
+          75% {
+            transform: translate(5px, 5px);
+          }
+        }
+
+        @keyframes pulse {
+          0%,
+          100% {
+            opacity: 0.7;
+          }
+          50% {
+            opacity: 0.9;
+          }
+        }
+      `}</style>
     </div>
   );
 }
