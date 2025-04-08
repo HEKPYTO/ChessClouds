@@ -22,7 +22,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'ChessCloud - Next Generation Chess Platform',
+  title: 'ChessClouds - Next Generation Chess Platform',
   description:
     'A next-generation chess platform designed for high-performance gameplay with players worldwide.',
 };

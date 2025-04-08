@@ -6,7 +6,7 @@ export default function Game() {
       <Pane playingAs="w"></Pane>
 
       <div className="text-center text-gray-500 text-sm py-10">
-        Built by ChessCloud Group
+        Built by ChessClouds Group
       </div>
     </div>
   );

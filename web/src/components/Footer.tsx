@@ -16,7 +16,7 @@ export default function Footer() {
           <div className="flex items-center">
             <div className="h-8 w-8 rounded bg-amber-600 dark:bg-amber-500 mr-2"></div>
             <span className="font-semibold text-amber-900 dark:text-amber-100">
-              ChessCloud
+              ChessClouds
             </span>
           </div>
 

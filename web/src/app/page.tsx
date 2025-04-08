@@ -84,7 +84,7 @@ export default function HomePage() {
             The definition of modern chess platform
           </h1>
           <p className="mt-6 text-lg text-amber-800 dark:text-amber-200 max-w-2xl mx-auto">
-            ChessCloud is a next-generation chess platform designed for
+            ChessClouds is a next-generation chess platform designed for
             high-performance gameplay with players worldwide.
           </p>
 
