@@ -112,42 +112,6 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-@layer utilities {
-  @keyframes gradient {
-    0% {
-      background-position: 0% 50%;
-      background-size: 200% 200%;
-    }
-    50% {
-      background-position: 100% 50%;
-      background-size: 200% 200%;
-    }
-    100% {
-      background-position: 0% 50%;
-      background-size: 200% 200%;
-    }
-  }
-
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-}
-
 .cg-wrap coords {
   color: #92400e !important;
 }
