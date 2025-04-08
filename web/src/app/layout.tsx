@@ -8,13 +8,11 @@ const playfair = Playfair_Display({
   display: 'swap',
   variable: '--font-playfair',
 });
-
 const robotoMono = Roboto_Mono({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-roboto-mono',
 });
-
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
@@ -41,10 +39,9 @@ export default function RootLayout({
         }
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
-      
       const theme = getInitialTheme();
       document.documentElement.classList.toggle('dark', theme === 'dark');
-    })()
+    })();
   `;
 
   return (
@@ -55,27 +52,19 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} ${robotoMono.variable} font-sans`}
       >
-        <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 bg-amber-50 dark:bg-slate-900 relative overflow-hidden">
-          <div className="absolute inset-0 bg-amber-50 dark:bg-slate-900">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: 'url(/noise.png)',
-                backgroundRepeat: 'repeat',
-                opacity: 0.03,
-              }}
-            />
-            <div className="absolute inset-0 grid grid-cols-[repeat(40,minmax(0,1fr))] grid-rows-[repeat(40,minmax(0,1fr))]">
-              {Array(1600)
-                .fill(0)
-                .map((_, i) => (
-                  <div
-                    key={i}
-                    className="border-[0.5px] border-amber-800/5 dark:border-amber-200/5"
-                  />
-                ))}
-            </div>
-          </div>
+        <div className="min-h-screen relative bg-amber-50 dark:bg-slate-900">
+          <div
+            className="absolute inset-0 pointer-events-none bg-[url('/noise.png')] bg-repeat"
+            style={{ opacity: 0.03 }}
+          />
+          <div
+            className="
+              absolute inset-0 pointer-events-none
+              [background-image:linear-gradient(90deg,rgba(241,194,125,0.15)_1px,transparent_1px),linear-gradient(180deg,rgba(241,194,125,0.15)_1px,transparent_1px)]
+              dark:[background-image:linear-gradient(90deg,rgba(255,191,0,0.15)_1px,transparent_1px),linear-gradient(180deg,rgba(255,191,0,0.15)_1px,transparent_1px)]
+              [background-size:20px_20px]
+            "
+          />
 
           <ClientLayout>{children}</ClientLayout>
         </div>
