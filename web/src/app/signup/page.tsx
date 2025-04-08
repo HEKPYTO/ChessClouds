@@ -79,7 +79,7 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden bg-gradient-to-tl from-amber-50 via-amber-100/70 to-amber-200/50 dark:from-slate-800 dark:via-amber-900/20 dark:to-slate-900/90 animate-[gradient_15s_ease_infinite]">
+    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden bg-gradient-to-tl from-amber-50 via-amber-100/70 to-amber-200/50 dark:from-slate-800 dark:via-amber-900/20 dark:to-slate-900/90">
       <div
         className="absolute inset-0"
         style={{
@@ -97,8 +97,8 @@ export default function SignUp() {
         "
       />
 
-      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-amber-200/20 dark:bg-amber-500/20 rounded-full blur-3xl animate-[float_12s_ease-in-out_infinite]"></div>
-      <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-amber-300/20 dark:bg-amber-600/15 rounded-full blur-3xl animate-[float_9s_ease-in-out_infinite_reverse]"></div>
+      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-amber-200/20 dark:bg-amber-500/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-amber-300/20 dark:bg-amber-600/15 rounded-full blur-3xl"></div>
 
       <div className="flex-grow flex items-center justify-center p-4 relative z-10">
         <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-700/40 shadow-xl dark:shadow-amber-900/30">
