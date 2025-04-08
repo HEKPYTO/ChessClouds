@@ -44,6 +44,7 @@ The content is organized as follows:
 
 <directory_structure>
 public/
+  apple.svg
   file.svg
   globe.svg
   next.svg
@@ -52,6 +53,10 @@ public/
 src/
   app/
     game/
+      page.tsx
+    signin/
+      page.tsx
+    signup/
       page.tsx
     globals.css
     layout.tsx
@@ -93,6 +98,13 @@ tsconfig.json
 <files>
 This section contains the contents of the repository's files.
 
+<file path="public/apple.svg">
+<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg fill="#000000" width="800px" height="800px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <path d="M9.438 31.401c-0.63-0.422-1.193-0.938-1.656-1.536-0.516-0.615-0.984-1.266-1.422-1.938-1.021-1.495-1.818-3.125-2.375-4.849-0.667-2-0.99-3.917-0.99-5.792 0-2.094 0.453-3.922 1.339-5.458 0.651-1.198 1.625-2.203 2.797-2.906 1.135-0.708 2.453-1.094 3.786-1.12 0.469 0 0.974 0.068 1.51 0.198 0.385 0.109 0.854 0.281 1.427 0.495 0.729 0.281 1.13 0.453 1.266 0.495 0.427 0.156 0.786 0.224 1.068 0.224 0.214 0 0.516-0.068 0.859-0.172 0.193-0.068 0.557-0.188 1.078-0.411 0.516-0.188 0.922-0.349 1.245-0.469 0.495-0.146 0.974-0.281 1.401-0.349 0.521-0.078 1.036-0.104 1.531-0.063 0.948 0.063 1.813 0.266 2.589 0.557 1.359 0.547 2.458 1.401 3.276 2.615-0.349 0.214-0.667 0.458-0.969 0.734-0.651 0.573-1.198 1.25-1.641 2.005-0.573 1.026-0.865 2.188-0.859 3.359 0.021 1.443 0.391 2.714 1.12 3.813 0.521 0.802 1.208 1.484 2.047 2.047 0.417 0.281 0.776 0.474 1.12 0.604-0.161 0.5-0.333 0.984-0.536 1.464-0.464 1.078-1.016 2.109-1.667 3.083-0.578 0.839-1.031 1.464-1.375 1.88-0.536 0.635-1.052 1.12-1.573 1.458-0.573 0.38-1.25 0.583-1.938 0.583-0.469 0.021-0.932-0.042-1.38-0.167-0.385-0.13-0.766-0.271-1.141-0.432-0.391-0.177-0.792-0.333-1.203-0.453-0.51-0.135-1.031-0.198-1.552-0.198-0.536 0-1.057 0.068-1.547 0.193-0.417 0.12-0.818 0.26-1.214 0.432-0.557 0.234-0.927 0.391-1.141 0.458-0.427 0.125-0.87 0.203-1.318 0.229-0.693 0-1.339-0.198-1.979-0.599zM18.578 6.786c-0.906 0.453-1.771 0.646-2.63 0.583-0.135-0.865 0-1.75 0.359-2.719 0.318-0.828 0.745-1.573 1.333-2.24 0.609-0.693 1.344-1.266 2.172-1.677 0.88-0.453 1.719-0.698 2.521-0.734 0.104 0.906 0 1.797-0.333 2.76-0.307 0.854-0.76 1.641-1.333 2.344-0.583 0.693-1.302 1.266-2.115 1.682z"/>
+</svg>
+</file>
+
 <file path="public/file.svg">
 <svg fill="none" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 13.5V5.41a1 1 0 0 0-.3-.7L9.8.29A1 1 0 0 0 9.08 0H1.5v13.5A2.5 2.5 0 0 0 4 16h8a2.5 2.5 0 0 0 2.5-2.5m-1.5 0v-7H8v-5H3v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1M9.5 5V2.12L12.38 5zM5.13 5h-.62v1.25h2.12V5zm-.62 3h7.12v1.25H4.5zm.62 3h-.62v1.25h7.12V11z" clip-rule="evenodd" fill="#666" fill-rule="evenodd"/></svg>
 </file>
@@ -123,6 +135,429 @@ export default function Game() {
 
       <div className="text-center text-gray-500 text-sm py-10">
         Built by ChessCloud Group
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/app/signin/page.tsx">
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
+
+export default function SignIn() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [pressedButton, setPressedButton] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 'g') {
+        setPressedButton('google');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 150);
+      } else if (e.key.toLowerCase() === 'a') {
+        setPressedButton('apple');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 150);
+      }
+    };
+
+    const handleKeyUp = () => {
+      setPressedButton(null);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  const handleSignInWithGoogle = () => {
+    setPressedButton('google');
+    setIsLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1500);
+  };
+
+  const handleSignInWithApple = () => {
+    setPressedButton('apple');
+    setIsLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1500);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 bg-amber-50 dark:bg-slate-900 relative overflow-hidden">
+      <div className="absolute inset-0 bg-amber-50 dark:bg-slate-900">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url(/noise.png)',
+            backgroundRepeat: 'repeat',
+            opacity: 0.03,
+          }}
+        />
+        <div className="absolute inset-0 grid grid-cols-[repeat(40,minmax(0,1fr))] grid-rows-[repeat(40,minmax(0,1fr))]">
+          {Array(1600)
+            .fill(0)
+            .map((_, i) => (
+              <div
+                key={i}
+                className="border-[0.5px] border-amber-800/5 dark:border-amber-200/5"
+              />
+            ))}
+        </div>
+      </div>
+
+      <div className="flex-grow flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-xl">
+          <CardHeader className="space-y-1 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500"></div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-amber-900 dark:text-amber-100 font-display">
+              Sign in to ChessCloud
+            </CardTitle>
+            <CardDescription className="text-amber-700 dark:text-amber-300">
+              Continue with your preferred account
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button
+              variant="outline"
+              className={`w-full border-amber-300 text-amber-800 hover:bg-amber-100/50 px-6 rounded-md transition-all 
+              shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+              dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+              dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
+              ${
+                pressedButton === 'google'
+                  ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                  : ''
+              }`}
+              disabled={isLoading}
+              onClick={handleSignInWithGoogle}
+            >
+              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                <path
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"
+                />
+              </svg>
+              {isLoading && pressedButton === 'google'
+                ? 'Signing in...'
+                : 'Continue with Google'}
+              <span
+                className={`ml-1 text-xs px-1 rounded transition-colors ${
+                  pressedButton === 'google'
+                    ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
+                    : 'bg-amber-100 dark:bg-slate-800'
+                }`}
+              >
+                G
+              </span>
+            </Button>
+
+            <Button
+              variant="outline"
+              className={`w-full border-amber-300 text-amber-800 hover:bg-amber-100/50 px-6 rounded-md transition-all 
+              shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+              dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+              dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
+              ${
+                pressedButton === 'apple'
+                  ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                  : ''
+              }`}
+              disabled={isLoading}
+              onClick={handleSignInWithApple}
+            >
+              <Image
+                src="/apple.svg"
+                alt="Apple icon"
+                width={20}
+                height={20}
+                className="w-5 h-5 mr-2"
+              />
+              {isLoading && pressedButton === 'apple'
+                ? 'Signing in...'
+                : 'Continue with Apple'}
+              <span
+                className={`ml-1 text-xs px-1 rounded transition-colors ${
+                  pressedButton === 'apple'
+                    ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
+                    : 'bg-amber-100 dark:bg-slate-800'
+                }`}
+              >
+                A
+              </span>
+            </Button>
+          </CardContent>
+          <Separator className="my-1 bg-amber-200/30 dark:bg-amber-700/20" />
+          <CardFooter className="flex flex-col space-y-4 pt-4">
+            <div className="text-center text-sm text-amber-700 dark:text-amber-300">
+              Don&apos;t have an account?{' '}
+              <Link
+                href="/signup"
+                className="text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 font-medium underline underline-offset-4"
+              >
+                Sign up
+              </Link>
+            </div>
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/app/signup/page.tsx">
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
+
+export default function SignUp() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [pressedButton, setPressedButton] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 'g') {
+        setPressedButton('google');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 150);
+      } else if (e.key.toLowerCase() === 'a') {
+        setPressedButton('apple');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 150);
+      }
+    };
+
+    const handleKeyUp = () => {
+      setPressedButton(null);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  const handleSignUpWithGoogle = () => {
+    setPressedButton('google');
+    setIsLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1500);
+  };
+
+  const handleSignUpWithApple = () => {
+    setPressedButton('apple');
+    setIsLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1500);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 bg-amber-50 dark:bg-slate-900 relative overflow-hidden">
+      <div className="absolute inset-0 bg-amber-50 dark:bg-slate-900">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url(/noise.png)',
+            backgroundRepeat: 'repeat',
+            opacity: 0.03,
+          }}
+        />
+        <div className="absolute inset-0 grid grid-cols-[repeat(40,minmax(0,1fr))] grid-rows-[repeat(40,minmax(0,1fr))]">
+          {Array(1600)
+            .fill(0)
+            .map((_, i) => (
+              <div
+                key={i}
+                className="border-[0.5px] border-amber-800/5 dark:border-amber-200/5"
+              />
+            ))}
+        </div>
+      </div>
+
+      <div className="flex-grow flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-xl">
+          <CardHeader className="space-y-1 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500"></div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-amber-900 dark:text-amber-100 font-display">
+              Join ChessCloud
+            </CardTitle>
+            <CardDescription className="text-amber-700 dark:text-amber-300">
+              Create your account to start playing
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button
+              variant="outline"
+              className={`w-full border-amber-300 text-amber-800 hover:bg-amber-100/50 px-6 rounded-md transition-all 
+              shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+              dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+              dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
+              ${
+                pressedButton === 'google'
+                  ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                  : ''
+              }`}
+              disabled={isLoading}
+              onClick={handleSignUpWithGoogle}
+            >
+              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                <path
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"
+                />
+              </svg>
+              {isLoading && pressedButton === 'google'
+                ? 'Creating account...'
+                : 'Sign up with Google'}
+              <span
+                className={`ml-1 text-xs px-1 rounded transition-colors ${
+                  pressedButton === 'google'
+                    ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
+                    : 'bg-amber-100 dark:bg-slate-800'
+                }`}
+              >
+                G
+              </span>
+            </Button>
+
+            <Button
+              variant="outline"
+              className={`w-full border-amber-300 text-amber-800 hover:bg-amber-100/50 px-6 rounded-md transition-all 
+              shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+              dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+              dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
+              ${
+                pressedButton === 'apple'
+                  ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                  : ''
+              }`}
+              disabled={isLoading}
+              onClick={handleSignUpWithApple}
+            >
+              <Image
+                src="/apple.svg"
+                alt="Apple icon"
+                width={20}
+                height={20}
+                className="w-5 h-5 mr-2"
+              />
+              {isLoading && pressedButton === 'apple'
+                ? 'Creating account...'
+                : 'Sign up with Apple'}
+              <span
+                className={`ml-1 text-xs px-1 rounded transition-colors ${
+                  pressedButton === 'apple'
+                    ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
+                    : 'bg-amber-100 dark:bg-slate-800'
+                }`}
+              >
+                A
+              </span>
+            </Button>
+
+            <div className="text-xs text-center text-amber-600 dark:text-amber-400">
+              By signing up, you agree to our{' '}
+              <Link href="#" className="underline underline-offset-2">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link href="#" className="underline underline-offset-2">
+                Privacy Policy
+              </Link>
+            </div>
+          </CardContent>
+          <Separator className="my-1 bg-amber-200/30 dark:bg-amber-700/20" />
+          <CardFooter className="flex flex-col space-y-4 pt-4">
+            <div className="text-center text-sm text-amber-700 dark:text-amber-300">
+              Already have an account?{' '}
+              <Link
+                href="/signin"
+                className="text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 font-medium underline underline-offset-4"
+              >
+                Sign in
+              </Link>
+            </div>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   );
@@ -343,9 +778,7 @@ import type { Metadata } from 'next';
 import { Playfair_Display, Roboto_Mono, Inter } from 'next/font/google';
 import Navbar from '@/components/NavBar';
 import Footer from '@/components/Footer';
-import Script from 'next/script';
 
-// Fonts
 const playfair = Playfair_Display({
   subsets: ['latin'],
   display: 'swap',
@@ -537,7 +970,9 @@ export default function HomePage() {
               <PlayIcon className="mr-2 h-5 w-5" /> Play now
               <span
                 className={`ml-1 text-xs px-1 rounded transition-colors ${
-                  pressedKey === 'p' ? 'bg-amber-800 dark:bg-amber-700' : 'bg-amber-700 dark:bg-amber-600'
+                  pressedKey === 'p'
+                    ? 'bg-amber-800 dark:bg-amber-700'
+                    : 'bg-amber-700 dark:bg-amber-600'
                 }`}
               >
                 P
@@ -598,7 +1033,9 @@ export default function HomePage() {
                 <div className="h-8 w-8 rounded-full bg-amber-100 dark:bg-amber-700/50 flex items-center justify-center text-amber-600 dark:text-amber-300 mr-3">
                   <BoltIcon className="h-5 w-5" />
                 </div>
-                <h3 className="text-lg font-medium text-amber-900 dark:text-amber-100">Fast</h3>
+                <h3 className="text-lg font-medium text-amber-900 dark:text-amber-100">
+                  Fast
+                </h3>
               </div>
               <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
                 Written from scratch to efficiently leverage multiple CPU cores
@@ -672,7 +1109,9 @@ export default function HomePage() {
                     <ChevronRightIcon className="ml-2 h-4 w-4" />
                     <span
                       className={`ml-1 text-xs px-1 rounded transition-colors ${
-                        pressedKey === 's' ? 'bg-amber-800 dark:bg-amber-700' : 'bg-amber-700 dark:bg-amber-600'
+                        pressedKey === 's'
+                          ? 'bg-amber-800 dark:bg-amber-700'
+                          : 'bg-amber-700 dark:bg-amber-600'
                       }`}
                     >
                       S
@@ -696,7 +1135,10 @@ export default function HomePage() {
               </div>
               <div className="relative flex items-center justify-center order-1 md:order-2">
                 <div className="w-full">
-                  <CustomChessBoard className="shadow-xl dark:shadow-amber-900/20" pgn={pgn} />
+                  <CustomChessBoard
+                    className="shadow-xl dark:shadow-amber-900/20"
+                    pgn={pgn}
+                  />
                 </div>
               </div>
             </div>
@@ -1474,7 +1916,9 @@ export default function ChessNotations({ pgn }: ChessNotationsProps) {
   return (
     <Card className="p-4 h-full flex flex-col bg-amber-50 border-amber-200 dark:bg-slate-800 dark:border-amber-800/30 overflow-hidden shadow-md">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="font-medium text-amber-900 dark:text-amber-100">Game Notation</h3>
+        <h3 className="font-medium text-amber-900 dark:text-amber-100">
+          Game Notation
+        </h3>
       </div>
 
       <div className="overflow-y-auto flex-grow mb-2 font-mono text-sm">
@@ -1488,19 +1932,28 @@ export default function ChessNotations({ pgn }: ChessNotationsProps) {
           </thead>
           <tbody>
             {moves.map((move) => (
-              <tr key={move.number} className="hover:bg-amber-100/50 dark:hover:bg-amber-900/20">
-                <td className="py-1 text-amber-600 dark:text-amber-400">{move.number}.</td>
+              <tr
+                key={move.number}
+                className="hover:bg-amber-100/50 dark:hover:bg-amber-900/20"
+              >
+                <td className="py-1 text-amber-600 dark:text-amber-400">
+                  {move.number}.
+                </td>
                 <td className="py-1">
                   {move.white && (
                     <div className="flex items-center">
-                      <span className="font-semibold text-amber-800 dark:text-amber-200">{move.white.move}</span>
+                      <span className="font-semibold text-amber-800 dark:text-amber-200">
+                        {move.white.move}
+                      </span>
                     </div>
                   )}
                 </td>
                 <td className="py-1">
                   {move.black && (
                     <div className="flex items-center">
-                      <span className="font-semibold text-amber-800 dark:text-amber-200">{move.black.move}</span>
+                      <span className="font-semibold text-amber-800 dark:text-amber-200">
+                        {move.black.move}
+                      </span>
                     </div>
                   )}
                 </td>
@@ -1634,11 +2087,15 @@ export default function CustomChessBoard({
 
   if (!fen)
     return (
-      <div className={`${className} w-full aspect-square bg-amber-100 dark:bg-slate-700`}></div>
+      <div
+        className={`${className} w-full aspect-square bg-amber-100 dark:bg-slate-700`}
+      ></div>
     );
 
   return (
-    <div className={`chess-board-container ${className} dark:ring-1 dark:ring-amber-700/30`}>
+    <div
+      className={`chess-board-container ${className} dark:ring-1 dark:ring-amber-700/30`}
+    >
       <div className="relative w-full aspect-square pointer-events-none">
         <Chessground
           width="100%"
@@ -1684,7 +2141,9 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center">
             <div className="h-8 w-8 rounded bg-amber-600 dark:bg-amber-500 mr-2"></div>
-            <span className="font-semibold text-amber-900 dark:text-amber-100">ChessCloud</span>
+            <span className="font-semibold text-amber-900 dark:text-amber-100">
+              ChessCloud
+            </span>
           </div>
 
           <div className="mt-4 md:mt-0 flex space-x-6">
@@ -1854,7 +2313,7 @@ export default function Navbar() {
 
         <div className="flex items-center space-x-4">
           <ThemeSwitch />
-          
+
           <Button
             variant="outline"
             className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-100/50 transition-all 
@@ -1895,7 +2354,9 @@ export default function Navbar() {
             Play now
             <span
               className={`ml-1 text-xs px-1 rounded transition-colors ${
-                pressedKey === 'p' ? 'bg-amber-800 dark:bg-amber-700' : 'bg-amber-700 dark:bg-amber-600'
+                pressedKey === 'p'
+                  ? 'bg-amber-800 dark:bg-amber-700'
+                  : 'bg-amber-700 dark:bg-amber-600'
               }`}
             >
               P
@@ -1941,8 +2402,10 @@ export default function ThemeProvider({
   useEffect(() => {
     setMounted(true);
     const storedTheme = localStorage.getItem('theme') as Theme | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+    const prefersDark = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    ).matches;
+
     if (storedTheme) {
       setTheme(storedTheme);
       document.documentElement.classList.toggle('dark', storedTheme === 'dark');
@@ -2013,7 +2476,9 @@ export default function ThemeSwitch() {
       dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
       dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
       ${
-        pressedKey ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800' : ''
+        pressedKey
+          ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+          : ''
       }`}
       onClick={toggleTheme}
       aria-label="Toggle theme"
