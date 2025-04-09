@@ -11,6 +11,7 @@ pub enum Error {
 }
 
 #[derive(Serialize, Deserialize, Debug, TS)]
+#[serde(tag = "kind", content = "value")]
 #[ts(export)]
 pub enum ClientMessage {
     Auth { game_id: String, user_id: String },
@@ -39,6 +40,7 @@ enum Outcome {
 }
 
 #[derive(Serialize, Debug, Clone, TS)]
+#[serde(tag = "kind", content = "value")]
 #[ts(export)]
 pub enum ServerMessage {
     Move(String),
