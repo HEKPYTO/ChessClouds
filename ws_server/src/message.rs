@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
-use shakmaty::{Color, Outcome};
+use ts_rs::TS;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, TS)]
+#[ts(export)]
 pub enum Error {
     Deserialization,
     Unauthorized,
@@ -9,34 +10,43 @@ pub enum Error {
     InvalidMove,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, TS)]
+#[ts(export)]
 pub enum ClientMessage {
     Auth { game_id: String, user_id: String },
     Move(String),
 }
 
-#[derive(Serialize, Deserialize)]
-#[serde(remote = "Color")]
-enum ColorDef {
+#[derive(Serialize, Deserialize, TS)]
+#[serde(remote = "shakmaty::Color")]
+#[ts(export)]
+enum Color {
     Black = 0,
     White = 1,
 }
 
 // why shakmaty does not derive this???
-#[derive(Serialize, Deserialize)]
-#[serde(remote = "Outcome")]
-enum OutcomeDef {
+#[derive(Serialize, Deserialize, TS)]
+#[serde(remote = "shakmaty::Outcome")]
+#[ts(export)]
+enum Outcome {
     Decisive {
-        #[serde(with = "ColorDef")]
-        winner: Color,
+        #[serde(with = "Color")]
+        #[ts(as = "Color")]
+        winner: shakmaty::Color,
     },
     Draw,
 }
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, TS)]
+#[ts(export)]
 pub enum ServerMessage {
     Move(String),
-    GameEnd(#[serde(with = "OutcomeDef")] Outcome),
+    GameEnd(
+        #[serde(with = "Outcome")]
+        #[ts(as = "Outcome")]
+        shakmaty::Outcome,
+    ),
     Error(Error),
     AuthSuccess,
     MoveHistory(Vec<String>),

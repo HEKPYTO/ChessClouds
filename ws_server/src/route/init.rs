@@ -1,9 +1,11 @@
 use axum::{extract::State, http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 use crate::game_state::{GameState, GameStateMap};
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, TS)]
+#[ts(export)]
 pub struct InitBody {
     pub game_id: String,
     pub white_user_id: String,
