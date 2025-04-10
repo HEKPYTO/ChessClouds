@@ -3,10 +3,27 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import ThemeSwitch from './ThemeSwitch';
+import { XMarkIcon, Bars3Icon } from '@heroicons/react/24/outline';
+
+type NavItem = {
+  name: string;
+  href: string;
+  hasChildren?: boolean;
+};
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [pressedKey, setPressedKey] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [animating, setAnimating] = useState(false);
+
+  const navigationItems: NavItem[] = [
+    { name: 'Features', href: '/features' },
+    { name: 'Tournaments', href: '/tournaments' },
+    { name: 'Docs', href: '/docs' },
+    { name: 'Blog', href: '/blog' },
+    { name: 'Resources', href: '/resources', hasChildren: true },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,7 +74,23 @@ export default function Navbar() {
   };
 
   const handleNavClick = (path: string) => {
+    setMobileMenuOpen(false);
     window.location.href = path;
+  };
+
+  const toggleMobileMenu = () => {
+    setAnimating(true);
+    if (mobileMenuOpen) {
+      setTimeout(() => {
+        setMobileMenuOpen(false);
+        setAnimating(false);
+      }, 300);
+    } else {
+      setMobileMenuOpen(true);
+      setTimeout(() => {
+        setAnimating(false);
+      }, 50);
+    }
   };
 
   return (
@@ -89,36 +122,137 @@ export default function Navbar() {
             </span>
           </button>
 
-          <nav className="hidden md:flex ml-10 space-x-8">
-            <button
-              onClick={() => handleNavClick('/features')}
-              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+          {/* Desktop navigation - only visible on xl screens */}
+          <nav className="hidden xl:flex ml-10 space-x-8">
+            {navigationItems.map((item) =>
+              item.hasChildren ? (
+                <div className="relative group" key={item.name}>
+                  <button className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 flex items-center cursor-pointer">
+                    {item.name}
+                    <svg
+                      className="ml-1 h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  key={item.name}
+                  onClick={() => handleNavClick(item.href)}
+                  className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+                >
+                  {item.name}
+                </button>
+              )
+            )}
+          </nav>
+        </div>
+
+        <div className="flex items-center space-x-3">
+          {/* Theme Switcher - Always visible */}
+          <ThemeSwitch />
+
+          {/* Sign up button - visible on medium and up screens */}
+          <div className="hidden md:block">
+            <Button
+              variant="outline"
+              className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-100/50 transition-all 
+              shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+              dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+              dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
+              ${
+                pressedKey === 's'
+                  ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                  : ''
+              }`}
+              onClick={handleSignUpClick}
             >
-              Features
-            </button>
-            <button
-              onClick={() => handleNavClick('/tournaments')}
-              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+              Sign up
+              <span
+                className={`ml-1 text-xs px-1 rounded transition-colors ${
+                  pressedKey === 's'
+                    ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
+                    : 'bg-amber-100 dark:bg-slate-800'
+                }`}
+              >
+                S
+              </span>
+            </Button>
+          </div>
+
+          {/* Play now button - visible on small and up screens */}
+          <div className="hidden sm:block">
+            <Button
+              className={`h-9 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md transition-all 
+              shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
+              dark:bg-amber-500 dark:hover:bg-amber-600
+              dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]
+              ${
+                pressedKey === 'p'
+                  ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
+                  : ''
+              }`}
+              onClick={handlePlayClick}
             >
-              Tournaments
-            </button>
+              Play now
+              <span
+                className={`ml-1 text-xs px-1 rounded transition-colors ${
+                  pressedKey === 'p'
+                    ? 'bg-amber-800 dark:bg-amber-700'
+                    : 'bg-amber-700 dark:bg-amber-600'
+                }`}
+              >
+                P
+              </span>
+            </Button>
+          </div>
+
+          {/* Hamburger Menu Button - hidden on xl screens */}
+          <button
+            className="xl:hidden flex items-center justify-center h-9 w-9 p-0 border border-amber-300 text-amber-800 
+            hover:bg-amber-100/50 rounded-md transition-all 
+            shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+            dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+            dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
+            onClick={toggleMobileMenu}
+            disabled={animating}
+            aria-label="Menu"
+          >
+            {mobileMenuOpen ? (
+              <XMarkIcon className="h-5 w-5" />
+            ) : (
+              <Bars3Icon className="h-5 w-5" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        className={`xl:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="px-4 py-4 space-y-3 border-t border-amber-200/30 dark:border-slate-700/30 bg-amber-50/95 dark:bg-slate-900/95 backdrop-blur-sm">
+          {navigationItems.map((item) => (
             <button
-              onClick={() => handleNavClick('/docs')}
-              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+              key={item.name}
+              onClick={() => handleNavClick(item.href)}
+              className="block w-full text-left py-2 px-3 text-base text-amber-800 hover:bg-amber-100/70 hover:text-amber-950 dark:text-amber-200 dark:hover:bg-slate-800/70 dark:hover:text-amber-50 rounded-md flex items-center justify-between"
             >
-              Docs
-            </button>
-            <button
-              onClick={() => handleNavClick('/blog')}
-              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
-            >
-              Blog
-            </button>
-            <div className="relative group">
-              <button className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 flex items-center cursor-pointer">
-                Resources
+              <span>{item.name}</span>
+              {item.hasChildren && (
                 <svg
-                  className="ml-1 h-4 w-4"
+                  className="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -127,65 +261,46 @@ export default function Navbar() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
+                    d="M9 5l7 7-7 7"
                   />
                 </svg>
-              </button>
+              )}
+            </button>
+          ))}
+          <div className="pt-2 border-t border-amber-200/30 dark:border-slate-700/30 flex flex-col gap-2">
+            {/* Sign up button in mobile menu - visible only when hidden in header (xs screens) */}
+            <div className="md:hidden">
+              <Button
+                variant="outline"
+                className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-100/50
+                shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+                dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+                dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
+                onClick={handleSignUpClick}
+              >
+                Sign up
+                <span className="ml-1 text-xs px-1 rounded bg-amber-100 dark:bg-slate-800">
+                  S
+                </span>
+              </Button>
             </div>
-          </nav>
-        </div>
 
-        <div className="flex items-center space-x-4">
-          <ThemeSwitch />
-
-          <Button
-            variant="outline"
-            className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-100/50 transition-all 
-            shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
-            dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-            dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
-            ${
-              pressedKey === 's'
-                ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
-                : ''
-            }`}
-            onClick={handleSignUpClick}
-          >
-            Sign up
-            <span
-              className={`ml-1 text-xs px-1 rounded transition-colors ${
-                pressedKey === 's'
-                  ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
-                  : 'bg-amber-100 dark:bg-slate-800'
-              }`}
-            >
-              S
-            </span>
-          </Button>
-
-          <Button
-            className={`h-9 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md transition-all 
-            shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
-            dark:bg-amber-500 dark:hover:bg-amber-600
-            dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]
-            ${
-              pressedKey === 'p'
-                ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
-                : ''
-            }`}
-            onClick={handlePlayClick}
-          >
-            Play now
-            <span
-              className={`ml-1 text-xs px-1 rounded transition-colors ${
-                pressedKey === 'p'
-                  ? 'bg-amber-800 dark:bg-amber-700'
-                  : 'bg-amber-700 dark:bg-amber-600'
-              }`}
-            >
-              P
-            </span>
-          </Button>
+            {/* Play now button in mobile menu - visible only when hidden in header (xs screens) */}
+            <div className="sm:hidden">
+              <Button
+                className="w-full mt-1 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md 
+                shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
+                dark:bg-amber-500 dark:hover:bg-amber-600
+                dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
+                onClick={handlePlayClick}
+              >
+                Play now
+                <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
+                  P
+                </span>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </header>
