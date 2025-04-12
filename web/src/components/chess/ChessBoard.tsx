@@ -62,13 +62,17 @@ export function ChessBoard({
   chess,
 }: ChessBoardProps) {
   const handleMove = (from: Square, to: Square) => {
-    if (previewIndex !== null) return; 
+    if (previewIndex !== null) return;
     onMove(from, to);
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto">      
-      <div className={`${previewIndex !== null ? 'p-0 bg-amber-500 dark:bg-amber-500' : ''} rounded-sm`}>
+    <div className="w-full max-w-lg mx-auto">
+      <div
+        className={`${
+          previewIndex !== null ? 'p-0 bg-amber-500 dark:bg-amber-500' : ''
+        } rounded-sm`}
+      >
         <div className="w-full">
           <div className="w-full aspect-square relative">
             <Chessground
@@ -81,24 +85,25 @@ export function ChessBoard({
               orientation={playingAs === 'w' ? 'white' : 'black'}
               movable={{
                 free: false,
-                color: previewIndex !== null 
-                  ? undefined 
-                  : chess.turn() === playingAs
+                color:
+                  previewIndex !== null
+                    ? undefined
+                    : chess.turn() === playingAs
                     ? playingAs === 'w'
                       ? 'white'
                       : 'black'
                     : undefined,
-                dests: previewIndex !== null ? new Map() : calcMovable(chess)
+                dests: previewIndex !== null ? new Map() : calcMovable(chess),
               }}
               coordinates={true}
               animation={{ enabled: true, duration: 100 }}
               highlight={{
                 lastMove: true,
-                check: true
+                check: true,
               }}
               viewOnly={previewIndex !== null}
             />
-            
+
             {selectVisible && !previewIndex && (
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-700 p-4 rounded shadow-md dark:shadow-black/20 z-10">
                 <div className="flex gap-4">
@@ -128,9 +133,7 @@ export function ChessBoard({
               Preview Mode
             </div>
           ) : (
-            <div className="bg-transparent py-6 font-medium">
-              
-            </div>
+            <div className="bg-transparent py-6 font-medium"></div>
           )}
         </div>
       </div>
