@@ -224,9 +224,29 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden">
-      <div className="flex-grow flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-xl">
+    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden bg-gradient-to-br from-amber-50 via-amber-100/70 to-amber-200/50 dark:from-slate-800 dark:via-amber-900/20 dark:to-slate-900/90">
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'url(/noise.png)',
+          backgroundRepeat: 'repeat',
+          opacity: 0.025,
+        }}
+      />
+      <div
+        className="
+          absolute inset-0 pointer-events-none
+          [background-image:linear-gradient(90deg,rgba(241,194,125,0.15)_1px,transparent_1px),linear-gradient(180deg,rgba(241,194,125,0.15)_1px,transparent_1px)]
+          dark:[background-image:linear-gradient(90deg,rgba(251,191,36,0.2)_1px,transparent_1px),linear-gradient(180deg,rgba(251,191,36,0.2)_1px,transparent_1px)]
+          [background-size:20px_20px]
+        "
+      />
+
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-200/20 dark:bg-amber-500/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-amber-300/20 dark:bg-amber-600/15 rounded-full blur-3xl"></div>
+
+      <div className="flex-grow flex items-center justify-center p-4 relative z-10">
+        <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-700/40 shadow-xl dark:shadow-amber-900/30">
           <CardHeader className="space-y-1 text-center pb-1 pt-6">
             <div className="flex justify-between items-center mb-6">
               <Button
@@ -240,7 +260,7 @@ export default function SignIn() {
                 <HomeIcon className="h-5 w-5" />
               </Button>
 
-              <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500"></div>
+              <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500 shadow-md dark:shadow-amber-600/20"></div>
 
               <Button
                 variant="outline"
@@ -448,9 +468,29 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden">
-      <div className="flex-grow flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-xl">
+    <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden bg-gradient-to-tl from-amber-50 via-amber-100/70 to-amber-200/50 dark:from-slate-800 dark:via-amber-900/20 dark:to-slate-900/90">
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'url(/noise.png)',
+          backgroundRepeat: 'repeat',
+          opacity: 0.025,
+        }}
+      />
+      <div
+        className="
+          absolute inset-0 pointer-events-none
+          [background-image:linear-gradient(90deg,rgba(241,194,125,0.15)_1px,transparent_1px),linear-gradient(180deg,rgba(241,194,125,0.15)_1px,transparent_1px)]
+          dark:[background-image:linear-gradient(90deg,rgba(251,191,36,0.2)_1px,transparent_1px),linear-gradient(180deg,rgba(251,191,36,0.2)_1px,transparent_1px)]
+          [background-size:20px_20px]
+        "
+      />
+
+      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-amber-200/20 dark:bg-amber-500/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-amber-300/20 dark:bg-amber-600/15 rounded-full blur-3xl"></div>
+
+      <div className="flex-grow flex items-center justify-center p-4 relative z-10">
+        <Card className="w-full max-w-md bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-700/40 shadow-xl dark:shadow-amber-900/30">
           <CardHeader className="space-y-1 text-center pb-1 pt-6">
             <div className="flex justify-between items-center mb-6">
               <Button
@@ -464,7 +504,7 @@ export default function SignUp() {
                 <HomeIcon className="h-5 w-5" />
               </Button>
 
-              <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500"></div>
+              <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500 shadow-md dark:shadow-amber-600/20"></div>
 
               <Button
                 variant="outline"
@@ -571,7 +611,7 @@ export default function SignUp() {
               </span>
             </Button>
 
-            <div className="text-xs text-center text-amber-600 dark:text-amber-400">
+            <div className="text-xs text-center text-amber-600 dark:text-amber-400 mt-6">
               By signing up, you agree to our{' '}
               <Link href="#" className="underline underline-offset-2">
                 Terms of Service
@@ -583,7 +623,7 @@ export default function SignUp() {
             </div>
           </CardContent>
           <Separator className="my-1 bg-amber-200/30 dark:bg-amber-700/20" />
-          <CardFooter className="flex flex-col space-y-4 pt-4">
+          <CardFooter className="flex flex-col space-y-4">
             <div className="text-center text-sm text-amber-700 dark:text-amber-300">
               Already have an account?{' '}
               <Link
@@ -716,18 +756,8 @@ export default function SignUp() {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-/* Board colors */
 .cg-wrap coords {
-  color: #92400e !important; /* amber-800 */
+  color: #92400e !important;
 }
 
 .brown .cg-wrap {
@@ -735,19 +765,18 @@ export default function SignUp() {
 }
 
 .cg-wrap {
-  --cg-coord-color-white: #fef3c7 !important; /* amber-100 */
-  --cg-coord-color-black: #92400e !important; /* amber-800 */
+  --cg-coord-color-white: #fef3c7 !important;
+  --cg-coord-color-black: #92400e !important;
   --cg-coord-shadow: none !important;
 }
 
 .brown .cg-wrap square.light {
-  background-color: #fef3c7 !important; /* amber-50 or 100 */
+  background-color: #fef3c7 !important;
 }
 .brown .cg-wrap square.dark {
-  background-color: #b45309 !important; /* amber-700 */
+  background-color: #b45309 !important;
 }
 
-/* Highlights */
 .cg-wrap square.move-dest {
   background: radial-gradient(rgba(217, 119, 6, 0.4) 19%, transparent 0);
 }
@@ -773,39 +802,10 @@ export default function SignUp() {
   background-color: rgba(217, 119, 6, 0.4) !important;
 }
 
-/* Custom shadow for the board */
 .chess-board-container {
   box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-  border-radius: 0.375rem; /* rounded-md */
+  border-radius: 0.375rem;
   overflow: hidden;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes pulse-subtle {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-.animate-float {
-  animation: float 5s ease-in-out infinite;
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 3s ease-in-out infinite;
 }
 </file>
 
@@ -2229,10 +2229,27 @@ export default function Footer() {
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import ThemeSwitch from './ThemeSwitch';
+import { XMarkIcon, Bars3Icon } from '@heroicons/react/24/outline';
+
+type NavItem = {
+  name: string;
+  href: string;
+  hasChildren?: boolean;
+};
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [pressedKey, setPressedKey] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [animating, setAnimating] = useState(false);
+
+  const navigationItems: NavItem[] = [
+    { name: 'Features', href: '/features' },
+    { name: 'Tournaments', href: '/tournaments' },
+    { name: 'Docs', href: '/docs' },
+    { name: 'Blog', href: '/blog' },
+    { name: 'Resources', href: '/resources', hasChildren: true },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -2283,14 +2300,30 @@ export default function Navbar() {
   };
 
   const handleNavClick = (path: string) => {
+    setMobileMenuOpen(false);
     window.location.href = path;
+  };
+
+  const toggleMobileMenu = () => {
+    setAnimating(true);
+    if (mobileMenuOpen) {
+      setTimeout(() => {
+        setMobileMenuOpen(false);
+        setAnimating(false);
+      }, 300);
+    } else {
+      setMobileMenuOpen(true);
+      setTimeout(() => {
+        setAnimating(false);
+      }, 50);
+    }
   };
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-200 ${
         scrolled
-          ? 'border-amber-200/20 bg-amber-50/80 backdrop-blur-md dark:border-slate-700/20 dark:bg-slate-900/80'
+          ? 'border-amber-200/20 bg-amber-50/80 backdrop-blur-sm dark:border-slate-700/20 dark:bg-slate-900/80'
           : 'border-amber-200/10 bg-amber-50/90 dark:border-slate-700/10 dark:bg-slate-900/90'
       }`}
     >
@@ -2315,36 +2348,137 @@ export default function Navbar() {
             </span>
           </button>
 
-          <nav className="hidden md:flex ml-10 space-x-8">
-            <button
-              onClick={() => handleNavClick('/features')}
-              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+          {/* Desktop navigation - only visible on xl screens */}
+          <nav className="hidden xl:flex ml-10 space-x-8">
+            {navigationItems.map((item) =>
+              item.hasChildren ? (
+                <div className="relative group" key={item.name}>
+                  <button className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 flex items-center cursor-pointer">
+                    {item.name}
+                    <svg
+                      className="ml-1 h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  key={item.name}
+                  onClick={() => handleNavClick(item.href)}
+                  className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+                >
+                  {item.name}
+                </button>
+              )
+            )}
+          </nav>
+        </div>
+
+        <div className="flex items-center space-x-3">
+          {/* Theme Switcher - Always visible */}
+          <ThemeSwitch />
+
+          {/* Sign up button - visible on medium and up screens */}
+          <div className="hidden md:block">
+            <Button
+              variant="outline"
+              className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-100/50 transition-all 
+              shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+              dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+              dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
+              ${
+                pressedKey === 's'
+                  ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                  : ''
+              }`}
+              onClick={handleSignUpClick}
             >
-              Features
-            </button>
-            <button
-              onClick={() => handleNavClick('/tournaments')}
-              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+              Sign up
+              <span
+                className={`ml-1 text-xs px-1 rounded transition-colors ${
+                  pressedKey === 's'
+                    ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
+                    : 'bg-amber-100 dark:bg-slate-800'
+                }`}
+              >
+                S
+              </span>
+            </Button>
+          </div>
+
+          {/* Play now button - visible on small and up screens */}
+          <div className="hidden sm:block">
+            <Button
+              className={`h-9 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md transition-all 
+              shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
+              dark:bg-amber-500 dark:hover:bg-amber-600
+              dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]
+              ${
+                pressedKey === 'p'
+                  ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
+                  : ''
+              }`}
+              onClick={handlePlayClick}
             >
-              Tournaments
-            </button>
+              Play now
+              <span
+                className={`ml-1 text-xs px-1 rounded transition-colors ${
+                  pressedKey === 'p'
+                    ? 'bg-amber-800 dark:bg-amber-700'
+                    : 'bg-amber-700 dark:bg-amber-600'
+                }`}
+              >
+                P
+              </span>
+            </Button>
+          </div>
+
+          {/* Hamburger Menu Button - hidden on xl screens */}
+          <button
+            className="xl:hidden flex items-center justify-center h-9 w-9 p-0 border border-amber-300 text-amber-800 
+            hover:bg-amber-100/50 rounded-md transition-all 
+            shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+            dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+            dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
+            onClick={toggleMobileMenu}
+            disabled={animating}
+            aria-label="Menu"
+          >
+            {mobileMenuOpen ? (
+              <XMarkIcon className="h-5 w-5" />
+            ) : (
+              <Bars3Icon className="h-5 w-5" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        className={`xl:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="px-4 py-4 space-y-3 border-t border-amber-200/30 dark:border-slate-700/30 bg-amber-50/95 dark:bg-slate-900/95 backdrop-blur-sm">
+          {navigationItems.map((item) => (
             <button
-              onClick={() => handleNavClick('/docs')}
-              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+              key={item.name}
+              onClick={() => handleNavClick(item.href)}
+              className="block w-full text-left py-2 px-3 text-base text-amber-800 hover:bg-amber-100/70 hover:text-amber-950 dark:text-amber-200 dark:hover:bg-slate-800/70 dark:hover:text-amber-50 rounded-md flex items-center justify-between"
             >
-              Docs
-            </button>
-            <button
-              onClick={() => handleNavClick('/blog')}
-              className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
-            >
-              Blog
-            </button>
-            <div className="relative group">
-              <button className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 flex items-center cursor-pointer">
-                Resources
+              <span>{item.name}</span>
+              {item.hasChildren && (
                 <svg
-                  className="ml-1 h-4 w-4"
+                  className="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -2353,65 +2487,46 @@ export default function Navbar() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
+                    d="M9 5l7 7-7 7"
                   />
                 </svg>
-              </button>
+              )}
+            </button>
+          ))}
+          <div className="pt-2 border-t border-amber-200/30 dark:border-slate-700/30 flex flex-col gap-2">
+            {/* Sign up button in mobile menu - visible only when hidden in header (xs screens) */}
+            <div className="md:hidden">
+              <Button
+                variant="outline"
+                className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-100/50
+                shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+                dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+                dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
+                onClick={handleSignUpClick}
+              >
+                Sign up
+                <span className="ml-1 text-xs px-1 rounded bg-amber-100 dark:bg-slate-800">
+                  S
+                </span>
+              </Button>
             </div>
-          </nav>
-        </div>
 
-        <div className="flex items-center space-x-4">
-          <ThemeSwitch />
-
-          <Button
-            variant="outline"
-            className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-100/50 transition-all 
-            shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
-            dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-            dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
-            ${
-              pressedKey === 's'
-                ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
-                : ''
-            }`}
-            onClick={handleSignUpClick}
-          >
-            Sign up
-            <span
-              className={`ml-1 text-xs px-1 rounded transition-colors ${
-                pressedKey === 's'
-                  ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
-                  : 'bg-amber-100 dark:bg-slate-800'
-              }`}
-            >
-              S
-            </span>
-          </Button>
-
-          <Button
-            className={`h-9 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md transition-all 
-            shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
-            dark:bg-amber-500 dark:hover:bg-amber-600
-            dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]
-            ${
-              pressedKey === 'p'
-                ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
-                : ''
-            }`}
-            onClick={handlePlayClick}
-          >
-            Play now
-            <span
-              className={`ml-1 text-xs px-1 rounded transition-colors ${
-                pressedKey === 'p'
-                  ? 'bg-amber-800 dark:bg-amber-700'
-                  : 'bg-amber-700 dark:bg-amber-600'
-              }`}
-            >
-              P
-            </span>
-          </Button>
+            {/* Play now button in mobile menu - visible only when hidden in header (xs screens) */}
+            <div className="sm:hidden">
+              <Button
+                className="w-full mt-1 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md 
+                shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
+                dark:bg-amber-500 dark:hover:bg-amber-600
+                dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
+                onClick={handlePlayClick}
+              >
+                Play now
+                <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
+                  P
+                </span>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </header>
@@ -2856,9 +2971,6 @@ module.exports = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  theme: {
-    extend: {},
-  },
   plugins: [],
 }
 </file>
