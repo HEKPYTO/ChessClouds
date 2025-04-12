@@ -16,6 +16,7 @@
     "chess.js": "^1.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.487.0",
     "next": "15.2.4",
     "react": "^19.0.0",
@@ -32,9 +33,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9.24.0",
     "eslint-config-next": "15.2.4",
+    "prettier": "^2.8.0",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "prettier": "^2.8.0"
+    "typescript": "^5"
   },
   "prettier": {
     "semi": true,
