@@ -29,9 +29,12 @@ function Pane({ playingAs }: PaneProps) {
   const [fen, setFen] = useState(chess.fen());
   const [lastMove, setLastMove] = useState<[Square, Square] | undefined>();
   const [selectVisible, setSelectVisible] = useState(false);
-  const [pendingMove, setPendingMove] = useState<[Square, Square] | undefined>();
+  const [pendingMove, setPendingMove] = useState<
+    [Square, Square] | undefined
+  >();
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fullHistory = useMemo(() => chess.history({ verbose: true }), [fen]);
 
   const previewFen = useMemo(() => {
@@ -113,7 +116,10 @@ function Pane({ playingAs }: PaneProps) {
   const handleNext = () => {
     if (previewIndex !== null && previewIndex < fullHistory.length - 1) {
       setPreviewIndex(previewIndex + 1);
-    } else if (previewIndex !== null && previewIndex === fullHistory.length - 1) {
+    } else if (
+      previewIndex !== null &&
+      previewIndex === fullHistory.length - 1
+    ) {
       setPreviewIndex(null);
     }
   };
@@ -122,15 +128,15 @@ function Pane({ playingAs }: PaneProps) {
     setPreviewIndex(null);
   };
 
-  const handleResetGame = () => {
-    chess.reset();
-    setFen(chess.fen());
-    setLastMove(undefined);
-    setPreviewIndex(null);
-    if (playingAs === 'b' && chess.turn() !== 'b' && !chess.isGameOver()) {
-      setTimeout(randomMove, 500);
-    }
-  };
+  // const handleResetGame = () => {
+  //   chess.reset();
+  //   setFen(chess.fen());
+  //   setLastMove(undefined);
+  //   setPreviewIndex(null);
+  //   if (playingAs === 'b' && chess.turn() !== 'b' && !chess.isGameOver()) {
+  //     setTimeout(randomMove, 500);
+  //   }
+  // };
 
   const movePairs = useMemo(() => {
     const pairs = [];
@@ -167,7 +173,7 @@ function Pane({ playingAs }: PaneProps) {
               chess={chess}
             />
           </div>
-          
+
           <div className="w-full md:w-1/2 flex flex-col gap-4">
             <div className="bg-white dark:bg-slate-700 rounded-lg border border-amber-200/50 dark:border-slate-600/50 p-4 text-center">
               <div className="font-medium text-lg text-amber-800 dark:text-amber-200">
@@ -177,10 +183,10 @@ function Pane({ playingAs }: PaneProps) {
                 {gameStatus}
               </div>
             </div>
-            
+
             <div className="bg-white dark:bg-slate-700 rounded-lg border border-amber-200/50 dark:border-slate-600/50 p-4 flex flex-col h-[435px]">
               <div className="flex justify-center gap-4 mb-4">
-                <Button 
+                <Button
                   variant="outline"
                   size="sm"
                   className="w-10 h-10 p-2 bg-amber-600 hover:bg-amber-700 border-none text-white transition-all 
@@ -193,7 +199,7 @@ function Pane({ playingAs }: PaneProps) {
                 >
                   <ChevronDoubleLeftIcon className="h-5 w-5" />
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   size="sm"
                   className="w-10 h-10 p-2 bg-amber-600 hover:bg-amber-700 border-none text-white transition-all 
@@ -206,7 +212,7 @@ function Pane({ playingAs }: PaneProps) {
                 >
                   <ChevronLeftIcon className="h-5 w-5" />
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   size="sm"
                   className="w-10 h-10 p-2 bg-amber-600 hover:bg-amber-700 border-none text-white transition-all 
@@ -219,7 +225,7 @@ function Pane({ playingAs }: PaneProps) {
                 >
                   <ChevronRightIcon className="h-5 w-5" />
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   size="sm"
                   className="w-10 h-10 p-2 bg-amber-600 hover:bg-amber-700 border-none text-white transition-all 
@@ -233,7 +239,7 @@ function Pane({ playingAs }: PaneProps) {
                   <ChevronDoubleRightIcon className="h-5 w-5" />
                 </Button>
               </div>
-              
+
               <div className="overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-amber-300 scrollbar-track-amber-100 dark:scrollbar-thumb-slate-500 dark:scrollbar-track-slate-700">
                 {movePairs.length > 0 ? (
                   <div className="pl-2">
@@ -242,25 +248,29 @@ function Pane({ playingAs }: PaneProps) {
                         <span className="w-8 text-amber-800 dark:text-amber-200 font-medium">
                           {pair.moveNumber}.
                         </span>
-                        
+
                         {pair.whiteMove && (
                           <button
                             className={`px-2 py-1 rounded mr-2 text-amber-800 dark:text-amber-200 font-mono
-                            ${previewIndex === pair.whiteIndex 
-                              ? 'bg-amber-100 dark:bg-amber-900/30' 
-                              : 'hover:bg-amber-100/50 dark:hover:bg-amber-900/20'}`}
+                            ${
+                              previewIndex === pair.whiteIndex
+                                ? 'bg-amber-100 dark:bg-amber-900/30'
+                                : 'hover:bg-amber-100/50 dark:hover:bg-amber-900/20'
+                            }`}
                             onClick={() => previewMove(pair.whiteIndex)}
                           >
                             {pair.whiteMove}
                           </button>
                         )}
-                        
+
                         {pair.blackMove && (
                           <button
                             className={`px-2 py-1 rounded text-amber-800 dark:text-amber-200 font-mono
-                            ${previewIndex === pair.blackIndex 
-                              ? 'bg-amber-100 dark:bg-amber-900/30' 
-                              : 'hover:bg-amber-100/50 dark:hover:bg-amber-900/20'}`}
+                            ${
+                              previewIndex === pair.blackIndex
+                                ? 'bg-amber-100 dark:bg-amber-900/30'
+                                : 'hover:bg-amber-100/50 dark:hover:bg-amber-900/20'
+                            }`}
                             onClick={() => previewMove(pair.blackIndex)}
                           >
                             {pair.blackMove}
@@ -284,12 +294,12 @@ function Pane({ playingAs }: PaneProps) {
 }
 
 function getGameStatus(chess: Chess): string {
-  if (!chess.isGameOver()) return "On Going";
+  if (!chess.isGameOver()) return 'On Going';
   if (chess.isCheckmate()) {
     const winner = chess.turn() === 'w' ? 'Black' : 'White';
     return `Completed - ${winner} wins by checkmate`;
   }
-  if (chess.isStalemate()) return "Completed - Stalemate";
-  if (chess.isDraw()) return "Completed - Draw";
-  return "Completed";
+  if (chess.isStalemate()) return 'Completed - Stalemate';
+  if (chess.isDraw()) return 'Completed - Draw';
+  return 'Completed';
 }
