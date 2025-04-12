@@ -61,60 +61,79 @@ export function ChessBoard({
   previewIndex,
   chess,
 }: ChessBoardProps) {
+  const handleMove = (from: Square, to: Square) => {
+    if (previewIndex !== null) return; 
+    onMove(from, to);
+  };
+
   return (
-    <div
-      className={`relative ${
-        previewIndex !== null ? 'border-orange-500' : 'border-transparent'
-      } rounded-sm border-10 w-full max-w-lg mx-auto`}
-    >
-      <div className="relative w-full aspect-square overflow-hidden">
-        <Chessground
-          width="100%"
-          height="100%"
-          fen={fen}
-          onMove={onMove}
-          lastMove={lastMove}
-          turnColor={chess.turn() === 'w' ? 'white' : 'black'}
-          orientation={playingAs === 'w' ? 'white' : 'black'}
-          movable={{
-            free: false,
-            color:
-              chess.turn() === playingAs
-                ? playingAs === 'w'
-                  ? 'white'
-                  : 'black'
-                : undefined,
-            dests: calcMovable(chess),
-          }}
-        />
-      </div>
-      {previewIndex !== null && (
-        <div className="bg-orange-500 text-white text-center pt-2">
-          Preview Mode
-        </div>
-      )}
-      {selectVisible && (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded shadow-md z-10">
-          <div className="flex gap-4">
-            {(['q', 'r', 'n', 'b'] as PromotionPiece[]).map((piece) => (
-              <div
-                key={piece}
-                className="w-12 h-12 flex justify-center items-center cursor-pointer"
-                onClick={() => promotion(piece)}
-              >
-                <Image
-                  src={pieceImages[chess.turn() as 'w' | 'b'][piece]}
-                  alt={`${
-                    chess.turn() === 'w' ? 'White' : 'Black'
-                  } ${piece.toUpperCase()}`}
-                  width={64}
-                  height={64}
-                />
+    <div className="w-full max-w-lg mx-auto">      
+      <div className={`${previewIndex !== null ? 'p-0 bg-amber-500 dark:bg-amber-500' : ''} rounded-sm`}>
+        <div className="w-full">
+          <div className="w-full aspect-square relative">
+            <Chessground
+              width="100%"
+              height="100%"
+              fen={fen}
+              onMove={handleMove}
+              lastMove={lastMove}
+              turnColor={chess.turn() === 'w' ? 'white' : 'black'}
+              orientation={playingAs === 'w' ? 'white' : 'black'}
+              movable={{
+                free: false,
+                color: previewIndex !== null 
+                  ? undefined 
+                  : chess.turn() === playingAs
+                    ? playingAs === 'w'
+                      ? 'white'
+                      : 'black'
+                    : undefined,
+                dests: previewIndex !== null ? new Map() : calcMovable(chess)
+              }}
+              coordinates={true}
+              animation={{ enabled: true, duration: 100 }}
+              highlight={{
+                lastMove: true,
+                check: true
+              }}
+              viewOnly={previewIndex !== null}
+            />
+            
+            {selectVisible && !previewIndex && (
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-700 p-4 rounded shadow-md dark:shadow-black/20 z-10">
+                <div className="flex gap-4">
+                  {(['q', 'r', 'n', 'b'] as PromotionPiece[]).map((piece) => (
+                    <div
+                      key={piece}
+                      className="w-12 h-12 flex justify-center items-center cursor-pointer bg-amber-50 dark:bg-slate-600 hover:bg-amber-100 dark:hover:bg-slate-500 rounded transition-colors"
+                      onClick={() => promotion(piece)}
+                    >
+                      <Image
+                        src={pieceImages[chess.turn() as 'w' | 'b'][piece]}
+                        alt={`${
+                          chess.turn() === 'w' ? 'White' : 'Black'
+                        } ${piece.toUpperCase()}`}
+                        width={64}
+                        height={64}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+            )}
           </div>
+
+          {previewIndex !== null ? (
+            <div className="bg-amber-500 text-white text-center py-3 font-medium">
+              Preview Mode
+            </div>
+          ) : (
+            <div className="bg-transparent py-6 font-medium">
+              
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
