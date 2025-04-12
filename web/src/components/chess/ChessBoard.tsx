@@ -5,6 +5,8 @@ import 'react-chessground/dist/styles/chessground.css';
 import { Chess } from 'chess.js';
 import type { Square } from 'chess.js';
 import Image from 'next/image';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 import wQ from 'react-chessground/dist/images/pieces/merida/wQ.svg';
 import wR from 'react-chessground/dist/images/pieces/merida/wR.svg';
@@ -67,11 +69,13 @@ export function ChessBoard({
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto">
-      <div
-        className={`${
-          previewIndex !== null ? 'p-0 bg-amber-500 dark:bg-amber-500' : ''
-        } rounded-sm`}
+    <Card className="w-full max-w-lg mx-auto bg-transparent border-0 shadow-none">
+      <CardContent
+        className={`p-0 ${
+          previewIndex !== null
+            ? 'bg-amber-500 dark:bg-amber-500 rounded-sm'
+            : ''
+        }`}
       >
         <div className="w-full">
           <div className="w-full aspect-square relative">
@@ -108,9 +112,10 @@ export function ChessBoard({
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-700 p-4 rounded shadow-md dark:shadow-black/20 z-10">
                 <div className="flex gap-4">
                   {(['q', 'r', 'n', 'b'] as PromotionPiece[]).map((piece) => (
-                    <div
+                    <Button
                       key={piece}
-                      className="w-12 h-12 flex justify-center items-center cursor-pointer bg-amber-50 dark:bg-slate-600 hover:bg-amber-100 dark:hover:bg-slate-500 rounded transition-colors"
+                      variant="outline"
+                      className="w-12 h-12 p-0 flex justify-center items-center bg-amber-50 dark:bg-slate-600 hover:bg-amber-100 dark:hover:bg-slate-500 transition-colors border-amber-200 dark:border-slate-500"
                       onClick={() => promotion(piece)}
                     >
                       <Image
@@ -121,7 +126,7 @@ export function ChessBoard({
                         width={64}
                         height={64}
                       />
-                    </div>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -136,7 +141,7 @@ export function ChessBoard({
             <div className="bg-transparent py-6 font-medium"></div>
           )}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
