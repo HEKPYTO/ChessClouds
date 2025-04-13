@@ -1,14 +1,10 @@
 name: Upload image to Amazon
 
 on:
-  push:
-    paths:
-      - 'web/**'
-    branches: ['*']
-  pull_request:
-    paths:
-      - 'web/**'
-    branches: ['*']
+  workflow_run:
+    workflows: ["Code check and build"]
+    types: [completed]
+    branches: ["*"]
 
 jobs:
 
