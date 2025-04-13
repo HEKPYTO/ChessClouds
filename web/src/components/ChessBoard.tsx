@@ -69,7 +69,7 @@ export function ChessBoard({
   };
 
   return (
-    <Card className="w-full max-w-lg mx-auto bg-transparent border-0 shadow-none">
+    <Card className="w-full max-w-lg mx-auto bg-transparent border-0 shadow-none pt-4 pb-0 md:py-6">
       <CardContent
         className={`p-0 ${
           previewIndex !== null
