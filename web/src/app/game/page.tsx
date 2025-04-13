@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Chess, type Move } from 'chess.js';
 import type { Square } from 'chess.js';
 import { Button } from '@/components/ui/button';
-import { ChessBoard } from '@/components/chess/ChessBoard';
+import { ChessBoard } from '@/components/ChessBoard';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   ChevronDoubleLeftIcon,

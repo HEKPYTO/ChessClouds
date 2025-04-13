@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import CustomChessBoard from '@/components/CustomChessBoard';
+import CustomChessBoard from '@/components/DisplayChessBoard';
 import ChessNotations from '@/components/ChessNotations';
 import { Button } from '@/components/ui/button';
 import {

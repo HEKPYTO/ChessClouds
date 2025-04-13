@@ -10,7 +10,7 @@ import {
   ChevronRightIcon,
   Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
-import CustomChessBoard from '@/components/CustomChessBoard';
+import CustomChessBoard from '@/components/DisplayChessBoard';
 import {
   Carousel,
   CarouselContent,
