@@ -36,7 +36,7 @@ function Pane({ playingAs }: PaneProps) {
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps 
   const fullHistory = useMemo(() => chess.history({ verbose: true }), [fen]);
 
   const previewFen = useMemo(() => {
