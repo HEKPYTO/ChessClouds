@@ -25,7 +25,8 @@ export default function ClientLayout({
     return () => clearTimeout(timer);
   }, []);
 
-  const isAuthPage = pathname === '/signin' || pathname === '/signup';
+  const isAuthPage =
+    pathname === '/signin' || pathname === '/signup' || pathname === '/signout';
 
   if (showLoading) {
     return <LoadingScreen />;
