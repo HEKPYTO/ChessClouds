@@ -20,7 +20,7 @@ export default function ClientLayout({
     const timer = setTimeout(() => {
       setMounted(true);
       setShowLoading(false);
-    }, 5000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
