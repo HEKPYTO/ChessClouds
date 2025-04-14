@@ -29,19 +29,22 @@ export default function DevPage() {
   const [connected, setConnected] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [messages, setMessages] = useState<string[]>([]);
-  const [gameId, setGameId] = useState('game123');
+  const [gameId, setGameId] = useState('game');
   const [userId, setUserId] = useState('white');
   const [moveToSend, setMoveToSend] = useState('e4');
 
   const logMessage = (message: string) => {
-    setMessages((prev) => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+    setMessages((prev) => [
+      ...prev,
+      `${new Date().toLocaleTimeString()}: ${message}`,
+    ]);
   };
 
   const connectWebSocket = () => {
     try {
       const serverUrl = `ws://${host}:${port}/ws`;
       logMessage(`Connecting to WebSocket at ${serverUrl}`);
-      
+
       const ws = new WebSocket(serverUrl);
       setSocket(ws);
 
@@ -92,23 +95,27 @@ export default function DevPage() {
 
   const initializeGame = async () => {
     try {
-      logMessage(`Initializing game ${gameId} with white: ${userId}, black: ${userId === 'white' ? 'black' : 'white'}`);
-      
+      logMessage(
+        `Initializing game ${gameId} with white: ${userId}, black: ${
+          userId === 'white' ? 'black' : 'white'
+        }`
+      );
+
       const initBody = {
         game_id: gameId,
         white_user_id: 'white',
-        black_user_id: 'black'
+        black_user_id: 'black',
       };
-      
+
       const response = await fetch(`http://${host}:${port}/init`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          Accept: 'application/json',
         },
-        body: JSON.stringify(initBody)
+        body: JSON.stringify(initBody),
       });
-      
+
       if (response.ok) {
         logMessage('Game initialized successfully');
       } else {
@@ -131,8 +138,8 @@ export default function DevPage() {
         kind: 'Auth',
         value: {
           game_id: gameId,
-          user_id: userId
-        }
+          user_id: userId,
+        },
       };
 
       logMessage(`Sending auth: ${JSON.stringify(authMsg)}`);
@@ -156,7 +163,7 @@ export default function DevPage() {
     try {
       const moveMsg: ClientMessage = {
         kind: 'Move',
-        value: moveToSend
+        value: moveToSend,
       };
 
       logMessage(`Sending move: ${JSON.stringify(moveMsg)}`);
@@ -177,19 +184,19 @@ export default function DevPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-4">WebSocket Testing</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-white/50 dark:bg-slate-800/50">
           <CardContent className="p-4">
             <h2 className="text-lg font-semibold mb-4">Controls</h2>
-            
+
             <div className="space-y-4">
               <div className="flex gap-4">
                 <div className="flex-1">
                   <label className="block text-sm mb-1">Server Host</label>
-                  <input 
-                    type="text" 
-                    value={host} 
+                  <input
+                    type="text"
+                    value={host}
                     onChange={(e) => setHost(e.target.value)}
                     className="w-full p-2 border rounded bg-amber-50 dark:bg-slate-700"
                     placeholder="localhost"
@@ -197,22 +204,22 @@ export default function DevPage() {
                 </div>
                 <div className="w-1/3">
                   <label className="block text-sm mb-1">Port</label>
-                  <input 
-                    type="text" 
-                    value={port} 
+                  <input
+                    type="text"
+                    value={port}
                     onChange={(e) => setPort(e.target.value)}
                     className="w-full p-2 border rounded bg-amber-50 dark:bg-slate-700"
                     placeholder="8000"
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm mb-1">Game ID</label>
                 <div className="flex gap-2">
-                  <input 
-                    type="text" 
-                    value={gameId} 
+                  <input
+                    type="text"
+                    value={gameId}
                     onChange={(e) => setGameId(e.target.value)}
                     className="w-full p-2 border rounded bg-amber-50 dark:bg-slate-700"
                   />
@@ -224,7 +231,7 @@ export default function DevPage() {
                   </Button>
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm mb-1">User ID</label>
                 <div className="flex gap-2">
@@ -238,7 +245,7 @@ export default function DevPage() {
                   </select>
                 </div>
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   onClick={connectWebSocket}
@@ -247,7 +254,7 @@ export default function DevPage() {
                 >
                   Connect WebSocket
                 </Button>
-                
+
                 <Button
                   onClick={authenticate}
                   disabled={!connected || authenticated}
@@ -256,13 +263,13 @@ export default function DevPage() {
                   Authenticate
                 </Button>
               </div>
-              
+
               <div>
                 <label className="block text-sm mb-1">Move (e.g., e4)</label>
                 <div className="flex gap-2">
-                  <input 
-                    type="text" 
-                    value={moveToSend} 
+                  <input
+                    type="text"
+                    value={moveToSend}
                     onChange={(e) => setMoveToSend(e.target.value)}
                     className="w-full p-2 border rounded bg-amber-50 dark:bg-slate-700"
                   />
@@ -275,20 +282,28 @@ export default function DevPage() {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="flex gap-2 mt-4">
-                <Badge className={`${connected ? 'bg-green-600' : 'bg-red-600'} text-white`}>
+                <Badge
+                  className={`${
+                    connected ? 'bg-green-600' : 'bg-red-600'
+                  } text-white`}
+                >
                   {connected ? 'Connected' : 'Disconnected'}
                 </Badge>
-                
-                <Badge className={`${authenticated ? 'bg-green-600' : 'bg-red-600'} text-white`}>
+
+                <Badge
+                  className={`${
+                    authenticated ? 'bg-green-600' : 'bg-red-600'
+                  } text-white`}
+                >
                   {authenticated ? 'Authenticated' : 'Not Authenticated'}
                 </Badge>
               </div>
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-white/50 dark:bg-slate-800/50">
           <CardContent className="p-4">
             <div className="flex justify-between items-center mb-2">
@@ -302,13 +317,18 @@ export default function DevPage() {
                 Clear
               </Button>
             </div>
-            
+
             <div className="bg-amber-50 dark:bg-slate-700 border border-amber-200 dark:border-slate-600 rounded p-2 h-[400px] overflow-y-auto">
               {messages.length === 0 ? (
-                <div className="text-center text-amber-600 dark:text-amber-400 py-4">No messages yet</div>
+                <div className="text-center text-amber-600 dark:text-amber-400 py-4">
+                  No messages yet
+                </div>
               ) : (
                 messages.map((msg, i) => (
-                  <div key={i} className="py-1 border-b border-amber-100 dark:border-slate-600 text-xs font-mono">
+                  <div
+                    key={i}
+                    className="py-1 border-b border-amber-100 dark:border-slate-600 text-xs font-mono"
+                  >
                     {msg}
                   </div>
                 ))
