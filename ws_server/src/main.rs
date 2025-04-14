@@ -5,7 +5,7 @@ use axum::{
     Router,
 };
 use scc::HashMap;
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::cors::CorsLayer;
 use ws_server::{
     game_state::GameStateMap,
     route::{games::get_games, init::post_init, ws::ws_handler},
@@ -18,10 +18,8 @@ async fn main() {
 
     let state: GameStateMap = Arc::new(HashMap::new());
 
-    let cors = CorsLayer::new().allow_origin(Any);
-
     let app = Router::new()
-        .layer(cors)
+        .layer(CorsLayer::permissive())
         .route("/ws", any(ws_handler))
         .route("/init", post(post_init))
         .route("/games", get(get_games))
