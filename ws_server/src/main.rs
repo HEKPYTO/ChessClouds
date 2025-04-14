@@ -19,11 +19,11 @@ async fn main() {
     let state: GameStateMap = Arc::new(HashMap::new());
 
     let app = Router::new()
-        .layer(CorsLayer::permissive())
         .route("/ws", any(ws_handler))
         .route("/init", post(post_init))
         .route("/games", get(get_games))
-        .with_state(state);
+        .with_state(state)
+        .layer(CorsLayer::permissive());
 
     let listener = tokio::net::TcpListener::bind(HOST).await.unwrap();
     axum::serve(listener, app).await.unwrap();
