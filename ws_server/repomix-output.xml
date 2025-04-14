@@ -969,7 +969,7 @@ pub mod message;
 pub mod route;
 
 pub const MAX_CHANNEL_CAPACITY: usize = 64;
-pub const HOST: &'static str = "0.0.0.0:3000";
+pub const HOST: &'static str = "0.0.0.0:8000";
 </file>
 
 <file path="src/main.rs">
@@ -980,6 +980,7 @@ use axum::{
     Router,
 };
 use scc::HashMap;
+use tower_http::cors::CorsLayer;
 use ws_server::{
     game_state::GameStateMap,
     route::{games::get_games, init::post_init, ws::ws_handler},
@@ -989,9 +990,11 @@ use ws_server::{
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
+
     let state: GameStateMap = Arc::new(HashMap::new());
 
     let app = Router::new()
+        .layer(CorsLayer::permissive())
         .route("/ws", any(ws_handler))
         .route("/init", post(post_init))
         .route("/games", get(get_games))
@@ -1114,6 +1117,7 @@ serde_json = "1.0.140"
 shakmaty = { version = "0.27.3", features = ["serde"] }
 tokio = { version = "1.44.1", features = ["full"] }
 tokio-tungstenite = "0.26.2"
+tower-http = { version = "0.6.2", features = ["cors"] }
 tracing = "0.1.41"
 tracing-subscriber = "0.3.19"
 ts-rs = "10.1.0"

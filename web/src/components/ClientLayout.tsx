@@ -16,6 +16,9 @@ export default function ClientLayout({
   const [mounted, setMounted] = useState(false);
   const [showLoading, setShowLoading] = useState(true);
 
+  const isAuthPage =
+  pathname === '/signin' || pathname === '/signup' || pathname === '/signout' || pathname === '/dev';
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setMounted(true);
@@ -25,8 +28,7 @@ export default function ClientLayout({
     return () => clearTimeout(timer);
   }, []);
 
-  const isAuthPage =
-    pathname === '/signin' || pathname === '/signup' || pathname === '/signout';
+
 
   if (showLoading) {
     return <LoadingScreen />;
