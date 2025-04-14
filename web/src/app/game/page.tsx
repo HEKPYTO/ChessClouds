@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Chess, type Move } from 'chess.js';
 import type { Square } from 'chess.js';
 import { Button } from '@/components/ui/button';
@@ -36,7 +36,7 @@ function Pane({ playingAs }: PaneProps) {
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fullHistory = useMemo(() => chess.history({ verbose: true }), [fen]);
 
   const previewFen = useMemo(() => {
@@ -49,6 +49,18 @@ function Pane({ playingAs }: PaneProps) {
   useEffect(() => {
     setFen(chess.fen());
   }, [chess]);
+
+  const moveListRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (
+      moveListRef.current &&
+      fullHistory.length > 0 &&
+      previewIndex === null
+    ) {
+      moveListRef.current.scrollTop = moveListRef.current.scrollHeight;
+    }
+  }, [fullHistory.length, previewIndex]);
 
   const onMove = (from: Square, to: Square) => {
     if (previewIndex !== null) {
@@ -307,7 +319,10 @@ function Pane({ playingAs }: PaneProps) {
           </div>
 
           <div className="bg-amber-50 dark:bg-slate-800 rounded-lg border border-amber-200/50 dark:border-amber-800/30 overflow-hidden shadow-md flex flex-col h-[435px]">
-            <div className="overflow-y-auto flex-grow max-h-[435px] px-4 font-mono text-sm">
+            <div
+              ref={moveListRef}
+              className="overflow-y-auto flex-grow max-h-[435px] px-4 font-mono text-sm"
+            >
               <div className="pt-2" />
               <table className="w-full table-fixed">
                 <thead className="text-left text-amber-700 dark:text-amber-300 border-b border-amber-200/50 dark:border-amber-700/30 sticky top-0 bg-amber-50 dark:bg-slate-800">
@@ -402,7 +417,10 @@ function Pane({ playingAs }: PaneProps) {
             </Card>
 
             <div className="flex-1 bg-amber-50 dark:bg-slate-800 rounded-lg border border-amber-200/50 dark:border-amber-800/30 overflow-hidden shadow-md flex flex-col h-[435px]">
-              <div className="overflow-y-auto flex-grow max-h-[320px] px-4 font-mono text-sm">
+              <div
+                ref={moveListRef}
+                className="overflow-y-auto flex-grow max-h-[400px] px-4 font-mono text-sm"
+              >
                 <div className="pt-2" />
                 <table className="w-full table-fixed">
                   <thead className="text-left text-amber-700 dark:text-amber-300 border-b border-amber-200/50 dark:border-amber-700/30 sticky top-0 bg-amber-50 dark:bg-slate-800">
