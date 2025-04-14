@@ -13,19 +13,14 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { HomeIcon } from '@heroicons/react/24/outline';
-import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
+import ThemeSwitch from '@/components/ThemeSwitch';
 
 export default function SignOut() {
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const [pressedButton, setPressedButton] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
-    setTheme(
-      document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-    );
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'h') {
         setPressedButton('home');
@@ -81,13 +76,6 @@ export default function SignOut() {
     }, 150);
   };
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
-    localStorage.setItem('theme', newTheme);
-  };
-
   return (
     <div className="min-h-screen flex flex-col text-slate-800 dark:text-amber-50 relative overflow-hidden bg-gradient-to-tr from-amber-50 via-amber-100/70 to-amber-200/50 dark:from-slate-800 dark:via-amber-900/20 dark:to-slate-900/90">
       <div
@@ -127,24 +115,11 @@ export default function SignOut() {
 
               <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500 shadow-md dark:shadow-amber-600/20"></div>
 
-              <Button
-                variant="outline"
-                className="h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-50
-                shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
-                dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-                dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
-                onClick={toggleTheme}
-              >
-                {theme === 'light' ? (
-                  <MoonIcon className="h-5 w-5" />
-                ) : (
-                  <SunIcon className="h-5 w-5" />
-                )}
-              </Button>
+              <ThemeSwitch />
             </div>
 
             <CardTitle className="text-2xl font-bold text-amber-900 dark:text-amber-100 font-display">
-              Sign out from ChessClouds
+              Exit ChessClouds
             </CardTitle>
             <CardDescription className="text-amber-700 dark:text-amber-300">
               Are you sure you really want to sign out?

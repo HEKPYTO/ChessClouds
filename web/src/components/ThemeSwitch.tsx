@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react';
 import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
 import { Button } from './ui/button';
 
-export default function ThemeSwitch() {
+interface ThemeSwitchProps {
+  className?: string;
+}
+
+export default function ThemeSwitch({ className = '' }: ThemeSwitchProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
   const [pressedKey, setPressedKey] = useState<boolean>(false);
@@ -27,7 +31,7 @@ export default function ThemeSwitch() {
   };
 
   if (!mounted) {
-    return;
+    return null;
   }
 
   return (
@@ -42,7 +46,7 @@ export default function ThemeSwitch() {
         pressedKey
           ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
           : ''
-      }`}
+      } ${className}`}
       onClick={toggleTheme}
       aria-label="Toggle theme"
     >
