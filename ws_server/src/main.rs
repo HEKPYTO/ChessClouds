@@ -5,6 +5,7 @@ use axum::{
     Router,
 };
 use scc::HashMap;
+use tower_http::cors::{Any, CorsLayer};
 use ws_server::{
     game_state::GameStateMap,
     route::{games::get_games, init::post_init, ws::ws_handler},
@@ -14,9 +15,13 @@ use ws_server::{
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
+
     let state: GameStateMap = Arc::new(HashMap::new());
 
+    let cors = CorsLayer::new().allow_origin(Any);
+
     let app = Router::new()
+        .layer(cors)
         .route("/ws", any(ws_handler))
         .route("/init", post(post_init))
         .route("/games", get(get_games))
