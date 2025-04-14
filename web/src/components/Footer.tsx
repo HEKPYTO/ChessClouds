@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-amber-200/30 dark:border-slate-700/30 py-12 mt-12 bg-amber-100 dark:bg-slate-800">
+    <footer className="relative border-t border-amber-200/30 dark:border-slate-700/30 py-12 bg-amber-100 dark:bg-slate-800">
       <div
         className="absolute inset-0"
         style={{

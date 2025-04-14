@@ -163,3 +163,7 @@
   border-radius: 0.375rem;
   overflow: hidden;
 }
+
+.cg-wrap square.check {
+  background-color: rgba(255, 73, 60, 0.75) !important;
+}

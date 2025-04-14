@@ -109,13 +109,18 @@ export function ChessBoard({
             />
 
             {selectVisible && !previewIndex && (
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-700 p-4 rounded shadow-md dark:shadow-black/20 z-10">
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 p-4 rounded-lg shadow-md dark:shadow-black/20 z-10">
                 <div className="flex gap-4">
                   {(['q', 'r', 'n', 'b'] as PromotionPiece[]).map((piece) => (
                     <Button
                       key={piece}
                       variant="outline"
-                      className="w-12 h-12 p-0 flex justify-center items-center bg-amber-50 dark:bg-slate-600 hover:bg-amber-100 dark:hover:bg-slate-500 transition-colors border-amber-200 dark:border-slate-500"
+                      className="w-12 h-12 p-0 flex justify-center items-center 
+                      border-amber-300 text-amber-800 hover:bg-amber-50/80 
+                      shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+                      dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+                      dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
+                      backdrop-blur-sm"
                       onClick={() => promotion(piece)}
                     >
                       <Image
@@ -123,8 +128,8 @@ export function ChessBoard({
                         alt={`${
                           chess.turn() === 'w' ? 'White' : 'Black'
                         } ${piece.toUpperCase()}`}
-                        width={64}
-                        height={64}
+                        width={40}
+                        height={40}
                       />
                     </Button>
                   ))}
