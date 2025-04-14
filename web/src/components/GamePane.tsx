@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Chess, type Move } from 'chess.js';
 import type { Square } from 'chess.js';
 import { Button } from '@/components/ui/button';
@@ -13,126 +13,55 @@ import {
   ChevronRightIcon,
 } from '@heroicons/react/24/outline';
 
-interface PaneProps {
-  playingAs: 'w' | 'b';
+interface GameProps {
+  chess: Chess;
+  fen: string;
+  lastMove?: [Square, Square];
+  selectVisible: boolean;
+  pendingMove?: [Square, Square];
+  previewIndex: number | null;
+  fullHistory: Move[];
+  previewFen: string | null;
+  onMove: (from: Square, to: Square) => void;
+  promotion: (piece: 'q' | 'r' | 'n' | 'b') => void;
+  previewMove: (index: number) => void;
+  handleFirstMove: () => void;
+  handlePrevious: () => void;
+  handleNext: () => void;
+  handleLastMove: () => void;
 }
 
-export default function GamePane({ playingAs }: PaneProps) {
-  const [chess] = useState(new Chess());
-  const [fen, setFen] = useState(chess.fen());
-  const [lastMove, setLastMove] = useState<[Square, Square] | undefined>();
-  const [selectVisible, setSelectVisible] = useState(false);
-  const [pendingMove, setPendingMove] = useState<
-    [Square, Square] | undefined
-  >();
-  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+interface PaneProps {
+  playingAs: 'w' | 'b';
+  gameProps: GameProps;
+}
+
+export default function GamePane({ playingAs, gameProps }: PaneProps) {
+  const {
+    chess,
+    fen,
+    lastMove,
+    selectVisible,
+    previewIndex,
+    fullHistory,
+    previewFen,
+    onMove,
+    promotion,
+    previewMove,
+    handleFirstMove,
+    handlePrevious,
+    handleNext,
+    handleLastMove,
+  } = gameProps;
+
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const fullHistory = useMemo(() => chess.history({ verbose: true }), [fen]);
-
-  const previewFen = useMemo(() => {
-    if (previewIndex === null) return null;
-    const temp = new Chess();
-    fullHistory.slice(0, previewIndex).forEach((m) => temp.move(m.san));
-    return temp.fen();
-  }, [previewIndex, fullHistory]);
-
-  useEffect(() => {
-    setFen(chess.fen());
-  }, [chess]);
-
   const moveListRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (
-      moveListRef.current &&
-      fullHistory.length > 0 &&
-      previewIndex === null
-    ) {
+    if (moveListRef.current && fullHistory.length > 0 && previewIndex === null) {
       moveListRef.current.scrollTop = moveListRef.current.scrollHeight;
     }
   }, [fullHistory.length, previewIndex]);
-
-  const onMove = (from: Square, to: Square) => {
-    if (previewIndex !== null) {
-      setPreviewIndex(null);
-      return;
-    }
-    if (chess.turn() !== playingAs) return;
-    const moves = chess.moves({ verbose: true });
-    const moveFound = moves.find((m) => m.from === from && m.to === to);
-    if (!moveFound) return;
-    if (moveFound.promotion) {
-      setPendingMove([from, to]);
-      setSelectVisible(true);
-    } else if (chess.move({ from, to })) {
-      setLastMove([from, to]);
-      updateState();
-      setTimeout(randomMove, 500);
-    }
-  };
-
-  const updateState = () => {
-    setFen(chess.fen());
-  };
-
-  const randomMove = () => {
-    const opponentColor = playingAs === 'w' ? 'b' : 'w';
-    const moves = chess
-      .moves({ verbose: true })
-      .filter((m: Move) => m.color === opponentColor);
-    if (moves.length > 0 && !chess.isGameOver()) {
-      const random = moves[Math.floor(Math.random() * moves.length)];
-      chess.move(random);
-      setLastMove([random.from as Square, random.to as Square]);
-      updateState();
-    }
-  };
-
-  const promotion = (piece: 'q' | 'r' | 'n' | 'b') => {
-    if (!pendingMove) return;
-    const [from, to] = pendingMove;
-    chess.move({ from, to, promotion: piece });
-    setLastMove([from, to]);
-    setSelectVisible(false);
-    updateState();
-    setTimeout(randomMove, 500);
-  };
-
-  const previewMove = (index: number) => {
-    if (index >= fullHistory.length) setPreviewIndex(null);
-    else setPreviewIndex(index);
-  };
-
-  const handleFirstMove = useCallback(() => {
-    if (fullHistory.length > 0) {
-      setPreviewIndex(0);
-    }
-  }, [fullHistory.length]);
-
-  const handlePrevious = useCallback(() => {
-    if (previewIndex === null && fullHistory.length > 0) {
-      setPreviewIndex(fullHistory.length - 1);
-    } else if (previewIndex !== null && previewIndex > 0) {
-      setPreviewIndex(previewIndex - 1);
-    }
-  }, [previewIndex, fullHistory.length]);
-
-  const handleNext = useCallback(() => {
-    if (previewIndex !== null && previewIndex < fullHistory.length - 1) {
-      setPreviewIndex(previewIndex + 1);
-    } else if (
-      previewIndex !== null &&
-      previewIndex === fullHistory.length - 1
-    ) {
-      setPreviewIndex(null);
-    }
-  }, [previewIndex, fullHistory.length]);
-
-  const handleLastMove = useCallback(() => {
-    setPreviewIndex(null);
-  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -182,21 +111,18 @@ export default function GamePane({ playingAs }: PaneProps) {
     };
   }, [handlePrevious, handleNext, handleFirstMove, handleLastMove]);
 
-  const movePairs = useMemo(() => {
-    const pairs = [];
-    for (let i = 0; i < fullHistory.length; i += 2) {
-      const whiteMove = fullHistory[i];
-      const blackMove = fullHistory[i + 1];
-      pairs.push({
-        moveNumber: Math.floor(i / 2) + 1,
-        whiteMove: whiteMove?.san,
-        blackMove: blackMove?.san,
-        whiteIndex: i + 1,
-        blackIndex: i + 2,
-      });
-    }
-    return pairs;
-  }, [fullHistory]);
+  const movePairs = [];
+  for (let i = 0; i < fullHistory.length; i += 2) {
+    const whiteMove = fullHistory[i];
+    const blackMove = fullHistory[i + 1];
+    movePairs.push({
+      moveNumber: Math.floor(i / 2) + 1,
+      whiteMove: whiteMove?.san,
+      blackMove: blackMove?.san,
+      whiteIndex: i + 1,
+      blackIndex: i + 2,
+    });
+  }
 
   const boardFen = previewFen ? previewFen : fen;
   const gameStatus = getGameStatus(chess);
