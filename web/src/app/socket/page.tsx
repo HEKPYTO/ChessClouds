@@ -4,10 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Chess } from 'chess.js';
 import type { Square } from 'chess.js';
 import SocketGamePane from '@/components/SocketGamePane';
-import SocketService from '@/lib/socketService';
+import { SocketService } from '@/lib/socketService';
 import LoadingScreen from '@/components/LoadingScreen';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
 export default function SocketGame() {
   const [chess] = useState(new Chess());
@@ -40,38 +38,51 @@ export default function SocketGame() {
   const userId = playingAs === 'w' ? 'white' : 'black';
 
   useEffect(() => {
-    const socketService = new SocketService('ws://localhost:8000/ws');
+    const initializeGame = async () => {
+      try {
+        await fetch(`/init`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            game_id: gameId,
+            white_user_id: 'white',
+            black_user_id: 'black'
+          })
+        });
+      } catch (err) {
+        console.error("Failed to initialize game:", err);
+      }
+    };
+
+    initializeGame();
+
+    const socketService = new SocketService();
     setSocket(socketService);
     
     socketService.onConnect(() => {
-      console.log("Socket connected and authenticated!");
       setIsConnected(true);
       setIsLoading(false);
       setError(null);
     });
 
     socketService.onMove((moveStr) => {
-      console.log("Received move:", moveStr);
       try {
         const move = chess.move(moveStr);
         if (move) {
           setLastMove([move.from as Square, move.to as Square]);
           updateState();
         }
-      } catch (error) {
-        console.error('Invalid move received:', error);
-      }
+      } catch (error) {}
     });
 
     socketService.onHistory((moves) => {
-      console.log("Received move history:", moves);
       chess.reset();
       moves.forEach(moveStr => {
         try {
           chess.move(moveStr);
-        } catch (error) {
-          console.error('Invalid move in history:', moveStr, error);
-        }
+        } catch (error) {}
       });
       
       if (moves.length > 0) {
@@ -85,54 +96,20 @@ export default function SocketGame() {
     });
 
     socketService.onGameEnd((outcome) => {
-      console.log("Game ended:", outcome);
       setGameOver(true);
       setGameOutcome(outcome);
     });
 
     socketService.onError((errorMsg) => {
-      console.error('Socket error:', errorMsg);
       setError(errorMsg);
-      setIsLoading(false);
+      if (!isConnected) {
+        setIsLoading(false);
+      }
     });
 
-    const initializeGame = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/init`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            game_id: gameId,
-            white_user_id: 'white',
-            black_user_id: 'black'
-          }),
-        });
-        
-        if (response.ok) {
-          console.log('Game initialized, connecting WebSocket...');
-          socketService.connect(gameId, userId);
-        } else {
-          const data = await response.text();
-          console.error('Failed to initialize game:', data);
-          
-          if (data.includes('Game already exists')) {
-            console.log('Game already exists, connecting to WebSocket...');
-            socketService.connect(gameId, userId);
-          } else {
-            setError(`Failed to initialize game: ${data}`);
-            setIsLoading(false);
-          }
-        }
-      } catch (err) {
-        console.error('Error initializing game:', err);
-        console.log('Connecting directly to WebSocket...');
-        socketService.connect(gameId, userId);
-      }
-    };
-
-    initializeGame();
+    setTimeout(() => {
+      socketService.connect(gameId, userId);
+    }, 1000);
 
     return () => {
       socketService.disconnect();
@@ -150,7 +127,6 @@ export default function SocketGame() {
     }
     
     if (chess.turn() !== playingAs) {
-      console.log("Not your turn");
       return;
     }
     
@@ -229,7 +205,6 @@ export default function SocketGame() {
     setIsLoading(true);
     setError(null);
     if (socket) {
-      socket.disconnect();
       socket.connect(gameId, userId);
     }
   }, [gameId, userId, socket]);
@@ -253,34 +228,16 @@ export default function SocketGame() {
     gameId,
     playingAs,
     gameOver,
-    gameOutcome
+    gameOutcome,
+    reconnect
   };
 
   if (isLoading) {
     return <LoadingScreen />;
   }
 
-//   if (error) {
-//     return (
-//       <div className="container mx-auto py-8 px-4 flex items-center justify-center min-h-[60vh]">
-//         <Card className="max-w-md w-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-md">
-//           <CardContent className="p-6 text-center">
-//             <div className="text-red-600 dark:text-red-400 text-xl mb-4">Connection Error</div>
-//             <p className="text-amber-800 dark:text-amber-200 mb-6">{error}</p>
-//             <Button 
-//               onClick={reconnect}
-//               className="bg-amber-600 hover:bg-amber-700 text-white px-6 rounded-md"
-//             >
-//               Try Again
-//             </Button>
-//           </CardContent>
-//         </Card>
-//       </div>
-//     );
-//   }
-
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="mx-auto px-12 py-8">
       <SocketGamePane playingAs={playingAs} gameProps={gameProps} />
     </div>
   );

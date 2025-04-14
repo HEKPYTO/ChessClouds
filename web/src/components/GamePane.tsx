@@ -58,7 +58,11 @@ export default function GamePane({ playingAs, gameProps }: PaneProps) {
   const moveListRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (moveListRef.current && fullHistory.length > 0 && previewIndex === null) {
+    if (
+      moveListRef.current &&
+      fullHistory.length > 0 &&
+      previewIndex === null
+    ) {
       moveListRef.current.scrollTop = moveListRef.current.scrollHeight;
     }
   }, [fullHistory.length, previewIndex]);
