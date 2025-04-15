@@ -205,6 +205,7 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
                 promotion={promotion}
                 previewIndex={previewIndex}
                 chess={chess}
+                viewOnly={gameOver || previewIndex !== null}
               />
             </div>
           </div>
@@ -410,6 +411,7 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
                 promotion={promotion}
                 previewIndex={previewIndex}
                 chess={chess}
+                viewOnly={gameOver || previewIndex !== null}
               />
             </div>
           </div>

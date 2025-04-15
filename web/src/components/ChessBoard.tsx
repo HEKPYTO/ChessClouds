@@ -29,9 +29,10 @@ export interface ChessBoardProps {
   lastMove?: [Square, Square];
   playingAs: 'w' | 'b';
   selectVisible: boolean;
-  promotion: (piece: PromotionPiece) => void;
+  promotion: (piece: 'q' | 'r' | 'n' | 'b') => void;
   previewIndex: number | null;
   chess: Chess;
+  viewOnly?: boolean; 
 }
 
 export function calcMovable(chess: Chess) {
@@ -62,9 +63,10 @@ export function ChessBoard({
   promotion,
   previewIndex,
   chess,
+  viewOnly = false
 }: ChessBoardProps) {
   const handleMove = (from: Square, to: Square) => {
-    if (previewIndex !== null) return;
+    if (previewIndex !== null || viewOnly) return;
     onMove(from, to);
   };
 
@@ -90,14 +92,14 @@ export function ChessBoard({
               movable={{
                 free: false,
                 color:
-                  previewIndex !== null
+                  previewIndex !== null || viewOnly
                     ? undefined
                     : chess.turn() === playingAs
                     ? playingAs === 'w'
                       ? 'white'
                       : 'black'
                     : undefined,
-                dests: previewIndex !== null ? new Map() : calcMovable(chess),
+                dests: previewIndex !== null || viewOnly ? new Map() : calcMovable(chess),
               }}
               coordinates={true}
               animation={{ enabled: true, duration: 100 }}
@@ -105,13 +107,13 @@ export function ChessBoard({
                 lastMove: true,
                 check: true,
               }}
-              viewOnly={previewIndex !== null}
+              viewOnly={previewIndex !== null || viewOnly}
             />
 
-            {selectVisible && !previewIndex && (
+            {selectVisible && !previewIndex && !viewOnly && (
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 p-4 rounded-lg shadow-md dark:shadow-black/20 z-10">
                 <div className="flex gap-4">
-                  {(['q', 'r', 'n', 'b'] as PromotionPiece[]).map((piece) => (
+                  {(['q', 'r', 'n', 'b'] as const).map((piece) => (
                     <Button
                       key={piece}
                       variant="outline"
@@ -119,7 +121,7 @@ export function ChessBoard({
                       border-amber-300 text-amber-800 hover:bg-amber-50/80 
                       shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
                       dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-                      dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
+                      dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
                       backdrop-blur-sm"
                       onClick={() => promotion(piece)}
                     >
@@ -141,6 +143,10 @@ export function ChessBoard({
           {previewIndex !== null ? (
             <div className="bg-amber-500 text-white text-center py-3 font-medium">
               Preview Mode
+            </div>
+          ) : viewOnly ? (
+            <div className="bg-amber-600 text-white text-center py-3 font-medium">
+              Game Ended
             </div>
           ) : (
             <div className="bg-transparent py-6 font-medium"></div>
