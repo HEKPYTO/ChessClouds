@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Chess } from 'chess.js';
@@ -7,6 +7,7 @@ import SocketGamePane from '@/components/SocketGamePane';
 import { SocketService } from '@/lib/socketService';
 import LoadingScreen from '@/components/LoadingScreen';
 import { toast } from 'sonner';
+import type { GameOutcome } from '@/types/socket-types';
 
 export default function SocketGame() {
   const [chess] = useState(new Chess());
@@ -19,14 +20,10 @@ export default function SocketGame() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [gameOver, setGameOver] = useState(false);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [gameOutcome, setGameOutcome] = useState<any>(null);
-
+  const [gameOutcome, setGameOutcome] = useState<GameOutcome | undefined>(undefined);
   const [gameId, setGameId] = useState('');
   const [playingAs, setPlayingAs] = useState<'w' | 'b'>('w');
-  
-  
+
   const lastLocalMoveRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -34,19 +31,36 @@ export default function SocketGame() {
       const params = new URLSearchParams(window.location.search);
       const id = params.get('game_id');
       const role = params.get('playas');
-      
       if (id) setGameId(id);
       if (role === 'w' || role === 'b') setPlayingAs(role);
     }
   }, []);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error);
+    if (error) {    
+      if (gameOutcome != undefined) {
+        toast.success("Server closed, Game Completed");
+      } else {
+        toast.error(error);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
 
   const userId = playingAs === 'w' ? 'white' : 'black';
+
+  const updateState = useCallback(() => {
+    setFen(chess.fen());
+    if (chess.isGameOver()) {
+      setGameOver(true);
+      if (chess.isCheckmate()) {
+        const winner = chess.turn() === 'w' ? 'b' : 'w';
+        setGameOutcome({ type: 'Decisive', winner });
+      } else {
+        setGameOutcome({ type: 'Draw' });
+      }
+    }
+  }, [chess]);
 
   useEffect(() => {
     const initializeGame = async () => {
@@ -54,7 +68,7 @@ export default function SocketGame() {
         await fetch(`/init`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             game_id: gameId,
@@ -68,9 +82,9 @@ export default function SocketGame() {
     };
 
     initializeGame();
-    
+
     const socketService = SocketService.getInstance();
-    
+
     socketService.onConnect(() => {
       setIsConnected(true);
       setIsLoading(false);
@@ -78,7 +92,6 @@ export default function SocketGame() {
     });
 
     socketService.onMove((moveStr) => {
-      
       if (lastLocalMoveRef.current === moveStr) {
         lastLocalMoveRef.current = null;
         return;
@@ -103,21 +116,23 @@ export default function SocketGame() {
           console.error('Invalid move in history:', error);
         }
       });
-      
       if (moves.length > 0) {
         const lastMoveObj = chess.history({ verbose: true }).pop();
         if (lastMoveObj) {
           setLastMove([lastMoveObj.from as Square, lastMoveObj.to as Square]);
         }
       }
-      
       updateState();
     });
 
     socketService.onGameEnd((outcome) => {
       setGameOver(true);
-      setGameOutcome(outcome);
-    });
+      if (outcome === 'Draw') {
+        setGameOutcome({ type: 'Draw' });
+      } else {
+        setGameOutcome(outcome as GameOutcome);
+      }
+    });    
 
     socketService.onError((errorMsg) => {
       setError(errorMsg);
@@ -127,7 +142,7 @@ export default function SocketGame() {
     });
 
     socketService.connect(gameId, userId);
-    
+
     return () => {
       socketService.onConnect(() => {});
       socketService.onMove(() => {});
@@ -138,31 +153,23 @@ export default function SocketGame() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chess, gameId, userId]);
 
-  const updateState = useCallback(() => {
-    setFen(chess.fen());
-  }, [chess]);
-
   const onMove = useCallback((from: Square, to: Square) => {
     if (previewIndex !== null) {
       setPreviewIndex(null);
       return;
     }
-    
     if (chess.turn() !== playingAs) {
       return;
     }
-    
     const moves = chess.moves({ verbose: true });
     const moveFound = moves.find((m) => m.from === from && m.to === to);
     if (!moveFound) return;
-    
     if (moveFound.promotion) {
       setPendingMove([from, to]);
       setSelectVisible(true);
     } else {
       const moveResult = chess.move({ from, to });
       if (moveResult) {
-        
         lastLocalMoveRef.current = moveResult.san;
         setLastMove([from, to]);
         updateState();
@@ -175,9 +182,7 @@ export default function SocketGame() {
     if (!pendingMove) return;
     const [from, to] = pendingMove;
     const moveResult = chess.move({ from, to, promotion: piece });
-    
     if (moveResult) {
-      
       lastLocalMoveRef.current = moveResult.san;
       setLastMove([from, to]);
       setSelectVisible(false);
