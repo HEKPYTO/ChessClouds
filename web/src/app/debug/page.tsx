@@ -36,7 +36,7 @@ export default function DevPage() {
   const [connected, setConnected] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [messages, setMessages] = useState<string[]>([]);
-  const [gameId, setGameId] = useState('game123');
+  const [gameId, setGameId] = useState('test');
   const [userId, setUserId] = useState('white');
   const [moveToSend, setMoveToSend] = useState('e4');
   const [copySuccess, setCopySuccess] = useState(false);

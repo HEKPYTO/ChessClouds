@@ -51,7 +51,7 @@ export default function SocketGame() {
 
   const updateState = useCallback(() => {
     setFen(chess.fen());
-    if (chess.isGameOver()) {
+    if (chess.isGameOver() || chess.isDraw()) {
       setGameOver(true);
       if (chess.isCheckmate()) {
         const winner = chess.turn() === 'w' ? 'b' : 'w';
@@ -63,26 +63,6 @@ export default function SocketGame() {
   }, [chess]);
 
   useEffect(() => {
-    const initializeGame = async () => {
-      try {
-        await fetch(`/init`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            game_id: gameId,
-            white_user_id: 'white',
-            black_user_id: 'black'
-          })
-        });
-      } catch (err) {
-        console.error("Failed to initialize game:", err);
-      }
-    };
-
-    initializeGame();
-
     const socketService = SocketService.getInstance();
 
     socketService.onConnect(() => {
