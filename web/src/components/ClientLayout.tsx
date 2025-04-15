@@ -5,6 +5,12 @@ import { useState, useEffect } from 'react';
 import Navbar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import LoadingScreen from '@/components/LoadingScreen';
+import { useRouter } from 'next/navigation';
+import { isAuthenticated } from '@/lib/auth/googleAuth';
+
+const PUBLIC_ROUTES = ['/home', '/signin', '/signup', '/'];
+
+const AUTH_ROUTES = ['/signin', '/signup'];
 
 export default function ClientLayout({
   children,
@@ -12,23 +18,49 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const [, setMounted] = useState(false);
   const [showLoading, setShowLoading] = useState(true);
+  const [isRoutingChecked, setIsRoutingChecked] = useState(false);
+
+  const isAuthPage =
+    pathname === '/signin' ||
+    pathname === '/signup' ||
+    pathname === '/signout' ||
+    pathname === '/debug';
 
   useEffect(() => {
+    const checkRouteAccess = () => {
+      const authenticated = isAuthenticated();
+
+      if (authenticated && AUTH_ROUTES.includes(pathname)) {
+        router.replace('/home');
+        return false;
+      }
+
+      if (!authenticated && !PUBLIC_ROUTES.includes(pathname)) {
+        router.replace('/signin');
+        return false;
+      }
+
+      return true;
+    };
+
     const timer = setTimeout(() => {
       setMounted(true);
-      setShowLoading(false);
+
+      const routeAccessible = checkRouteAccess();
+      if (routeAccessible) {
+        setShowLoading(false);
+      }
+
+      setIsRoutingChecked(true);
     }, 500);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [pathname, router]);
 
-  const isAuthPage =
-    pathname === '/signin' || pathname === '/signup' || pathname === '/signout';
-
-  if (showLoading) {
+  if (showLoading || !isRoutingChecked) {
     return <LoadingScreen />;
   }
 

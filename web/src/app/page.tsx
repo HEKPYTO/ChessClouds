@@ -114,7 +114,7 @@ export default function HomePage() {
             </Button>
             <Button
               variant="outline"
-              className={`h-12 border-amber-300 text-amber-800 hover:bg-amber-50 px-6 rounded-md transition-all 
+              className={`h-12 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 px-6 rounded-md transition-all 
               shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
               dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
               dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
@@ -253,7 +253,7 @@ export default function HomePage() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="border-amber-300 text-amber-800 hover:bg-amber-50 
+                    className="border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
                     shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
                     dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-700/50
                     dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"

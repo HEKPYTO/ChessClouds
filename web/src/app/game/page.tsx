@@ -10,7 +10,9 @@ export default function Game() {
   const [fen, setFen] = useState(chess.fen());
   const [lastMove, setLastMove] = useState<[Square, Square] | undefined>();
   const [selectVisible, setSelectVisible] = useState(false);
-  const [pendingMove, setPendingMove] = useState<[Square, Square] | undefined>();
+  const [pendingMove, setPendingMove] = useState<
+    [Square, Square] | undefined
+  >();
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   const fullHistory = chess.history({ verbose: true });
@@ -18,26 +20,6 @@ export default function Game() {
   const updateState = useCallback(() => {
     setFen(chess.fen());
   }, [chess]);
-
-  const onMove = useCallback((from: Square, to: Square) => {
-    if (previewIndex !== null) {
-      setPreviewIndex(null);
-      return;
-    }
-    
-    const moves = chess.moves({ verbose: true });
-    const moveFound = moves.find((m) => m.from === from && m.to === to);
-    if (!moveFound) return;
-    
-    if (moveFound.promotion) {
-      setPendingMove([from, to]);
-      setSelectVisible(true);
-    } else if (chess.move({ from, to })) {
-      setLastMove([from, to]);
-      updateState();
-      setTimeout(randomMove, 500);
-    }
-  }, [chess, previewIndex, updateState]);
 
   const randomMove = useCallback(() => {
     const moves = chess.moves({ verbose: true });
@@ -49,20 +31,49 @@ export default function Game() {
     }
   }, [chess, updateState]);
 
-  const promotion = useCallback((piece: 'q' | 'r' | 'n' | 'b') => {
-    if (!pendingMove) return;
-    const [from, to] = pendingMove;
-    chess.move({ from, to, promotion: piece });
-    setLastMove([from, to]);
-    setSelectVisible(false);
-    updateState();
-    setTimeout(randomMove, 500);
-  }, [chess, pendingMove, randomMove, updateState]);
+  const onMove = useCallback(
+    (from: Square, to: Square) => {
+      if (previewIndex !== null) {
+        setPreviewIndex(null);
+        return;
+      }
 
-  const previewMove = useCallback((index: number) => {
-    if (index >= fullHistory.length) setPreviewIndex(null);
-    else setPreviewIndex(index);
-  }, [fullHistory.length]);
+      const moves = chess.moves({ verbose: true });
+      const moveFound = moves.find((m) => m.from === from && m.to === to);
+      if (!moveFound) return;
+
+      if (moveFound.promotion) {
+        setPendingMove([from, to]);
+        setSelectVisible(true);
+      } else if (chess.move({ from, to })) {
+        setLastMove([from, to]);
+        updateState();
+        setTimeout(randomMove, 500);
+      }
+    },
+    [chess, previewIndex, updateState, randomMove]
+  );
+
+  const promotion = useCallback(
+    (piece: 'q' | 'r' | 'n' | 'b') => {
+      if (!pendingMove) return;
+      const [from, to] = pendingMove;
+      chess.move({ from, to, promotion: piece });
+      setLastMove([from, to]);
+      setSelectVisible(false);
+      updateState();
+      setTimeout(randomMove, 500);
+    },
+    [chess, pendingMove, randomMove, updateState]
+  );
+
+  const previewMove = useCallback(
+    (index: number) => {
+      if (index >= fullHistory.length) setPreviewIndex(null);
+      else setPreviewIndex(index);
+    },
+    [fullHistory.length]
+  );
 
   const handleFirstMove = useCallback(() => {
     if (fullHistory.length > 0) {
@@ -81,7 +92,10 @@ export default function Game() {
   const handleNext = useCallback(() => {
     if (previewIndex !== null && previewIndex < fullHistory.length - 1) {
       setPreviewIndex(previewIndex + 1);
-    } else if (previewIndex !== null && previewIndex === fullHistory.length - 1) {
+    } else if (
+      previewIndex !== null &&
+      previewIndex === fullHistory.length - 1
+    ) {
       setPreviewIndex(null);
     }
   }, [previewIndex, fullHistory.length]);
