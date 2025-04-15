@@ -39,4 +39,3 @@ jobs:
 
       - name: Push Docker image to ECR
         run: docker push 058264495198.dkr.ecr.ap-southeast-1.amazonaws.com/chesscloud:latest
-

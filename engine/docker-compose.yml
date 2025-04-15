@@ -9,11 +9,11 @@ services:
     networks:
       - engine
       
-  fastapi:
+  axum:
     build:
-      context: ./fastapi
+      context: ./axum
       dockerfile: Dockerfile
-    container_name: fastapi
+    container_name: axum
     ports:
       - "4000:4000"
     depends_on:
