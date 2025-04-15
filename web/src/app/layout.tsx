@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Playfair_Display, Roboto_Mono, Inter } from 'next/font/google';
 import ClientLayout from '@/components/ClientLayout';
+import { Toaster } from '@/components/ui/sonner';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -67,6 +68,7 @@ export default function RootLayout({
           />
 
           <ClientLayout>{children}</ClientLayout>
+          <Toaster richColors />
         </div>
       </body>
     </html>

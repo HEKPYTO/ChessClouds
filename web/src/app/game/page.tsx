@@ -21,6 +21,16 @@ export default function Game() {
     setFen(chess.fen());
   }, [chess]);
 
+  const randomMove = useCallback(() => {
+    const moves = chess.moves({ verbose: true });
+    if (moves.length > 0 && !chess.isGameOver()) {
+      const random = moves[Math.floor(Math.random() * moves.length)];
+      chess.move(random);
+      setLastMove([random.from as Square, random.to as Square]);
+      updateState();
+    }
+  }, [chess, updateState]);
+
   const onMove = useCallback(
     (from: Square, to: Square) => {
       if (previewIndex !== null) {
@@ -41,18 +51,8 @@ export default function Game() {
         setTimeout(randomMove, 500);
       }
     },
-    [chess, previewIndex, updateState]
+    [chess, previewIndex, updateState, randomMove]
   );
-
-  const randomMove = useCallback(() => {
-    const moves = chess.moves({ verbose: true });
-    if (moves.length > 0 && !chess.isGameOver()) {
-      const random = moves[Math.floor(Math.random() * moves.length)];
-      chess.move(random);
-      setLastMove([random.from as Square, random.to as Square]);
-      updateState();
-    }
-  }, [chess, updateState]);
 
   const promotion = useCallback(
     (piece: 'q' | 'r' | 'n' | 'b') => {

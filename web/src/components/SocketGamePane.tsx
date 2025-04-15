@@ -17,7 +17,7 @@ import {
   SignalSlashIcon,
 } from '@heroicons/react/24/outline';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { GameOutcome } from '@/types/socket-types';
 
 interface GameProps {
   chess: Chess;
@@ -38,7 +38,7 @@ interface GameProps {
   gameId: string;
   playingAs: 'w' | 'b';
   gameOver?: boolean;
-  gameOutcome?: any;
+  gameOutcome?: GameOutcome;
   reconnect?: () => void;
 }
 
@@ -50,7 +50,7 @@ interface PaneProps {
 function getGameStatus(
   chess: Chess,
   gameOver?: boolean,
-  gameOutcome?: any
+  gameOutcome?: GameOutcome
 ): string {
   if (gameOver && gameOutcome) {
     if (typeof gameOutcome === 'string' && gameOutcome === 'Draw') {
@@ -427,7 +427,7 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
                           </span>
                         ) : (
                           <span className="text-amber-600 dark:text-amber-400">
-                            Opponent's turn
+                            Opponent&apos;s turn
                           </span>
                         )}
                       </div>
@@ -757,7 +757,7 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
                             </span>
                           ) : (
                             <span className="text-amber-600 dark:text-amber-400">
-                              Opponent's turn
+                              Opponent&apos;s turn
                             </span>
                           )}
                         </div>

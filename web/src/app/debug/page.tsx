@@ -4,12 +4,22 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronRightIcon, SignalIcon, SignalSlashIcon } from '@heroicons/react/24/outline';
+import {
+  ChevronRightIcon,
+  SignalIcon,
+  SignalSlashIcon,
+  ClipboardIcon,
+} from '@heroicons/react/24/outline';
+import { toast } from 'sonner';
 
 export type Color = 'Black' | 'White';
 export type GameOutcome = { Decisive: { winner: Color } } | 'Draw';
-export type ErrorType = 'Deserialization' | 'Unauthorized' | 'InvalidTurn' | 'InvalidMove';
-export type ClientMessage = 
+export type ErrorType =
+  | 'Deserialization'
+  | 'Unauthorized'
+  | 'InvalidTurn'
+  | 'InvalidMove';
+export type ClientMessage =
   | { kind: 'Auth'; value: { game_id: string; user_id: string } }
   | { kind: 'Move'; value: string };
 export type ServerMessage =
@@ -26,14 +36,18 @@ export default function DevPage() {
   const [connected, setConnected] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [messages, setMessages] = useState<string[]>([]);
-  const [gameId, setGameId] = useState('game');
+  const [gameId, setGameId] = useState('game123');
   const [userId, setUserId] = useState('white');
   const [moveToSend, setMoveToSend] = useState('e4');
+  const [copySuccess, setCopySuccess] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
 
   const logMessage = (message: string) => {
-    setMessages((prev) => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
-    
+    setMessages((prev) => [
+      ...prev,
+      `${new Date().toLocaleTimeString()}: ${message}`,
+    ]);
+
     setTimeout(() => {
       if (logRef.current) {
         logRef.current.scrollTop = logRef.current.scrollHeight;
@@ -45,7 +59,7 @@ export default function DevPage() {
     try {
       const serverUrl = `ws://${host}:${port}/ws`;
       logMessage(`Connecting to WebSocket at ${serverUrl}`);
-      
+
       const ws = new WebSocket(serverUrl);
       setSocket(ws);
 
@@ -96,31 +110,53 @@ export default function DevPage() {
 
   const initializeGame = async () => {
     try {
-      logMessage(`Initializing game ${gameId} with white: ${userId}, black: ${userId === 'white' ? 'black' : 'white'}`);
-      
+      logMessage(
+        `Initializing game ${gameId} with white: white, black: black`
+      );
+  
       const initBody = {
         game_id: gameId,
         white_user_id: 'white',
-        black_user_id: 'black'
+        black_user_id: 'black',
       };
-      
+  
       const response = await fetch(`http://${host}:${port}/init`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          Accept: 'application/json',
         },
-        body: JSON.stringify(initBody)
+        body: JSON.stringify(initBody),
       });
-      
+  
       if (response.ok) {
         logMessage('Game initialized successfully');
+        toast.success('Game initialized successfully', {
+          description: 'Ready to connect and play!',
+        });
+        return true;
       } else {
         const text = await response.text();
-        logMessage(`Game initialization failed: ${response.status} ${text}`);
+        if (text === "Game already exists") {
+          logMessage('Game already exists, ready to connect');
+          toast.info('Game already exists', {
+            description: 'You can connect to this existing game',
+          });
+          return true;
+        } else {
+          logMessage(`Game initialization failed: ${response.status} ${text}`);
+          toast.error('Game initialization failed', {
+            description: text,
+          });
+          return false;
+        }
       }
     } catch (error) {
       logMessage(`Error initializing game: ${error}`);
+      toast.error('Error initializing game', {
+        description: String(error),
+      });
+      return false;
     }
   };
 
@@ -135,8 +171,8 @@ export default function DevPage() {
         kind: 'Auth',
         value: {
           game_id: gameId,
-          user_id: userId
-        }
+          user_id: userId,
+        },
       };
 
       logMessage(`Sending auth: ${JSON.stringify(authMsg)}`);
@@ -160,7 +196,7 @@ export default function DevPage() {
     try {
       const moveMsg: ClientMessage = {
         kind: 'Move',
-        value: moveToSend
+        value: moveToSend,
       };
 
       logMessage(`Sending move: ${JSON.stringify(moveMsg)}`);
@@ -168,6 +204,25 @@ export default function DevPage() {
     } catch (error) {
       logMessage(`Error sending move: ${error}`);
     }
+  };
+
+  const copyGameLink = () => {
+    const playas = userId === 'white' ? 'b' : 'w';
+    const url = `${window.location.origin}/socket?game_id=${gameId}&playas=${playas}`;
+    
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+        toast.success('Game link copied!', {
+          description: 'Share this with your opponent',
+        });
+      })
+      .catch(err => {
+        toast.error('Failed to copy', {
+          description: String(err),
+        });
+      });
   };
 
   useEffect(() => {
@@ -180,43 +235,53 @@ export default function DevPage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6 text-amber-900 dark:text-amber-100 font-display">WebSocket Testing</h1>
-      
+      <h1 className="text-2xl font-bold mb-6 text-amber-900 dark:text-amber-100 font-display">
+        Chess Game Setup
+      </h1>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-md">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xl text-amber-900 dark:text-amber-100">Connection Settings</CardTitle>
+            <CardTitle className="text-xl text-amber-900 dark:text-amber-100">
+              Game Settings
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-5">
             <div className="flex gap-4">
               <div className="flex-1">
-                <label className="block text-sm mb-1 text-amber-700 dark:text-amber-300">Server Host</label>
-                <input 
-                  type="text" 
-                  value={host} 
+                <label className="block text-sm mb-1 text-amber-700 dark:text-amber-300">
+                  Server Host
+                </label>
+                <input
+                  type="text"
+                  value={host}
                   onChange={(e) => setHost(e.target.value)}
                   className="w-full p-2 border rounded bg-amber-50/80 dark:bg-slate-700/80 border-amber-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   placeholder="localhost"
                 />
               </div>
               <div className="w-1/3">
-                <label className="block text-sm mb-1 text-amber-700 dark:text-amber-300">Port</label>
-                <input 
-                  type="text" 
-                  value={port} 
+                <label className="block text-sm mb-1 text-amber-700 dark:text-amber-300">
+                  Port
+                </label>
+                <input
+                  type="text"
+                  value={port}
                   onChange={(e) => setPort(e.target.value)}
                   className="w-full p-2 border rounded bg-amber-50/80 dark:bg-slate-700/80 border-amber-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   placeholder="8000"
                 />
               </div>
             </div>
-            
+
             <div>
-              <label className="block text-sm mb-1 text-amber-700 dark:text-amber-300">Game ID</label>
+              <label className="block text-sm mb-1 text-amber-700 dark:text-amber-300">
+                Game ID
+              </label>
               <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  value={gameId} 
+                <input
+                  type="text"
+                  value={gameId}
                   onChange={(e) => setGameId(e.target.value)}
                   className="w-full p-2 border rounded bg-amber-50/80 dark:bg-slate-700/80 border-amber-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
@@ -230,9 +295,11 @@ export default function DevPage() {
                 </Button>
               </div>
             </div>
-            
+
             <div>
-              <label className="block text-sm mb-1 text-amber-700 dark:text-amber-300">User ID</label>
+              <label className="block text-sm mb-1 text-amber-700 dark:text-amber-300">
+                User ID
+              </label>
               <select
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
@@ -242,7 +309,7 @@ export default function DevPage() {
                 <option value="black">black</option>
               </select>
             </div>
-            
+
             <div className="flex gap-2">
               <Button
                 onClick={connectWebSocket}
@@ -252,24 +319,26 @@ export default function DevPage() {
               >
                 Connect WebSocket
               </Button>
-              
+
               <Button
                 onClick={authenticate}
                 disabled={!connected || authenticated}
-                className="flex-1 border-amber-300 text-amber-800 hover:bg-amber-50 shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+                className="flex-1 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
                 dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] disabled:opacity-50 disabled:shadow-none"
                 variant="outline"
               >
                 Authenticate
               </Button>
             </div>
-            
+
             <div>
-              <label className="block text-sm mb-1 text-amber-700 dark:text-amber-300">Move (e.g., e4)</label>
+              <label className="block text-sm mb-1 text-amber-700 dark:text-amber-300">
+                Move (e.g., e4)
+              </label>
               <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  value={moveToSend} 
+                <input
+                  type="text"
+                  value={moveToSend}
                   onChange={(e) => setMoveToSend(e.target.value)}
                   className="w-full p-2 border rounded bg-amber-50/80 dark:bg-slate-700/80 border-amber-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
@@ -284,64 +353,120 @@ export default function DevPage() {
                 </Button>
               </div>
             </div>
-            
-            <div className="flex gap-2 pt-2">
-              <div className="flex gap-2 items-center">
-                <Badge
-                  className={`${connected ? 'bg-green-600' : 'bg-red-600'} text-white w-6 h-6 flex items-center justify-center p-0`}
-                >
-                  {connected ? <SignalIcon className="h-4 w-4" /> : <SignalSlashIcon className="h-4 w-4" />}
-                </Badge>
-                <span className="text-sm text-amber-700 dark:text-amber-300">
-                  {connected ? 'Connected' : 'Disconnected'}
-                </span>
+
+            <div className="flex flex-col gap-2 pt-2">
+              <div className="flex gap-4 items-center">
+                <div className="flex gap-2 items-center">
+                  <Badge
+                    className={`${
+                      connected ? 'bg-green-600' : 'bg-red-600'
+                    } text-white w-6 h-6 flex items-center justify-center p-0`}
+                  >
+                    {connected ? (
+                      <SignalIcon className="h-4 w-4" />
+                    ) : (
+                      <SignalSlashIcon className="h-4 w-4" />
+                    )}
+                  </Badge>
+                  <span className="text-sm text-amber-700 dark:text-amber-300">
+                    {connected ? 'Connected' : 'Disconnected'}
+                  </span>
+                </div>
+
+                <div className="flex gap-2 items-center ml-4">
+                  <Badge
+                    className={`${
+                      authenticated ? 'bg-green-600' : 'bg-red-600'
+                    } text-white w-6 h-6 flex items-center justify-center p-0`}
+                  >
+                    {authenticated ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        className="h-4 w-4"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        className="h-4 w-4"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    )}
+                  </Badge>
+                  <span className="text-sm text-amber-700 dark:text-amber-300">
+                    {authenticated ? 'Authenticated' : 'Not Authenticated'}
+                  </span>
+                </div>
               </div>
               
-              <div className="flex gap-2 items-center ml-4">
-                <Badge
-                  className={`${authenticated ? 'bg-green-600' : 'bg-red-600'} text-white w-6 h-6 flex items-center justify-center p-0`}
-                >
-                  {authenticated ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-4 w-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="h-4 w-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  )}
-                </Badge>
-                <span className="text-sm text-amber-700 dark:text-amber-300">
-                  {authenticated ? 'Authenticated' : 'Not Authenticated'}
-                </span>
-              </div>
+              <Button
+                onClick={copyGameLink}
+                className="bg-amber-600 hover:bg-amber-700 text-white shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
+                dark:bg-amber-500 dark:hover:bg-amber-600 dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
+              >
+                {copySuccess ? "Copied!" : "Copy Game Link for Opponent"}
+                <ClipboardIcon className="ml-2 h-4 w-4" />
+              </Button>
+              
+              <a 
+                href={`/socket?game_id=${gameId}&playas=${userId === 'white' ? 'w' : 'b'}`} 
+                target="_blank"
+                className="text-center p-2 border border-amber-300 dark:border-amber-700 rounded-md text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-slate-700"
+              >
+                Open Game in This Browser
+              </a>
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-md">
           <CardHeader className="pb-3 flex flex-row justify-between items-center">
-            <CardTitle className="text-xl text-amber-900 dark:text-amber-100">Message Log</CardTitle>
+            <CardTitle className="text-xl text-amber-900 dark:text-amber-100">
+              Message Log
+            </CardTitle>
             <Button
               onClick={() => setMessages([])}
               size="sm"
               variant="outline"
-              className="h-8 border-amber-300 text-amber-800 hover:bg-amber-50 shadow-[0_2px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[1px]
+              className="h-8 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 shadow-[0_2px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[1px]
                 dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_2px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
             >
               Clear Log
             </Button>
           </CardHeader>
           <CardContent className="p-6">
-            <div 
+            <div
               ref={logRef}
               className="bg-amber-50/80 dark:bg-slate-700/80 border border-amber-200/50 dark:border-slate-600/50 rounded-lg p-3 h-[400px] overflow-y-auto font-mono text-sm"
             >
               {messages.length === 0 ? (
-                <div className="text-center text-amber-600 dark:text-amber-400 py-4">No messages yet</div>
+                <div className="text-center text-amber-600 dark:text-amber-400 py-4">
+                  No messages yet
+                </div>
               ) : (
                 messages.map((msg, i) => (
-                  <div key={i} className="py-1 border-b border-amber-100/50 dark:border-slate-600/50 text-xs">
+                  <div
+                    key={i}
+                    className="py-1 border-b border-amber-100/50 dark:border-slate-600/50 text-xs"
+                  >
                     {msg}
                   </div>
                 ))
