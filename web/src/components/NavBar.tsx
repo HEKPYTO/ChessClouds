@@ -165,7 +165,7 @@ export default function Navbar() {
           <div className="hidden md:block">
             <Button
               variant="outline"
-              className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 transition-all 
+              className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all 
               shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
               dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
               dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
@@ -219,7 +219,7 @@ export default function Navbar() {
           {/* Hamburger Menu Button - hidden on xl screens */}
           <button
             className="xl:hidden flex items-center justify-center h-9 w-9 p-0 border border-amber-300 text-amber-800 
-            hover:bg-amber-50 rounded-md transition-all 
+            hover:bg-amber-50 hover:text-amber-900 rounded-md transition-all 
             shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
             dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
             dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
@@ -272,7 +272,7 @@ export default function Navbar() {
             <div className="md:hidden">
               <Button
                 variant="outline"
-                className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-50
+                className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
                 shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
                 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
                 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
