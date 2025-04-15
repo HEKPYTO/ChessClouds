@@ -1,0 +1,26 @@
+services:
+  stockfish:
+    build:
+      context: ./stockfish
+      dockerfile: Dockerfile
+    container_name: stockfish
+    ports:
+      - "4001:4001"
+    networks:
+      - engine
+      
+  fastapi:
+    build:
+      context: ./fastapi
+      dockerfile: Dockerfile
+    container_name: fastapi
+    ports:
+      - "4000:4000"
+    depends_on:
+      - stockfish
+    networks:
+      - engine
+
+networks:
+  engine:
+    driver: bridge

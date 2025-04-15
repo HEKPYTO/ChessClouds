@@ -14,6 +14,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { HomeIcon } from '@heroicons/react/24/outline';
 import ThemeSwitch from '@/components/ThemeSwitch';
+import { signOut } from '@/lib/auth/googleAuth';
 
 export default function SignOut() {
   const [isLoading, setIsLoading] = useState(false);
@@ -56,7 +57,7 @@ export default function SignOut() {
         setCountdown(countdown - 1);
       }, 1000);
     } else if (isLoading && countdown === 0) {
-      window.location.href = '/';
+      signOut();
     }
 
     return () => {
@@ -104,7 +105,7 @@ export default function SignOut() {
             <div className="flex justify-between items-center mb-6">
               <Button
                 variant="outline"
-                className="h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-50
+                className="h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
                 shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
                 dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
                 dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
@@ -144,7 +145,7 @@ export default function SignOut() {
 
             <Button
               variant="outline"
-              className={`w-full border-amber-300 text-amber-800 hover:bg-amber-50 px-6 rounded-md transition-all 
+              className={`w-full border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 px-6 rounded-md transition-all 
               shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
               dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
               dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]

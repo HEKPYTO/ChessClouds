@@ -12,25 +12,41 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import Image from 'next/image';
 import { HomeIcon } from '@heroicons/react/24/outline';
 import ThemeSwitch from '@/components/ThemeSwitch';
+import {
+  initiateGoogleAuth,
+  getAuthError,
+  clearAuthError,
+  isAuthenticated,
+} from '@/lib/auth/googleAuth';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [pressedButton, setPressedButton] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
+    if (isAuthenticated()) {
+      router.push('/home');
+      return;
+    }
+
+    const error = getAuthError();
+    if (error) {
+      toast.warning('Authentication Error', {
+        description: error,
+      });
+      clearAuthError();
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'g') {
         setPressedButton('google');
         setTimeout(() => {
-          window.location.href = '/';
-        }, 150);
-      } else if (e.key.toLowerCase() === 'a') {
-        setPressedButton('apple');
-        setTimeout(() => {
-          window.location.href = '/';
+          handleSignInWithGoogle();
         }, 150);
       }
     };
@@ -46,24 +62,12 @@ export default function SignIn() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [router]);
 
   const handleSignInWithGoogle = () => {
     setPressedButton('google');
     setIsLoading(true);
-
-    setTimeout(() => {
-      window.location.href = '/';
-    }, 1500);
-  };
-
-  const handleSignInWithApple = () => {
-    setPressedButton('apple');
-    setIsLoading(true);
-
-    setTimeout(() => {
-      window.location.href = '/';
-    }, 1500);
+    initiateGoogleAuth('/home');
   };
 
   return (
@@ -94,7 +98,7 @@ export default function SignIn() {
             <div className="flex justify-between items-center mb-6">
               <Button
                 variant="outline"
-                className="h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-50
+                className="h-9 w-9 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
                 shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
                 dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
                 dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
@@ -118,7 +122,7 @@ export default function SignIn() {
           <CardContent className="space-y-4">
             <Button
               variant="outline"
-              className={`w-full border-amber-300 text-amber-800 hover:bg-amber-50 px-6 rounded-md transition-all 
+              className={`w-full border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 px-6 rounded-md transition-all 
               shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
               dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
               dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
@@ -159,41 +163,6 @@ export default function SignIn() {
                 }`}
               >
                 G
-              </span>
-            </Button>
-
-            <Button
-              variant="outline"
-              className={`w-full border-amber-300 text-amber-800 hover:bg-amber-50 px-6 rounded-md transition-all 
-              shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
-              dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-              dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
-              ${
-                pressedButton === 'apple'
-                  ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
-                  : ''
-              }`}
-              disabled={isLoading}
-              onClick={handleSignInWithApple}
-            >
-              <Image
-                src="/apple.svg"
-                alt="Apple icon"
-                width={20}
-                height={20}
-                className="w-5 h-5 mr-2"
-              />
-              {isLoading && pressedButton === 'apple'
-                ? 'Signing in...'
-                : 'Continue with Apple'}
-              <span
-                className={`ml-1 text-xs px-1 rounded transition-colors ${
-                  pressedButton === 'apple'
-                    ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
-                    : 'bg-amber-100 dark:bg-slate-800'
-                }`}
-              >
-                A
               </span>
             </Button>
           </CardContent>

@@ -18,10 +18,17 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { getUserInfo, handleAuthCallback } from '@/lib/auth/googleAuth';
+import { useRouter } from 'next/navigation';
+import LoadingScreen from '@/components/LoadingScreen';
+import { toast } from 'sonner';
 
 export default function HomePage() {
   const [username, setUsername] = useState('Player');
   const [greeting, setGreeting] = useState('Hello');
+  const [isProcessingAuth, setIsProcessingAuth] = useState(true);
+  const router = useRouter();
+
   const [gamesInPlay] = useState([
     {
       id: 1,
@@ -108,9 +115,25 @@ export default function HomePage() {
   });
 
   useEffect(() => {
-    const fetchUsername = async () => {
-      setUsername('Alex');
-    };
+    const { token, error, redirectPath } = handleAuthCallback();
+
+    if (token) {
+      if (window.location.hash) {
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname
+        );
+      }
+
+      if (redirectPath) {
+        router.push(redirectPath);
+      }
+    } else if (error) {
+      toast.warning('Authentication Error', {
+        description: error,
+      });
+    }
 
     const getTimeBasedGreeting = () => {
       const hour = new Date().getHours();
@@ -123,15 +146,20 @@ export default function HomePage() {
       }
     };
 
-    fetchUsername();
     setGreeting(getTimeBasedGreeting());
+    setUsername(getUserInfo()?.email?.split("@")[0] || "Player");
+    setIsProcessingAuth(false);
 
     const greetingInterval = setInterval(() => {
       setGreeting(getTimeBasedGreeting());
     }, 60000);
 
     return () => clearInterval(greetingInterval);
-  }, []);
+  }, [router]);
+
+  if (isProcessingAuth) {
+    return <LoadingScreen />;
+  }
 
   const handlePlayNow = () => {
     window.location.href = '/game';
@@ -154,8 +182,7 @@ export default function HomePage() {
       const turn = fen.split(' ')[1];
       return turn === playingAs ? 'Your' : "Opponent's";
     } catch (error) {
-      console.error('Error parsing FEN:', error);
-      return 'Unknown';
+      return 'Unknown: ' + error;
     }
   };
 
@@ -180,7 +207,7 @@ export default function HomePage() {
         <div className="flex space-x-3 items-center">
           <Button
             variant="outline"
-            className="h-10 w-10 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-50
+            className="h-10 w-10 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
             shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
             dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
             dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
@@ -190,7 +217,7 @@ export default function HomePage() {
 
           <Button
             variant="outline"
-            className="h-10 w-10 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-50
+            className="h-10 w-10 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
             shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
             dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
             dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
@@ -234,7 +261,7 @@ export default function HomePage() {
 
             <Button
               variant="outline"
-              className="w-full border-amber-300 text-amber-800 hover:bg-amber-50 px-6 rounded-md transition-all 
+              className="w-full border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 px-6 rounded-md transition-all 
               shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
               dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
               dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
@@ -246,7 +273,7 @@ export default function HomePage() {
 
             <Button
               variant="outline"
-              className="w-full border-amber-300 text-amber-800 hover:bg-amber-50 px-6 rounded-md transition-all 
+              className="w-full border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 px-6 rounded-md transition-all 
               shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
               dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
               dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
@@ -324,11 +351,11 @@ export default function HomePage() {
                 </CarouselContent>
                 <div className="flex justify-end gap-2 mt-4">
                   <CarouselPrevious
-                    className="relative inset-0 translate-y-0 border-amber-300 text-amber-800 hover:bg-amber-50 rounded-md
+                    className="relative inset-0 translate-y-0 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 hover:text-amber-900 rounded-md
                   dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50"
                   />
                   <CarouselNext
-                    className="relative inset-0 translate-y-0 border-amber-300 text-amber-800 hover:bg-amber-50 rounded-md
+                    className="relative inset-0 translate-y-0 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 hover:text-amber-900 rounded-md
                   dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50"
                   />
                 </div>
@@ -347,7 +374,7 @@ export default function HomePage() {
             <Button
               variant="outline"
               size="sm"
-              className="border-amber-300 text-amber-800 hover:bg-amber-50
+              className="border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
               dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50"
             >
               View All
@@ -369,7 +396,7 @@ export default function HomePage() {
                   {gameHistory.map((game) => (
                     <tr
                       key={game.id}
-                      className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 dark:hover:bg-slate-700/30 transition-colors"
+                      className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-slate-700/30 transition-colors"
                     >
                       <td className="py-2 pl-2">{game.opponent}</td>
                       <td
@@ -410,7 +437,7 @@ export default function HomePage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 w-7 p-0 border-amber-300 text-amber-800 hover:bg-amber-50
+                  className="h-7 w-7 p-0 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
                   dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50"
                   disabled
                 >
@@ -419,7 +446,7 @@ export default function HomePage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 w-7 p-0 border-amber-300 text-amber-800 hover:bg-amber-50
+                  className="h-7 w-7 p-0 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
                   dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50"
                 >
                   &gt;

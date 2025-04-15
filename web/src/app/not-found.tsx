@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { 
-  HomeIcon, 
+import {
+  HomeIcon,
   ArrowPathIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
 } from '@heroicons/react/24/outline';
 import CustomChessBoard from '@/components/DisplayChessBoard';
 
@@ -23,7 +23,7 @@ export default function NotFound() {
       setChessAnimation((prev) => (prev + 1) % animations.length);
     }, 8000);
     return () => clearInterval(interval);
-  }, []);
+  }, [animations.length]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-amber-50 via-amber-100/70 to-amber-200/50 dark:from-slate-800 dark:via-amber-900/20 dark:to-slate-900/90">
@@ -50,18 +50,21 @@ export default function NotFound() {
       <div className="w-full max-w-5xl z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div className="order-2 md:order-1 p-6">
-            <div className="mb-2 text-lg text-amber-600 dark:text-amber-400 font-medium">Error 404</div>
+            <div className="mb-2 text-lg text-amber-600 dark:text-amber-400 font-medium">
+              Error 404
+            </div>
             <h1 className="text-4xl md:text-5xl font-bold text-amber-900 dark:text-amber-100 font-display mb-6">
               Missing Piece
             </h1>
             <p className="text-amber-800 dark:text-amber-200 mb-8">
-              The page you're looking for has moved, been captured, or never existed. 
-              Like a forgotten chess piece, it's no longer on the board.
+              The page you`&apos;`re looking for has moved, been captured, or
+              never existed. Like a forgotten chess piece, it`&apos;`s no longer
+              on the board.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                onClick={() => window.location.href = '/'}
+              <Button
+                onClick={() => (window.location.href = '/')}
                 className="bg-amber-600 hover:bg-amber-700 text-white px-6 rounded-md 
                 shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e] hover:translate-y-[2px]
                 dark:bg-amber-500 dark:hover:bg-amber-600
@@ -70,11 +73,11 @@ export default function NotFound() {
                 <HomeIcon className="mr-2 h-5 w-5" />
                 Return Home
               </Button>
-              
-              <Button 
+
+              <Button
                 variant="outline"
                 onClick={() => window.history.back()}
-                className="border-amber-300 text-amber-800 hover:bg-amber-50
+                className="border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
                 shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
                 dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
                 dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
@@ -83,21 +86,21 @@ export default function NotFound() {
                 Go Back
               </Button>
             </div>
-            
+
             <div className="mt-12">
               <div className="text-sm text-amber-700 dark:text-amber-300">
                 Looking for something specific?
               </div>
               <div className="mt-2 flex gap-6">
-                <Link 
-                  href="/game" 
+                <Link
+                  href="/game"
                   className="text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 flex items-center text-sm"
                 >
                   Play Game
                   <ChevronRightIcon className="ml-1 h-4 w-4" />
                 </Link>
-                <Link 
-                  href="/home" 
+                <Link
+                  href="/home"
                   className="text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 flex items-center text-sm"
                 >
                   Dashboard
@@ -106,20 +109,24 @@ export default function NotFound() {
               </div>
             </div>
           </div>
-          
+
           <div className="order-1 md:order-2 p-6 flex justify-center">
             <div className="w-full max-w-sm relative">
               <div className="absolute z-1 -top-8 -left-8 md:-top-14 md:-left-14 w-20 h-20 md:w-32 md:h-32 rounded-full bg-white dark:bg-slate-800 shadow-md flex items-center justify-center">
-                <div className="text-6xl md:text-8xl font-bold text-amber-300 dark:text-amber-600 font-display">?</div>
+                <div className="text-6xl md:text-8xl font-bold text-amber-300 dark:text-amber-600 font-display">
+                  ?
+                </div>
               </div>
               <div className="chess-board-container">
-                <CustomChessBoard 
-                  className="shadow-2xl dark:shadow-black/30" 
+                <CustomChessBoard
+                  className="shadow-2xl dark:shadow-black/30"
                   pgn={animations[chessAnimation]}
                 />
               </div>
               <div className="absolute -bottom-8 -right-8 md:-bottom-12 md:-right-12 w-20 h-20 md:w-32 md:h-32 rounded-full bg-white dark:bg-slate-800 shadow-md flex items-center justify-center">
-                <div className="text-6xl md:text-8xl font-bold text-amber-300 dark:text-amber-600 font-display">4</div>
+                <div className="text-6xl md:text-8xl font-bold text-amber-300 dark:text-amber-600 font-display">
+                  4
+                </div>
               </div>
             </div>
           </div>

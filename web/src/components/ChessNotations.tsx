@@ -107,7 +107,7 @@ export default function ChessNotations({ pgn }: ChessNotationsProps) {
             {moves.map((move) => (
               <tr
                 key={move.number}
-                className="hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                className="hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-amber-900/20"
               >
                 <td className="py-1 text-amber-600 dark:text-amber-400">
                   {move.number}.

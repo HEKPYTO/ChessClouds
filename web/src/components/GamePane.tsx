@@ -257,7 +257,7 @@ export default function GamePane({ playingAs, gameProps }: PaneProps) {
                     movePairs.map((move) => (
                       <tr
                         key={move.moveNumber}
-                        className="hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                        className="hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-amber-900/20"
                       >
                         <td className="py-1 text-amber-600 dark:text-amber-400">
                           {move.moveNumber}.
@@ -355,7 +355,7 @@ export default function GamePane({ playingAs, gameProps }: PaneProps) {
                       movePairs.map((move) => (
                         <tr
                           key={move.moveNumber}
-                          className="hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                          className="hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-amber-900/20"
                         >
                           <td className="py-1 text-amber-600 dark:text-amber-400">
                             {move.moveNumber}.
