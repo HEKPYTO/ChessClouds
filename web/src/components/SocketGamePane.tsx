@@ -64,6 +64,32 @@ function getGameStatus(
         return 'Game ended';
     }
   }
+
+  if (chess.isGameOver()) {
+    if (chess.isCheckmate()) {
+      const winner = chess.turn() === 'w' ? 'Black' : 'White';
+      return `${winner} wins by checkmate`;
+    }
+    
+    if (chess.isStalemate()) {
+      return 'Draw by stalemate';
+    }
+    
+    if (chess.isThreefoldRepetition()) {
+      return 'Draw by repetition';
+    }
+    
+    if (chess.isInsufficientMaterial()) {
+      return 'Draw by insufficient material';
+    }
+    
+    if (chess.isDrawByFiftyMoves()) {
+      return 'Draw by fifty-move rule';
+    }
+    
+    return 'Draw';
+  }
+
   return 'Game in progress';
 }
 
