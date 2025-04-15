@@ -1,5 +1,8 @@
 export type Color = 'Black' | 'White';
-export type GameOutcome = { Decisive: { winner: Color } } | 'Draw';
+export type GameOutcome =
+  | { type: 'Decisive'; winner: 'w' | 'b' }
+  | { type: 'Draw' }
+  | { type: 'Ongoing' };
 export type ErrorType =
   | 'Deserialization'
   | 'Unauthorized'
