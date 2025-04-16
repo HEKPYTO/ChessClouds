@@ -1,0 +1,72 @@
+name: Upload Engine Images to Amazon ECR
+
+on:
+  workflow_run:
+    workflows: ["Code check and build"]
+    types: [completed]
+    branches: ["main"]
+
+jobs:
+  build-stockfish:
+    name: Build and Push Stockfish Image
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: engine/stockfish
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set default.region ap-southeast-1
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 058264495198.dkr.ecr.ap-southeast-1.amazonaws.com
+
+      - name: Build Docker image
+        run: docker build -t stockfish:latest .
+
+      - name: Tag Docker image
+        run: docker tag stockfish:latest 058264495198.dkr.ecr.ap-southeast-1.amazonaws.com/stockfish:latest
+
+      - name: Push Docker image to ECR
+        run: docker push 058264495198.dkr.ecr.ap-southeast-1.amazonaws.com/stockfish:latest
+
+  build-axum:
+    name: Build and Push Axum API Image
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: engine/axum
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set default.region ap-southeast-1
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 058264495198.dkr.ecr.ap-southeast-1.amazonaws.com
+
+      - name: Build Docker image
+        run: docker build -t axum:latest .
+
+      - name: Tag Docker image
+        run: docker tag axum:latest 058264495198.dkr.ecr.ap-southeast-1.amazonaws.com/axum:latest
+
+      - name: Push Docker image to ECR
+        run: docker push 058264495198.dkr.ecr.ap-southeast-1.amazonaws.com/axum:latest
