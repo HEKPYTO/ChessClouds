@@ -147,7 +147,7 @@ export default function HomePage() {
     };
 
     setGreeting(getTimeBasedGreeting());
-    setUsername(getUserInfo()?.email?.split("@")[0] || "Player");
+    setUsername(getUserInfo()?.email?.split('@')[0] || 'Player');
     setIsProcessingAuth(false);
 
     const greetingInterval = setInterval(() => {

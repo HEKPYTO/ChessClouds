@@ -57,8 +57,8 @@ export default function NotFound() {
               Missing Piece
             </h1>
             <p className="text-amber-800 dark:text-amber-200 mb-8">
-              The page you`&apos;`re looking for has moved, been captured, or
-              never existed. Like a forgotten chess piece, it`&apos;`s no longer
+              The page you&apos;re looking for has moved, been captured, or
+              never existed. Like a forgotten chess piece, it&apos;s no longer
               on the board.
             </p>
 
