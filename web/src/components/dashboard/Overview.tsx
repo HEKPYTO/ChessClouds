@@ -3,8 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardTabProps } from '@/types/dashboard-props';
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
-import { useRouter } from 'next/navigation';
 
 const HISTORY_PER_PAGE = 10;
 const FRIEND_PER_PAGE = 5;
@@ -110,14 +108,13 @@ const mockFriends = [
   { id: 5, name: 'chess_lover99', rating: 700, status: 'offline' },
 ];
 
-export default function OverviewTab({ setActiveTab } : DashboardTabProps) {
-
+export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
   const handleViewGames = () => {
-    setActiveTab('games')
+    setActiveTab('games');
   };
 
   const handleViewFriends = () => {
-    setActiveTab('friends')
+    setActiveTab('friends');
   };
 
   const getStatusColor = (status: string) => {

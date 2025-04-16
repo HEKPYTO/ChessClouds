@@ -10,7 +10,6 @@ import {
   MagnifyingGlassIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/outline';
-import { DashboardTabProps } from '@/types/dashboard-props';
 
 const mockGameHistory = Array(50)
   .fill(null)
@@ -50,7 +49,7 @@ const mockGameHistory = Array(50)
     };
   });
 
-export default function GamesTab({ setActiveTab } : DashboardTabProps) {
+export default function GamesTab() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [resultFilter, setResultFilter] = useState('All');
