@@ -85,13 +85,13 @@ export default function Navbar() {
     }, 150);
   };
 
-  // This handler will act as the click action for the sign up/dashboard button.
   const handleDashboardSignUpClick = () => {
     setPressedKey(authenticated ? 'd' : 's');
     setTimeout(() => {
       router.push(authenticated ? '/dashboard' : '/signup');
+      setPressedKey(null);
     }, 150);
-  };
+  };  
 
   const toggleMobileMenu = () => {
     setAnimating(true);
@@ -188,6 +188,7 @@ export default function Navbar() {
                     : ''
                 }`}
               onClick={handleDashboardSignUpClick}
+              onMouseUp={() => setPressedKey(null)}
             >
               {authenticated ? 'Dashboard' : 'Sign up'}
               <span
@@ -213,6 +214,7 @@ export default function Navbar() {
                     : ''
                 }`}
               onClick={handlePlayClick}
+              onMouseUp={() => setPressedKey(null)}
             >
               Play now
               <span
