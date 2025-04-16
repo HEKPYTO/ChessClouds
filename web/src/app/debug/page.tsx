@@ -110,16 +110,14 @@ export default function DevPage() {
 
   const initializeGame = async () => {
     try {
-      logMessage(
-        `Initializing game ${gameId} with white: white, black: black`
-      );
-  
+      logMessage(`Initializing game ${gameId} with white: white, black: black`);
+
       const initBody = {
         game_id: gameId,
         white_user_id: 'white',
         black_user_id: 'black',
       };
-  
+
       const response = await fetch(`http://${host}:${port}/init`, {
         method: 'POST',
         headers: {
@@ -128,7 +126,7 @@ export default function DevPage() {
         },
         body: JSON.stringify(initBody),
       });
-  
+
       if (response.ok) {
         logMessage('Game initialized successfully');
         toast.success('Game initialized successfully', {
@@ -137,7 +135,7 @@ export default function DevPage() {
         return true;
       } else {
         const text = await response.text();
-        if (text === "Game already exists") {
+        if (text === 'Game already exists') {
           logMessage('Game already exists, ready to connect');
           toast.info('Game already exists', {
             description: 'You can connect to this existing game',
@@ -209,8 +207,9 @@ export default function DevPage() {
   const copyGameLink = () => {
     const playas = userId === 'white' ? 'b' : 'w';
     const url = `${window.location.origin}/socket?game_id=${gameId}&playas=${playas}`;
-    
-    navigator.clipboard.writeText(url)
+
+    navigator.clipboard
+      .writeText(url)
       .then(() => {
         setCopySuccess(true);
         setTimeout(() => setCopySuccess(false), 2000);
@@ -218,7 +217,7 @@ export default function DevPage() {
           description: 'Share this with your opponent',
         });
       })
-      .catch(err => {
+      .catch((err) => {
         toast.error('Failed to copy', {
           description: String(err),
         });
@@ -416,18 +415,20 @@ export default function DevPage() {
                   </span>
                 </div>
               </div>
-              
+
               <Button
                 onClick={copyGameLink}
                 className="bg-amber-600 hover:bg-amber-700 text-white shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
                 dark:bg-amber-500 dark:hover:bg-amber-600 dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
               >
-                {copySuccess ? "Copied!" : "Copy Game Link for Opponent"}
+                {copySuccess ? 'Copied!' : 'Copy Game Link for Opponent'}
                 <ClipboardIcon className="ml-2 h-4 w-4" />
               </Button>
-              
-              <a 
-                href={`/socket?game_id=${gameId}&playas=${userId === 'white' ? 'w' : 'b'}`} 
+
+              <a
+                href={`/socket?game_id=${gameId}&playas=${
+                  userId === 'white' ? 'w' : 'b'
+                }`}
                 target="_blank"
                 className="text-center p-2 border border-amber-300 dark:border-amber-700 rounded-md text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-slate-700"
               >

@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import ThemeSwitch from './ThemeSwitch';
 import { XMarkIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { isAuthenticated } from '@/lib/auth/googleAuth';
+import { useRouter } from 'next/navigation';
 
 type NavItem = {
   name: string;
@@ -12,10 +14,12 @@ type NavItem = {
 };
 
 export default function Navbar() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [pressedKey, setPressedKey] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [animating, setAnimating] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
 
   const navigationItems: NavItem[] = [
     { name: 'Features', href: '/features' },
@@ -26,20 +30,23 @@ export default function Navbar() {
   ];
 
   useEffect(() => {
+    setAuthenticated(isAuthenticated());
+    
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'p') {
+      const key = e.key.toLowerCase();
+      if (key === 'p') {
         setPressedKey('p');
         setTimeout(() => {
-          window.location.href = '/play';
+          router.push(isAuthenticated() ? '/play': '/signin');
         }, 150);
-      } else if (e.key.toLowerCase() === 's') {
+      } else if (key === 's') {
         setPressedKey('s');
         setTimeout(() => {
-          window.location.href = '/signup';
+          router.push(isAuthenticated() ? '/profile' : '/signup');
         }, 150);
       }
     };
@@ -57,25 +64,25 @@ export default function Navbar() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [router]);
+
+  const handleNavClick = (path: string) => {
+    setMobileMenuOpen(false);
+    router.push(path);
+  };
 
   const handlePlayClick = () => {
     setPressedKey('p');
     setTimeout(() => {
-      window.location.href = '/play';
+      router.push(authenticated ? '/play' : '/signin');
     }, 150);
   };
 
   const handleSignUpClick = () => {
     setPressedKey('s');
     setTimeout(() => {
-      window.location.href = '/signup';
+      router.push(authenticated ? '/profile': '/signup');
     }, 150);
-  };
-
-  const handleNavClick = (path: string) => {
-    setMobileMenuOpen(false);
-    window.location.href = path;
   };
 
   const toggleMobileMenu = () => {
@@ -113,7 +120,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center">
           <button
-            onClick={() => handleNavClick('/')}
+            onClick={() => handleNavClick(authenticated ? '/home' : '/')}
             className="flex items-center cursor-pointer"
           >
             <div className="h-8 w-8 rounded bg-amber-600 dark:bg-amber-500 mr-2"></div>
@@ -129,18 +136,8 @@ export default function Navbar() {
                 <div className="relative group" key={item.name}>
                   <button className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 flex items-center cursor-pointer">
                     {item.name}
-                    <svg
-                      className="ml-1 h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
+                    <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
                 </div>
@@ -161,22 +158,18 @@ export default function Navbar() {
           {/* Theme Switcher - Always visible */}
           <ThemeSwitch />
 
-          {/* Sign up button - visible on medium and up screens */}
+          {/* Desktop button: Profile if authenticated, otherwise Sign up */}
           <div className="hidden md:block">
             <Button
               variant="outline"
-              className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all 
-              shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
-              dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-              dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
-              ${
+              className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] ${
                 pressedKey === 's'
                   ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
                   : ''
               }`}
               onClick={handleSignUpClick}
             >
-              Sign up
+              {authenticated ? 'Profile' : 'Sign up'}
               <span
                 className={`ml-1 text-xs px-1 rounded transition-colors ${
                   pressedKey === 's'
@@ -192,11 +185,7 @@ export default function Navbar() {
           {/* Play now button - visible on small and up screens */}
           <div className="hidden sm:block">
             <Button
-              className={`h-9 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md transition-all 
-              shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
-              dark:bg-amber-500 dark:hover:bg-amber-600
-              dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]
-              ${
+              className={`h-9 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md transition-all shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px] dark:bg-amber-500 dark:hover:bg-amber-600 dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f] ${
                 pressedKey === 'p'
                   ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
                   : ''
@@ -218,11 +207,7 @@ export default function Navbar() {
 
           {/* Hamburger Menu Button - hidden on xl screens */}
           <button
-            className="xl:hidden flex items-center justify-center h-9 w-9 p-0 border border-amber-300 text-amber-800 
-            hover:bg-amber-50 hover:text-amber-900 rounded-md transition-all 
-            shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
-            dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-            dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
+            className="xl:hidden flex items-center justify-center h-9 w-9 p-0 border border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 rounded-md transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
             onClick={toggleMobileMenu}
             disabled={animating}
             aria-label="Menu"
@@ -251,47 +236,31 @@ export default function Navbar() {
             >
               <span>{item.name}</span>
               {item.hasChildren && (
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               )}
             </button>
           ))}
           <div className="pt-2 border-t border-amber-200/30 dark:border-slate-700/30 flex flex-col gap-2">
-            {/* Sign up button in mobile menu - visible only when hidden in header (xs screens) */}
+            {/* Mobile Menu: Profile if authenticated, otherwise Sign up */}
             <div className="md:hidden">
               <Button
                 variant="outline"
-                className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
-                shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
-                dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-                dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
+                className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
                 onClick={handleSignUpClick}
               >
-                Sign up
+                {authenticated ? 'Profile' : 'Sign up'}
                 <span className="ml-1 text-xs px-1 rounded bg-amber-100 dark:bg-slate-800">
                   S
                 </span>
               </Button>
             </div>
 
-            {/* Play now button in mobile menu - visible only when hidden in header (xs screens) */}
+            {/* Mobile Menu: Play now button */}
             <div className="sm:hidden">
               <Button
-                className="w-full mt-1 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md 
-                shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
-                dark:bg-amber-500 dark:hover:bg-amber-600
-                dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
+                className="w-full mt-1 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px] dark:bg-amber-500 dark:hover:bg-amber-600 dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
                 onClick={handlePlayClick}
               >
                 Play now

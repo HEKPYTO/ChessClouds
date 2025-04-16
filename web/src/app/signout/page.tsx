@@ -123,7 +123,7 @@ export default function SignOut() {
               Exit ChessClouds
             </CardTitle>
             <CardDescription className="text-amber-700 dark:text-amber-300">
-              Are you sure you really want to sign out?
+              Are you sure you <em>really</em> want to sign out?
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pt-6">

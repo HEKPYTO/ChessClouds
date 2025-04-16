@@ -32,7 +32,7 @@ export interface ChessBoardProps {
   promotion: (piece: 'q' | 'r' | 'n' | 'b') => void;
   previewIndex: number | null;
   chess: Chess;
-  viewOnly?: boolean; 
+  viewOnly?: boolean;
 }
 
 export function calcMovable(chess: Chess) {
@@ -63,7 +63,7 @@ export function ChessBoard({
   promotion,
   previewIndex,
   chess,
-  viewOnly = false
+  viewOnly = false,
 }: ChessBoardProps) {
   const handleMove = (from: Square, to: Square) => {
     if (previewIndex !== null || viewOnly) return;
@@ -99,7 +99,10 @@ export function ChessBoard({
                       ? 'white'
                       : 'black'
                     : undefined,
-                dests: previewIndex !== null || viewOnly ? new Map() : calcMovable(chess),
+                dests:
+                  previewIndex !== null || viewOnly
+                    ? new Map()
+                    : calcMovable(chess),
               }}
               coordinates={true}
               animation={{ enabled: true, duration: 100 }}

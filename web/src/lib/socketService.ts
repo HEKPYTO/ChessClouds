@@ -1,11 +1,10 @@
-// src/lib/socketService.ts
-import { 
-  ServerMessage, 
-  MoveCallback, 
-  ConnectCallback, 
-  ErrorCallback, 
-  HistoryCallback, 
-  GameEndCallback, 
+import {
+  ServerMessage,
+  MoveCallback,
+  ConnectCallback,
+  ErrorCallback,
+  HistoryCallback,
+  GameEndCallback,
 } from '@/types/shared';
 
 let socketInstance: SocketService | null = null;
@@ -31,7 +30,9 @@ export class SocketService {
     this.serverUrl = serverUrl;
   }
 
-  static getInstance(serverUrl: string = 'ws://localhost:8000/ws'): SocketService {
+  static getInstance(
+    serverUrl: string = 'ws://localhost:8000/ws'
+  ): SocketService {
     if (!socketInstance) {
       socketInstance = new SocketService(serverUrl);
     }
@@ -46,7 +47,11 @@ export class SocketService {
   }
 
   connect(gameId: string, userId: string): void {
-    if (this.isConnected() && this.gameId === gameId && this.userId === userId) {
+    if (
+      this.isConnected() &&
+      this.gameId === gameId &&
+      this.userId === userId
+    ) {
       console.log('Already connected to the same game');
       if (this.onConnectCallback) this.onConnectCallback();
       return;
@@ -57,12 +62,12 @@ export class SocketService {
     this.authenticated = false;
     this.reconnectAttempt = 0;
     this.manualDisconnect = false;
-    
+
     if (this.connecting) {
       console.log('Connection attempt already in progress');
       return;
     }
-    
+
     this.createSocketConnection();
   }
 
@@ -71,7 +76,10 @@ export class SocketService {
     this.connecting = true;
 
     if (this.socket) {
-      if (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING) {
+      if (
+        this.socket.readyState === WebSocket.OPEN ||
+        this.socket.readyState === WebSocket.CONNECTING
+      ) {
         this.socket.close();
       }
       this.socket = null;
@@ -98,7 +106,7 @@ export class SocketService {
               break;
             case 'AuthSuccess':
               this.authenticated = true;
-              this.reconnectAttempt = 0; // Reset on successful authentication
+              this.reconnectAttempt = 0;
               if (this.onConnectCallback) this.onConnectCallback();
               console.log('Authentication successful');
               break;
@@ -110,9 +118,12 @@ export class SocketService {
               break;
             case 'Error':
               console.error('Server error:', message.value);
-              if (this.onErrorCallback) this.onErrorCallback(typeof message.value === 'string' 
-                ? message.value 
-                : String(message.value));
+              if (this.onErrorCallback)
+                this.onErrorCallback(
+                  typeof message.value === 'string'
+                    ? message.value
+                    : String(message.value)
+                );
               break;
           }
         } catch (error) {
@@ -134,13 +145,22 @@ export class SocketService {
       this.socket.onclose = (event) => {
         this.connecting = false;
         this.authenticated = false;
-        console.log(`WebSocket closed: ${event.code} ${event.reason || 'No reason provided'}`);
-        
+        console.log(
+          `WebSocket closed: ${event.code} ${
+            event.reason || 'No reason provided'
+          }`
+        );
+
         if (this.onErrorCallback && !this.manualDisconnect) {
-          this.onErrorCallback('Connection closed: ' + (event.reason || 'Unknown reason'));
+          this.onErrorCallback(
+            'Connection closed: ' + (event.reason || 'Unknown reason')
+          );
         }
-        
-        if (!this.manualDisconnect && this.reconnectAttempt < this.maxReconnectAttempts) {
+
+        if (
+          !this.manualDisconnect &&
+          this.reconnectAttempt < this.maxReconnectAttempts
+        ) {
           this.scheduleReconnect();
         }
       };
@@ -156,19 +176,33 @@ export class SocketService {
   private scheduleReconnect(): void {
     const baseDelay = 1000;
     const maxDelay = 10000;
-    const delay = Math.min(baseDelay * Math.pow(1.5, this.reconnectAttempt), maxDelay);
+    const delay = Math.min(
+      baseDelay * Math.pow(1.5, this.reconnectAttempt),
+      maxDelay
+    );
     const jitter = 0.2 * delay * (Math.random() - 0.5);
     const finalDelay = Math.floor(delay + jitter);
-    
-    console.log(`Scheduling reconnect attempt ${this.reconnectAttempt + 1} in ${finalDelay}ms`);
-    
+
+    console.log(
+      `Scheduling reconnect attempt ${
+        this.reconnectAttempt + 1
+      } in ${finalDelay}ms`
+    );
+
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
     }
-    
+
     this.reconnectTimer = setTimeout(() => {
-      if (this.reconnectAttempt < this.maxReconnectAttempts && !this.manualDisconnect) {
-        console.log(`Reconnect attempt ${this.reconnectAttempt + 1}/${this.maxReconnectAttempts}`);
+      if (
+        this.reconnectAttempt < this.maxReconnectAttempts &&
+        !this.manualDisconnect
+      ) {
+        console.log(
+          `Reconnect attempt ${this.reconnectAttempt + 1}/${
+            this.maxReconnectAttempts
+          }`
+        );
         this.reconnectAttempt++;
         this.createSocketConnection();
       } else if (!this.manualDisconnect) {
@@ -249,19 +283,22 @@ export class SocketService {
 
   disconnect(): void {
     this.manualDisconnect = true;
-    
+
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
-    
+
     if (this.socket) {
-      if (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING) {
-        this.socket.close(1000, "Disconnected by user");
+      if (
+        this.socket.readyState === WebSocket.OPEN ||
+        this.socket.readyState === WebSocket.CONNECTING
+      ) {
+        this.socket.close(1000, 'Disconnected by user');
       }
       this.socket = null;
     }
-    
+
     this.authenticated = false;
     this.connecting = false;
   }

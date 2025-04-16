@@ -1,8 +1,8 @@
-import { 
-  AuthCallbackResult, 
-  GoogleCognitoJwtPayload, 
-  JwtParseResult, 
-  UserInfo 
+import {
+  AuthCallbackResult,
+  GoogleCognitoJwtPayload,
+  JwtParseResult,
+  UserInfo,
 } from '@/types/googleAuthTypes';
 
 export const initiateGoogleAuth = (redirectPath?: string): void => {

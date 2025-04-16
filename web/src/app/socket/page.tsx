@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Chess } from 'chess.js';
@@ -14,13 +14,17 @@ export default function SocketGame() {
   const [fen, setFen] = useState(chess.fen());
   const [lastMove, setLastMove] = useState<[Square, Square] | undefined>();
   const [selectVisible, setSelectVisible] = useState(false);
-  const [pendingMove, setPendingMove] = useState<[Square, Square] | undefined>();
+  const [pendingMove, setPendingMove] = useState<
+    [Square, Square] | undefined
+  >();
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [gameOver, setGameOver] = useState(false);
-  const [gameOutcome, setGameOutcome] = useState<GameOutcome | undefined>(undefined);
+  const [gameOutcome, setGameOutcome] = useState<GameOutcome | undefined>(
+    undefined
+  );
   const [gameId, setGameId] = useState('');
   const [playingAs, setPlayingAs] = useState<'w' | 'b'>('w');
 
@@ -37,9 +41,9 @@ export default function SocketGame() {
   }, []);
 
   useEffect(() => {
-    if (error) {    
+    if (error) {
       if (gameOutcome != undefined) {
-        toast.success("Server closed, Game Completed");
+        toast.success('Server closed, Game Completed');
       } else {
         toast.error(error);
       }
@@ -89,7 +93,7 @@ export default function SocketGame() {
 
     socketService.onHistory((moves) => {
       chess.reset();
-      moves.forEach(moveStr => {
+      moves.forEach((moveStr) => {
         try {
           chess.move(moveStr);
         } catch (error) {
@@ -112,7 +116,7 @@ export default function SocketGame() {
       } else {
         setGameOutcome(outcome as GameOutcome);
       }
-    });    
+    });
 
     socketService.onError((errorMsg) => {
       setError(errorMsg);
@@ -130,51 +134,60 @@ export default function SocketGame() {
       socketService.onGameEnd(() => {});
       socketService.onError(() => {});
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chess, gameId, userId]);
 
-  const onMove = useCallback((from: Square, to: Square) => {
-    if (previewIndex !== null) {
-      setPreviewIndex(null);
-      return;
-    }
-    if (chess.turn() !== playingAs) {
-      return;
-    }
-    const moves = chess.moves({ verbose: true });
-    const moveFound = moves.find((m) => m.from === from && m.to === to);
-    if (!moveFound) return;
-    if (moveFound.promotion) {
-      setPendingMove([from, to]);
-      setSelectVisible(true);
-    } else {
-      const moveResult = chess.move({ from, to });
+  const onMove = useCallback(
+    (from: Square, to: Square) => {
+      if (previewIndex !== null) {
+        setPreviewIndex(null);
+        return;
+      }
+      if (chess.turn() !== playingAs) {
+        return;
+      }
+      const moves = chess.moves({ verbose: true });
+      const moveFound = moves.find((m) => m.from === from && m.to === to);
+      if (!moveFound) return;
+      if (moveFound.promotion) {
+        setPendingMove([from, to]);
+        setSelectVisible(true);
+      } else {
+        const moveResult = chess.move({ from, to });
+        if (moveResult) {
+          lastLocalMoveRef.current = moveResult.san;
+          setLastMove([from, to]);
+          updateState();
+          SocketService.getInstance().sendMove(moveResult.san);
+        }
+      }
+    },
+    [chess, previewIndex, updateState, playingAs]
+  );
+
+  const promotion = useCallback(
+    (piece: 'q' | 'r' | 'n' | 'b') => {
+      if (!pendingMove) return;
+      const [from, to] = pendingMove;
+      const moveResult = chess.move({ from, to, promotion: piece });
       if (moveResult) {
         lastLocalMoveRef.current = moveResult.san;
         setLastMove([from, to]);
+        setSelectVisible(false);
         updateState();
         SocketService.getInstance().sendMove(moveResult.san);
       }
-    }
-  }, [chess, previewIndex, updateState, playingAs]);
+    },
+    [chess, pendingMove, updateState]
+  );
 
-  const promotion = useCallback((piece: 'q' | 'r' | 'n' | 'b') => {
-    if (!pendingMove) return;
-    const [from, to] = pendingMove;
-    const moveResult = chess.move({ from, to, promotion: piece });
-    if (moveResult) {
-      lastLocalMoveRef.current = moveResult.san;
-      setLastMove([from, to]);
-      setSelectVisible(false);
-      updateState();
-      SocketService.getInstance().sendMove(moveResult.san);
-    }
-  }, [chess, pendingMove, updateState]);
-
-  const previewMove = useCallback((index: number) => {
-    if (index >= chess.history().length) setPreviewIndex(null);
-    else setPreviewIndex(index);
-  }, [chess]);
+  const previewMove = useCallback(
+    (index: number) => {
+      if (index >= chess.history().length) setPreviewIndex(null);
+      else setPreviewIndex(index);
+    },
+    [chess]
+  );
 
   const handleFirstMove = useCallback(() => {
     if (chess.history().length > 0) {
@@ -193,7 +206,10 @@ export default function SocketGame() {
   const handleNext = useCallback(() => {
     if (previewIndex !== null && previewIndex < chess.history().length - 1) {
       setPreviewIndex(previewIndex + 1);
-    } else if (previewIndex !== null && previewIndex === chess.history().length - 1) {
+    } else if (
+      previewIndex !== null &&
+      previewIndex === chess.history().length - 1
+    ) {
       setPreviewIndex(null);
     }
   }, [previewIndex, chess]);
@@ -238,7 +254,7 @@ export default function SocketGame() {
     playingAs,
     gameOver,
     gameOutcome,
-    reconnect
+    reconnect,
   };
 
   if (isLoading) {
