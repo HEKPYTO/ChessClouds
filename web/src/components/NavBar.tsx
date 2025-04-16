@@ -91,7 +91,7 @@ export default function Navbar() {
       router.push(authenticated ? '/dashboard' : '/signup');
       setPressedKey(null);
     }, 150);
-  };  
+  };
 
   const toggleMobileMenu = () => {
     setAnimating(true);

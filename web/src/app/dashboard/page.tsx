@@ -22,16 +22,16 @@ export default function Dashboard() {
   const isVerified = userInfo?.email_verified || true;
 
   const renderTabContent = () => {
-    const sharedProps = { setActiveTab }
+    const sharedProps = { setActiveTab };
     switch (activeTab) {
       case 'overview':
-        return <OverviewTab { ...sharedProps }/>;
+        return <OverviewTab {...sharedProps} />;
       case 'games':
-        return <GamesTab { ...sharedProps }/>;
+        return <GamesTab />;
       case 'friends':
-        return <FriendsTab { ...sharedProps }/>;
+        return <FriendsTab />;
       default:
-        return <OverviewTab { ...sharedProps }/>;
+        return <OverviewTab {...sharedProps} />;
     }
   };
 
