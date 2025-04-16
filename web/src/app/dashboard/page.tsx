@@ -12,7 +12,7 @@ import { UserInfo } from '@/types/googleAuthTypes';
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  
+
   useEffect(() => {
     const info = getUserInfo();
     setUserInfo(info);
@@ -22,15 +22,16 @@ export default function Dashboard() {
   const isVerified = userInfo?.email_verified || true;
 
   const renderTabContent = () => {
+    const sharedProps = { setActiveTab }
     switch (activeTab) {
       case 'overview':
-        return <OverviewTab />;
+        return <OverviewTab { ...sharedProps }/>;
       case 'games':
-        return <GamesTab />;
+        return <GamesTab { ...sharedProps }/>;
       case 'friends':
-        return <FriendsTab />;
+        return <FriendsTab { ...sharedProps }/>;
       default:
-        return <OverviewTab />;
+        return <OverviewTab { ...sharedProps }/>;
     }
   };
 
@@ -44,7 +45,7 @@ export default function Dashboard() {
               <div className="relative flex justify-center md:justify-start">
                 <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-amber-600 dark:bg-amber-500 shadow-md dark:shadow-amber-600/20"></div>
               </div>
-              
+
               {/* User Info */}
               <div className="flex-1 text-center md:text-left">
                 <div className="flex flex-col md:flex-row gap-2 md:items-center justify-center md:justify-start">
@@ -52,7 +53,16 @@ export default function Dashboard() {
                     {username}
                     {isVerified && (
                       <Badge className="ml-3 bg-green-600 text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 mr-1"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
                           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                           <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
@@ -61,7 +71,7 @@ export default function Dashboard() {
                     )}
                   </h1>
                 </div>
-                                
+
                 <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 mt-2 sm:mt-3 text-amber-700 dark:text-amber-300 justify-center md:justify-start">
                   <div className="flex items-center">
                     <span className="text-green-600 font-bold mr-2">•</span>
@@ -77,7 +87,7 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-          
+
           {/* Submenu - Scrollable on mobile */}
           <div className="flex border-t border-amber-200/30 dark:border-slate-700/30 overflow-x-auto scrollbar-hide">
             <button
@@ -113,9 +123,7 @@ export default function Dashboard() {
           </div>
         </Card>
 
-        <div className="w-full">
-          {renderTabContent()}
-        </div>
+        <div className="w-full">{renderTabContent()}</div>
       </div>
     </div>
   );

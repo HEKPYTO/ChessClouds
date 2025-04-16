@@ -13,6 +13,7 @@ import {
   XMarkIcon,
   CheckIcon,
 } from '@heroicons/react/24/outline';
+import { DashboardTabProps } from '@/types/dashboard-props';
 
 const mockFriends = Array(30)
   .fill(null)
@@ -68,7 +69,7 @@ const mockUserSearch = [
   { id: 105, name: 'queen_attack', rating: 1460 },
 ];
 
-export default function FriendsTab() {
+export default function FriendsTab({ setActiveTab } : DashboardTabProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [friendSearchTerm, setFriendSearchTerm] = useState('');
   const [userSearchTerm, setUserSearchTerm] = useState('');
@@ -89,9 +90,7 @@ export default function FriendsTab() {
   const filteredInvitations = mockInvitations.filter(
     (invitation) =>
       invitationSearchTerm === '' ||
-      invitation.name
-        .toLowerCase()
-        .includes(invitationSearchTerm.toLowerCase())
+      invitation.name.toLowerCase().includes(invitationSearchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredFriends.length / itemsPerPage);
