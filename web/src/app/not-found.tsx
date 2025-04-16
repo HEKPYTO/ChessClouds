@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   HomeIcon,
@@ -9,13 +10,18 @@ import {
   ChevronRightIcon,
 } from '@heroicons/react/24/outline';
 import CustomChessBoard from '@/components/DisplayChessBoard';
+import { isAuthenticated } from '@/lib/auth/googleAuth';
 
 export default function NotFound() {
+  const router = useRouter();
   const [chessAnimation, setChessAnimation] = useState(0);
   const animations = [
     '1. e4 e5 2. Nf3 Nc6 3. d4 exd4 4. Bc4',
     '1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5',
     '1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3',
+    '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 O-O 8. c3 d5 9. exd5 Nxd5 10. Nxe5 Nxe5 11. Rxe5 c6 12. d4 Bd6 13. Re1 Qh4 14. g3 Qh3',
+    '1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6',
+    '1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nf6',
   ];
 
   useEffect(() => {
@@ -64,7 +70,7 @@ export default function NotFound() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
-                onClick={() => (window.location.href = '/')}
+                onClick={() => router.push(isAuthenticated() ? '/home' : '/')}
                 className="bg-amber-600 hover:bg-amber-700 text-white px-6 rounded-md 
                 shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e] hover:translate-y-[2px]
                 dark:bg-amber-500 dark:hover:bg-amber-600
@@ -76,7 +82,7 @@ export default function NotFound() {
 
               <Button
                 variant="outline"
-                onClick={() => window.history.back()}
+                onClick={() => router.back()}
                 className="border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
                 shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
                 dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
