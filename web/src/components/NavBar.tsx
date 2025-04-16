@@ -31,7 +31,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setAuthenticated(isAuthenticated());
-    
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
@@ -41,12 +41,19 @@ export default function Navbar() {
       if (key === 'p') {
         setPressedKey('p');
         setTimeout(() => {
-          router.push(isAuthenticated() ? '/play': '/signin');
+          router.push(isAuthenticated() ? '/play' : '/signin');
         }, 150);
-      } else if (key === 's') {
+      } else if (key === 'd' && authenticated) {
+        // For authenticated users, the D key navigates to the dashboard.
+        setPressedKey('d');
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 150);
+      } else if (key === 's' && !authenticated) {
+        // For non-authenticated users, the S key navigates to sign up.
         setPressedKey('s');
         setTimeout(() => {
-          router.push(isAuthenticated() ? '/profile' : '/signup');
+          router.push('/signup');
         }, 150);
       }
     };
@@ -64,7 +71,7 @@ export default function Navbar() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [router]);
+  }, [router, authenticated]);
 
   const handleNavClick = (path: string) => {
     setMobileMenuOpen(false);
@@ -78,10 +85,11 @@ export default function Navbar() {
     }, 150);
   };
 
-  const handleSignUpClick = () => {
-    setPressedKey('s');
+  // This handler will act as the click action for the sign up/dashboard button.
+  const handleDashboardSignUpClick = () => {
+    setPressedKey(authenticated ? 'd' : 's');
     setTimeout(() => {
-      router.push(authenticated ? '/profile': '/signup');
+      router.push(authenticated ? '/dashboard' : '/signup');
     }, 150);
   };
 
@@ -136,8 +144,18 @@ export default function Navbar() {
                 <div className="relative group" key={item.name}>
                   <button className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 flex items-center cursor-pointer">
                     {item.name}
-                    <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <svg
+                      className="ml-1 h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -158,26 +176,28 @@ export default function Navbar() {
           {/* Theme Switcher - Always visible */}
           <ThemeSwitch />
 
-          {/* Desktop button: Profile if authenticated, otherwise Sign up */}
+          {/* Desktop button: Dashboard if authenticated, otherwise Sign up */}
           <div className="hidden md:block">
             <Button
               variant="outline"
-              className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] ${
-                pressedKey === 's'
-                  ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
-                  : ''
-              }`}
-              onClick={handleSignUpClick}
+              className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all 
+                shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+                dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] ${
+                  pressedKey === (authenticated ? 'd' : 's')
+                    ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                    : ''
+                }`}
+              onClick={handleDashboardSignUpClick}
             >
-              {authenticated ? 'Profile' : 'Sign up'}
+              {authenticated ? 'Dashboard' : 'Sign up'}
               <span
                 className={`ml-1 text-xs px-1 rounded transition-colors ${
-                  pressedKey === 's'
+                  pressedKey === (authenticated ? 'd' : 's')
                     ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
                     : 'bg-amber-100 dark:bg-slate-800'
                 }`}
               >
-                S
+                {authenticated ? 'D' : 'S'}
               </span>
             </Button>
           </div>
@@ -185,11 +205,13 @@ export default function Navbar() {
           {/* Play now button - visible on small and up screens */}
           <div className="hidden sm:block">
             <Button
-              className={`h-9 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md transition-all shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px] dark:bg-amber-500 dark:hover:bg-amber-600 dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f] ${
-                pressedKey === 'p'
-                  ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
-                  : ''
-              }`}
+              className={`h-9 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md transition-all 
+                shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
+                dark:bg-amber-500 dark:hover:bg-amber-600 dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f] ${
+                  pressedKey === 'p'
+                    ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
+                    : ''
+                }`}
               onClick={handlePlayClick}
             >
               Play now
@@ -236,23 +258,33 @@ export default function Navbar() {
             >
               <span>{item.name}</span>
               {item.hasChildren && (
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               )}
             </button>
           ))}
           <div className="pt-2 border-t border-amber-200/30 dark:border-slate-700/30 flex flex-col gap-2">
-            {/* Mobile Menu: Profile if authenticated, otherwise Sign up */}
+            {/* Mobile Menu: Dashboard if authenticated, otherwise Sign up */}
             <div className="md:hidden">
               <Button
                 variant="outline"
                 className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
-                onClick={handleSignUpClick}
+                onClick={handleDashboardSignUpClick}
               >
-                {authenticated ? 'Profile' : 'Sign up'}
+                {authenticated ? 'Dashboard' : 'Sign up'}
                 <span className="ml-1 text-xs px-1 rounded bg-amber-100 dark:bg-slate-800">
-                  S
+                  {authenticated ? 'D' : 'S'}
                 </span>
               </Button>
             </div>
