@@ -9,11 +9,11 @@ services:
     networks:
       - engine
       
-  axum:
+  actix:
     build:
-      context: ./axum
+      context: ./actix
       dockerfile: Dockerfile
-    container_name: axum
+    container_name: actix
     ports:
       - "4000:4000"
     depends_on:

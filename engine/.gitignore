@@ -1,3 +1,16 @@
-target
+# Ignore build artifacts for the actix project
+actix/target/
+
+# Ignore common Rust/Cargo backup and temporary files
+**/*.rs.bk
+
+# IDE, Editor, and OS-specific files
+.vscode/
+.idea/
 .DS_Store
-.vscode
+*~
+*.swp
+*.swo
+
+# Log files
+*.log
