@@ -24,4 +24,4 @@ Cargo.lock
 Thumbs.db
 
 # === Project-specific ===
-repomix-output.xml
+*repomix-output.xml
