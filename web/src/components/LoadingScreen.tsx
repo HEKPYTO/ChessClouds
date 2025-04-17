@@ -1,6 +1,6 @@
 'use client';
 
-import ChessCloudIcon from "./ChessCloud";
+import ChessCloudIcon from './ChessCloud';
 
 export default function LoadingScreen() {
   return (
