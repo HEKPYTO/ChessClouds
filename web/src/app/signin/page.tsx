@@ -22,6 +22,7 @@ import {
 } from '@/lib/auth/googleAuth';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import ChessCloudIcon from '@/components/ChessCloud';
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
@@ -107,7 +108,7 @@ export default function SignIn() {
                 <HomeIcon className="h-5 w-5" />
               </Button>
 
-              <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500 shadow-md dark:shadow-amber-600/20"></div>
+              <ChessCloudIcon className='h-12 w-12'/>
 
               <ThemeSwitch />
             </div>

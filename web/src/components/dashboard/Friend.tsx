@@ -78,7 +78,7 @@ export default function FriendsTab() {
   const [invitationSearchTerm, setInvitationSearchTerm] = useState('');
   const [showUserSearch, setShowUserSearch] = useState(false);
 
-  const itemsPerPage = 8;
+  const itemsPerPage = 7;
 
   const filteredFriends = mockFriends.filter(
     (friend) =>
@@ -179,7 +179,7 @@ export default function FriendsTab() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {paginatedFriends.length > 0 ? (
                 paginatedFriends.map((friend) => (
                   <div
