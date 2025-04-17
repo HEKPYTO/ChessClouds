@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import ThemeSwitch from './ThemeSwitch';
 import { XMarkIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { isAuthenticated } from '@/lib/auth/googleAuth';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import ChessCloudIcon from './ChessCloud';
 
 type NavItem = {
@@ -16,6 +16,8 @@ type NavItem = {
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
+
   const [scrolled, setScrolled] = useState(false);
   const [pressedKey, setPressedKey] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -30,6 +32,8 @@ export default function Navbar() {
     { name: 'Resources', href: '/resources', hasChildren: true },
   ];
 
+  const isDashboardPage = pathname.startsWith('/dashboard');
+
   useEffect(() => {
     setAuthenticated(isAuthenticated());
 
@@ -42,16 +46,19 @@ export default function Navbar() {
       if (key === 'p') {
         setPressedKey('p');
         setTimeout(() => {
-          router.push(isAuthenticated() ? '/play' : '/signin');
+          router.push(authenticated ? '/play' : '/signin');
         }, 150);
-      } else if (key === 'd' && authenticated) {
-        // For authenticated users, the D key navigates to the dashboard.
+      } else if (key === 'd' && authenticated && !isDashboardPage) {
         setPressedKey('d');
         setTimeout(() => {
           router.push('/dashboard');
         }, 150);
+      } else if (key === 'h' && authenticated && isDashboardPage) {
+        setPressedKey('h');
+        setTimeout(() => {
+          router.push('/home');
+        }, 150);
       } else if (key === 's' && !authenticated) {
-        // For non-authenticated users, the S key navigates to sign up.
         setPressedKey('s');
         setTimeout(() => {
           router.push('/signup');
@@ -72,7 +79,7 @@ export default function Navbar() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [router, authenticated]);
+  }, [router, authenticated, pathname, isDashboardPage]);
 
   const handleNavClick = (path: string) => {
     setMobileMenuOpen(false);
@@ -81,17 +88,23 @@ export default function Navbar() {
 
   const handlePlayClick = () => {
     setPressedKey('p');
+    setMobileMenuOpen(false);
     setTimeout(() => {
       router.push(authenticated ? '/play' : '/signin');
     }, 150);
   };
 
   const handleDashboardSignUpClick = () => {
-    setPressedKey(authenticated ? 'd' : 's');
-    setTimeout(() => {
-      router.push(authenticated ? '/dashboard' : '/signup');
-      setPressedKey(null);
-    }, 150);
+    setMobileMenuOpen(false);
+    if (authenticated) {
+      if (isDashboardPage) {
+        router.push('/home');
+      } else {
+        router.push('/dashboard');
+      }
+    } else {
+      router.push('/signup');
+    }
   };
 
   const toggleMobileMenu = () => {
@@ -182,24 +195,24 @@ export default function Navbar() {
             <Button
               variant="outline"
               className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all 
-                shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
-                dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] ${
-                  pressedKey === (authenticated ? 'd' : 's')
-                    ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
-                    : ''
-                }`}
+              shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
+              dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] ${
+                pressedKey === (isDashboardPage ? 'h' : 'd')
+                  ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                  : ''
+              }`}
               onClick={handleDashboardSignUpClick}
               onMouseUp={() => setPressedKey(null)}
             >
-              {authenticated ? 'Dashboard' : 'Sign up'}
+              {isDashboardPage ? 'Home' : 'Dashboard'}
               <span
                 className={`ml-1 text-xs px-1 rounded transition-colors ${
-                  pressedKey === (authenticated ? 'd' : 's')
+                  pressedKey === (isDashboardPage ? 'h' : 'd')
                     ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
                     : 'bg-amber-100 dark:bg-slate-800'
                 }`}
               >
-                {authenticated ? 'D' : 'S'}
+                {isDashboardPage ? 'H' : 'D'}
               </span>
             </Button>
           </div>
@@ -285,9 +298,13 @@ export default function Navbar() {
                 className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
                 onClick={handleDashboardSignUpClick}
               >
-                {authenticated ? 'Dashboard' : 'Sign up'}
+                {isDashboardPage
+                  ? 'Home'
+                  : authenticated
+                  ? 'Dashboard'
+                  : 'Sign up'}
                 <span className="ml-1 text-xs px-1 rounded bg-amber-100 dark:bg-slate-800">
-                  {authenticated ? 'D' : 'S'}
+                  {isDashboardPage ? 'H' : authenticated ? 'D' : 'S'}
                 </span>
               </Button>
             </div>

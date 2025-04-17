@@ -98,7 +98,7 @@ export default function Dashboard() {
           </div>
 
           {/* Submenu - Scrollable on mobile */}
-          <div className="flex border-t border-amber-200/30 dark:border-slate-700/30 overflow-x-auto scrollbar-hide">
+          <div className="flex justify-center md:justify-start border-t border-amber-200/30 dark:border-slate-700/30 overflow-x-auto scrollbar-hide px-6">
             <button
               className={`py-3 px-4 sm:px-6 font-medium text-base sm:text-lg whitespace-nowrap ${
                 activeTab === 'overview'
