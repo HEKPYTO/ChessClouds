@@ -4,7 +4,6 @@
 Cargo.lock
 
 # === Docker ===
-**/Dockerfile
 *.tar
 
 # === Logs / Runtime files ===
