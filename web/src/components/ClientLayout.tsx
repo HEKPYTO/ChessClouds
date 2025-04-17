@@ -67,7 +67,9 @@ export default function ClientLayout({
   return (
     <div className="flex flex-col">
       {!isAuthPage && <Navbar />}
-      <main className={`flex-1 min-h-screen ${!isAuthPage ? 'pt-16' : ''} relative`}>
+      <main
+        className={`flex-1 min-h-screen ${!isAuthPage ? 'pt-16' : ''} relative`}
+      >
         {children}
       </main>
       {!isAuthPage && <Footer />}

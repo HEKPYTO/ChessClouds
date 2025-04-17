@@ -1,24 +1,26 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { isAuthenticated } from '@/lib/auth/googleAuth'
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { isAuthenticated } from '@/lib/auth/googleAuth';
 
 interface ChessCloudIconProps {
-  className?: string
+  className?: string;
 }
 
-export default function ChessCloudIcon({ className = '' }: ChessCloudIconProps) {
-  const [mounted, setMounted] = useState(false)
-  const router = useRouter()
+export default function ChessCloudIcon({
+  className = '',
+}: ChessCloudIconProps) {
+  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   const handleClick = () => {
-    router.push(isAuthenticated() ? '/home' : '/')
-  }
+    router.push(isAuthenticated() ? '/home' : '/');
+  };
 
   if (!mounted) {
     return (
@@ -33,7 +35,7 @@ export default function ChessCloudIcon({ className = '' }: ChessCloudIconProps) 
           animate-[float_8s_ease-in-out_infinite] dark:animate-[float_2s_ease-in-out_infinite]
         "
       />
-    )
+    );
   }
 
   return (
@@ -61,5 +63,5 @@ export default function ChessCloudIcon({ className = '' }: ChessCloudIconProps) 
         <div className="bg-amber-100" />
       </div>
     </div>
-  )
+  );
 }

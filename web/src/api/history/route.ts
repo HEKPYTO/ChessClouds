@@ -10,22 +10,19 @@ export async function GET(request: NextRequest) {
     const playerId = searchParams.get('playerId');
     const limit = parseInt(searchParams.get('limit') || '10', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
-    
+
     const conditions = [];
-    
+
     if (gameId) {
       conditions.push(eq(gamehistory.gameid, gameId));
     }
-    
+
     if (playerId) {
       conditions.push(
-        or(
-          eq(gamehistory.playera, playerId),
-          eq(gamehistory.playerb, playerId)
-        )
+        or(eq(gamehistory.playera, playerId), eq(gamehistory.playerb, playerId))
       );
     }
-    
+
     const games = await db
       .select()
       .from(gamehistory)
