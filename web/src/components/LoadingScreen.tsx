@@ -1,5 +1,7 @@
 'use client';
 
+import ChessCloudIcon from "./ChessCloud";
+
 export default function LoadingScreen() {
   return (
     <div className="flex flex-col min-h-screen bg-amber-50 dark:bg-slate-900 relative">
@@ -21,7 +23,7 @@ export default function LoadingScreen() {
       />
       <div className="flex-1 flex items-center justify-center relative z-10">
         <div className="text-center">
-          <div className="inline-block h-12 w-12 rounded bg-amber-600 dark:bg-amber-500 mb-6"></div>
+          <ChessCloudIcon className="inline-block w-12 h-12 mb-6" />
           <div className="flex items-center justify-center space-x-2">
             <div
               className="h-2 w-2 bg-amber-600 dark:bg-amber-500 rounded-full animate-bounce"
