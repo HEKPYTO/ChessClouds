@@ -203,7 +203,7 @@ export default function HomePage() {
     if (isTestingEngine || !isEngineAvailable) return;
     setShowEngineOptions(() => !showEngineOptions);
   };
-
+  
   const handlePlayAsWhite = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push('/computer?color=w');
