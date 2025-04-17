@@ -25,7 +25,6 @@ export default function ComputerGame() {
   const [isThinking, setIsThinking] = useState(false);
 
   const moveHistory = useRef<string[]>([]);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSuccessRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -152,7 +151,7 @@ export default function ComputerGame() {
           setLastMove([from, to]);
           moveHistory.current.push(m.san);
           updateState();
-          timeoutRef.current = setTimeout(makeComputerMove, 500);
+          makeComputerMove();
         }
       }
     },
@@ -177,7 +176,7 @@ export default function ComputerGame() {
         moveHistory.current.push(m.san);
         setSelectVisible(false);
         updateState();
-        timeoutRef.current = setTimeout(makeComputerMove, 500);
+        makeComputerMove();
       }
     },
     [chess, pendingMove, updateState, makeComputerMove]
