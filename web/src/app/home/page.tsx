@@ -181,6 +181,10 @@ export default function HomePage() {
     router.push('/dashboard?tab=friends');
   };
 
+  const handleViewAllHistory = () => {
+    router.push('/dashboard?tabe=games')
+  }
+
   const getTurnFromFen = (fen: string, playingAs: 'w' | 'b' = 'w') => {
     try {
       const turn = fen.split(' ')[1];
@@ -381,6 +385,7 @@ export default function HomePage() {
               size="sm"
               className="border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
               dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50"
+              onClick={() => handleViewAllHistory()}
             >
               View All
             </Button>
