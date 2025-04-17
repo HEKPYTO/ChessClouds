@@ -22,12 +22,18 @@ import { getUserInfo, handleAuthCallback } from '@/lib/auth/googleAuth';
 import { useRouter } from 'next/navigation';
 import LoadingScreen from '@/components/LoadingScreen';
 import { toast } from 'sonner';
+import { testEngine } from '@/lib/engine';  
+import { Separator } from '@radix-ui/react-separator';
 
 export default function HomePage() {
+  const router = useRouter();
   const [username, setUsername] = useState('Player');
   const [greeting, setGreeting] = useState('Hello');
   const [isProcessingAuth, setIsProcessingAuth] = useState(true);
-  const router = useRouter();
+  const [showEngineOptions, setShowEngineOptions] = useState(false);
+  const [isEngineAvailable, setIsEngineAvailable] = useState(false);
+  const [isTestingEngine, setIsTestingEngine] = useState(true);
+
 
   const [gamesInPlay] = useState([
     {
@@ -114,6 +120,17 @@ export default function HomePage() {
     tournamentCount: 5,
   });
 
+  const testEngineAvailability = async () => {
+    try {
+      const data = await testEngine(); 
+      setIsEngineAvailable(data.status === 'success');
+    } catch (err) {
+      setIsEngineAvailable(false);
+    } finally {
+      setIsTestingEngine(false);
+    }
+  };
+
   useEffect(() => {
     const { token, error, redirectPath } = handleAuthCallback();
 
@@ -146,6 +163,8 @@ export default function HomePage() {
       }
     };
 
+    testEngineAvailability();
+
     setGreeting(getTimeBasedGreeting());
     setUsername(getUserInfo()?.email?.split('@')[0] || 'Player');
     setIsProcessingAuth(false);
@@ -169,10 +188,6 @@ export default function HomePage() {
     window.location.href = '/invite';
   };
 
-  const handlePlayComputer = () => {
-    window.location.href = '/computer';
-  };
-
   const handleGoToGame = (gameId: number) => {
     window.location.href = `/game/${gameId}`;
   };
@@ -184,6 +199,21 @@ export default function HomePage() {
   const handleViewAllHistory = () => {
     router.push('/dashboard?tabe=games')
   }
+
+  const handleComputerClick = () => {
+    if (isTestingEngine || !isEngineAvailable) return;
+    setShowEngineOptions(() => !showEngineOptions);
+  }
+  
+  const handlePlayAsWhite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push('/computer?color=w');
+  };
+  
+  const handlePlayAsBlack = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push('/computer?color=b');
+  };
 
   const getTurnFromFen = (fen: string, playingAs: 'w' | 'b' = 'w') => {
     try {
@@ -258,41 +288,70 @@ export default function HomePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Button
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white px-6 rounded-md transition-all 
-              shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e] hover:translate-y-[2px]
-              dark:bg-amber-500 dark:hover:bg-amber-600
-              dark:shadow-[0_4px_0_0_#92400e] dark:hover:shadow-[0_2px_0_0_#78350f]"
+              className="w-full flex justify-center items-center
+                        bg-amber-600 hover:bg-amber-700 text-white px-6 rounded-md
+                        shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e]
+                        hover:translate-y-[2px] transition-all"
               onClick={handlePlayNow}
             >
               Play Now
               <ChevronRightIcon className="ml-2 h-4 w-4" />
             </Button>
 
+
             <Button
-              variant="outline"
-              className="w-full border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 px-6 rounded-md transition-all 
-              shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
-              dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-              dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
+              className="w-full flex justify-center items-center
+                        bg-amber-600 hover:bg-amber-700 text-white px-6 rounded-md
+                        shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e]
+                        hover:translate-y-[2px] transition-all"
               onClick={handlePlayFriend}
             >
               Play a Friend
               <ChevronRightIcon className="ml-2 h-4 w-4" />
             </Button>
 
+
             <Button
               variant="outline"
-              className="w-full border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 px-6 rounded-md transition-all 
-              shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
-              dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-              dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
-              onClick={handlePlayComputer}
-              disabled
+              className={`w-full flex justify-center items-center
+                          border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
+                          px-6 rounded-md transition-all shadow-[0_4px_0_0_#fcd34d]
+                          hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
+                          dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200
+                          dark:hover:bg-slate-800/50 dark:shadow-[0_4px_0_0_#475569]
+                          dark:hover:shadow-[0_2px_0_0_#475569]
+                          ${!isEngineAvailable ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={handleComputerClick}
+              disabled={!isEngineAvailable || isTestingEngine}
             >
-              <LockClosedIcon className="-ml-8 h-4 w-4" />
               Play with Computer
+              {!isEngineAvailable && <LockClosedIcon className="ml-2 h-4 w-4" />}
             </Button>
           </CardContent>
+
+          {showEngineOptions && (
+            <div className="flex justify-center md:justify-start border-t border-amber-200/30 dark:border-slate-700/30 px-6 pt-4 gap-2">
+              <Button
+                className="flex-1 bg-white hover:bg-gray-100 text-gray-800 border border-gray-300
+                          shadow-[0_4px_0_0_#d1d5db] hover:shadow-[0_2px_0_0_#9ca3af] hover:translate-y-[2px]
+                          dark:bg-gray-100 dark:hover:bg-gray-200 dark:text-gray-900
+                          dark:shadow-[0_4px_0_0_#9ca3af] dark:hover:shadow-[0_2px_0_0_#6b7280]"
+                onClick={handlePlayAsWhite}
+              >
+                Play White
+              </Button>
+
+              <Button
+                className="flex-1 bg-gray-800 hover:bg-gray-900 text-white
+                          shadow-[0_4px_0_0_#4b5563] hover:shadow-[0_2px_0_0_#374151] hover:translate-y-[2px]
+                          dark:bg-gray-700 dark:hover:bg-gray-800
+                          dark:shadow-[0_4px_0_0_#6b7280] dark:hover:shadow-[0_2px_0_0_#4b5563]"
+                onClick={handlePlayAsBlack}
+              >
+                Play Black
+              </Button>
+            </div>
+          )}
         </Card>
 
         <Card className="col-span-5 lg:col-span-3 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-md hover:shadow-lg transition-all">
