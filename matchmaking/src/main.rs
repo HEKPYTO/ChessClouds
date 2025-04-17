@@ -1,11 +1,13 @@
 use std::{
     collections::VecDeque,
+    env,
     sync::{Arc, Mutex},
 };
 
 use axum::{http::StatusCode, routing::post, Json, Router};
 use dotenvy::dotenv;
 use serde::{Deserialize, Serialize};
+use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 use tokio::sync::{mpsc, oneshot};
 
 const MAX_CHANNEL_SIZE: usize = 4096;
@@ -62,7 +64,11 @@ pub struct MatchingPlayer {
     pub tx: oneshot::Sender<MatchResponse>,
 }
 
-async fn matcher(mut rx: mpsc::Receiver<()>, player_queue: ConcurrentQueue<MatchingPlayer>) {
+async fn matcher(
+    mut rx: mpsc::Receiver<()>,
+    player_queue: ConcurrentQueue<MatchingPlayer>,
+    pool: Pool<Postgres>,
+) {
     while let Some(_) = rx.recv().await {
         loop {
             let (player1, player2) = {
@@ -78,7 +84,23 @@ async fn matcher(mut rx: mpsc::Receiver<()>, player_queue: ConcurrentQueue<Match
 
             let game_id = uuid::Uuid::new_v4();
 
-            // TODO: insert into DB
+            if let Err(e) = sqlx::query!(
+                "INSERT INTO ActiveGames (GameID, Black, White) VALUES ($1, $2, $3)",
+                game_id,
+                player2.user_id,
+                player1.user_id
+            )
+            .execute(&pool)
+            .await
+            {
+                let _ = player1.tx.send(MatchResponse::Err(
+                    format!("DB insertion failed: {e}]").to_string(),
+                ));
+                let _ = player2.tx.send(MatchResponse::Err(
+                    format!("DB insertion failed: {e}").to_string(),
+                ));
+                continue;
+            }
 
             tracing::info!("Matched {} and {}", player1.user_id, player2.user_id);
 
@@ -149,6 +171,12 @@ async fn main() {
 
     let player_queue = Arc::new(Mutex::new(VecDeque::<MatchingPlayer>::new()));
 
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&env::var("DATABASE_URL").expect("expecting DATABASE_URL in .env"))
+        .await
+        .unwrap();
+
     let app = Router::new().route(
         "/match",
         post({
@@ -157,7 +185,7 @@ async fn main() {
         }),
     );
 
-    tokio::spawn(matcher(notify_rx, player_queue.clone()));
+    tokio::spawn(matcher(notify_rx, player_queue.clone(), pool));
 
     let listener = tokio::net::TcpListener::bind(HOST).await.unwrap();
     tracing::info!("Running at {HOST}");
