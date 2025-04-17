@@ -22,8 +22,7 @@ import { getUserInfo, handleAuthCallback } from '@/lib/auth/googleAuth';
 import { useRouter } from 'next/navigation';
 import LoadingScreen from '@/components/LoadingScreen';
 import { toast } from 'sonner';
-import { testEngine } from '@/lib/engine';  
-import { Separator } from '@radix-ui/react-separator';
+import { testEngine } from '@/lib/engine';
 
 export default function HomePage() {
   const router = useRouter();
@@ -33,7 +32,6 @@ export default function HomePage() {
   const [showEngineOptions, setShowEngineOptions] = useState(false);
   const [isEngineAvailable, setIsEngineAvailable] = useState(false);
   const [isTestingEngine, setIsTestingEngine] = useState(true);
-
 
   const [gamesInPlay] = useState([
     {
@@ -122,9 +120,10 @@ export default function HomePage() {
 
   const testEngineAvailability = async () => {
     try {
-      const data = await testEngine(); 
+      const data = await testEngine();
       setIsEngineAvailable(data.status === 'success');
     } catch (err) {
+      console.error('Engine Error: ', err);
       setIsEngineAvailable(false);
     } finally {
       setIsTestingEngine(false);
@@ -197,19 +196,19 @@ export default function HomePage() {
   };
 
   const handleViewAllHistory = () => {
-    router.push('/dashboard?tabe=games')
-  }
+    router.push('/dashboard?tabe=games');
+  };
 
   const handleComputerClick = () => {
     if (isTestingEngine || !isEngineAvailable) return;
     setShowEngineOptions(() => !showEngineOptions);
-  }
-  
+  };
+
   const handlePlayAsWhite = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push('/computer?color=w');
   };
-  
+
   const handlePlayAsBlack = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push('/computer?color=b');
@@ -298,7 +297,6 @@ export default function HomePage() {
               <ChevronRightIcon className="ml-2 h-4 w-4" />
             </Button>
 
-
             <Button
               className="w-full flex justify-center items-center
                         bg-amber-600 hover:bg-amber-700 text-white px-6 rounded-md
@@ -310,7 +308,6 @@ export default function HomePage() {
               <ChevronRightIcon className="ml-2 h-4 w-4" />
             </Button>
 
-
             <Button
               variant="outline"
               className={`w-full flex justify-center items-center
@@ -320,12 +317,18 @@ export default function HomePage() {
                           dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200
                           dark:hover:bg-slate-800/50 dark:shadow-[0_4px_0_0_#475569]
                           dark:hover:shadow-[0_2px_0_0_#475569]
-                          ${!isEngineAvailable ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          ${
+                            !isEngineAvailable
+                              ? 'opacity-50 cursor-not-allowed'
+                              : ''
+                          }`}
               onClick={handleComputerClick}
               disabled={!isEngineAvailable || isTestingEngine}
             >
               Play with Computer
-              {!isEngineAvailable && <LockClosedIcon className="ml-2 h-4 w-4" />}
+              {!isEngineAvailable && (
+                <LockClosedIcon className="ml-2 h-4 w-4" />
+              )}
             </Button>
           </CardContent>
 
