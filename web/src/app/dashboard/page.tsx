@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getUserInfo } from '@/lib/auth/googleAuth';
@@ -10,8 +11,12 @@ import FriendsTab from '@/components/dashboard/Friend';
 import { UserInfo } from '@/types/googleAuthTypes';
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  // Get active tab from URL query parameter
+  const activeTab = searchParams.get('tab') || 'overview';
 
   useEffect(() => {
     const info = getUserInfo();
@@ -20,6 +25,10 @@ export default function Dashboard() {
 
   const username = userInfo?.email?.split('@')[0] || 'anonymous';
   const isVerified = userInfo?.email_verified || true;
+
+  const setActiveTab = (tab: string) => {
+    router.push(`/dashboard?tab=${tab}`);
+  };
 
   const renderTabContent = () => {
     const sharedProps = { setActiveTab };

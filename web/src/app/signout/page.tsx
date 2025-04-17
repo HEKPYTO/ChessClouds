@@ -15,6 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { HomeIcon } from '@heroicons/react/24/outline';
 import ThemeSwitch from '@/components/ThemeSwitch';
 import { signOut } from '@/lib/auth/googleAuth';
+import ChessCloudIcon from '@/components/ChessCloud';
 
 export default function SignOut() {
   const [isLoading, setIsLoading] = useState(false);
@@ -109,12 +110,12 @@ export default function SignOut() {
                 shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
                 dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
                 dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]"
-                onClick={() => (window.location.href = '/')}
+                onClick={() => (window.location.href = '/home')}
               >
                 <HomeIcon className="h-5 w-5" />
               </Button>
 
-              <div className="h-12 w-12 rounded bg-amber-600 dark:bg-amber-500 shadow-md dark:shadow-amber-600/20"></div>
+              <ChessCloudIcon className='h-12 w-12'/>
 
               <ThemeSwitch />
             </div>

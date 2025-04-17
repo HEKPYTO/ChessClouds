@@ -177,6 +177,10 @@ export default function HomePage() {
     window.location.href = `/game/${gameId}`;
   };
 
+  const handleViewFriend = () => {
+    router.push('/dashboard?tab=friends');
+  }
+
   const getTurnFromFen = (fen: string, playingAs: 'w' | 'b' = 'w') => {
     try {
       const turn = fen.split(' ')[1];
@@ -211,6 +215,7 @@ export default function HomePage() {
             shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
             dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
             dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
+            onClick={handleViewFriend}
           >
             <UserGroupIcon className="h-5 w-5" />
           </Button>

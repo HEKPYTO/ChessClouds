@@ -14,3 +14,4 @@ actix/target/
 
 # Log files
 *.log
+repomix-output.xml

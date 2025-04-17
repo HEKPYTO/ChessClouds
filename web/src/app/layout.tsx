@@ -21,9 +21,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'ChessClouds - Next Generation Chess Platform',
+  title: 'ChessClouds',
   description:
-    'A next-generation chess platform designed for high-performance gameplay with players worldwide.',
+    'The next-generation chess platform designed for high-performance gameplay with players worldwide.',
+  icons: {
+    icon: [
+      { url: 'icon/chess-cloud-light.ico', media: '(prefers-color-scheme: light)' },
+      { url: 'icon/chess-cloud-dark.ico', media: '(prefers-color-scheme: dark)' }
+    ]
+  }
 };
 
 export default function RootLayout({

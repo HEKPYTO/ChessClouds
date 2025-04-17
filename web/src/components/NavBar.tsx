@@ -6,6 +6,7 @@ import ThemeSwitch from './ThemeSwitch';
 import { XMarkIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { isAuthenticated } from '@/lib/auth/googleAuth';
 import { useRouter } from 'next/navigation';
+import ChessCloudIcon from './ChessCloud';
 
 type NavItem = {
   name: string;
@@ -131,7 +132,7 @@ export default function Navbar() {
             onClick={() => handleNavClick(authenticated ? '/home' : '/')}
             className="flex items-center cursor-pointer"
           >
-            <div className="h-8 w-8 rounded bg-amber-600 dark:bg-amber-500 mr-2"></div>
+            <ChessCloudIcon />
             <span className="font-semibold text-lg text-amber-900 dark:text-amber-100 ml-2">
               ChessClouds
             </span>
