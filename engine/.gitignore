@@ -6,7 +6,6 @@ Cargo.lock
 # === Docker ===
 **/Dockerfile
 *.tar
-docker-compose.override.yml
 
 # === Logs / Runtime files ===
 *.log
