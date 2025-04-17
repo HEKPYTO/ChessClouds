@@ -9,11 +9,11 @@ services:
     networks:
       - engine
       
-  actix:
+  hyper:
     build:
-      context: ./actix
+      context: ./hyper
       dockerfile: Dockerfile
-    container_name: actix
+    container_name: hyper
     ports:
       - "4000:4000"
     depends_on:

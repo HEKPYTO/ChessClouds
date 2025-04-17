@@ -1,17 +1,29 @@
-# Ignore build artifacts for the actix project
-actix/target/
-
-# Ignore common Rust/Cargo backup and temporary files
+# === Rust ===
+**/target/
 **/*.rs.bk
+Cargo.lock
 
-# IDE, Editor, and OS-specific files
+# === Docker ===
+**/Dockerfile
+*.tar
+docker-compose.override.yml
+
+# === Logs / Runtime files ===
+*.log
+*.pid
+*.seed
+*.sock
+
+# === Editor/IDE ===
 .vscode/
 .idea/
-.DS_Store
+*.sw?
 *~
-*.swp
-*.swo
+*.bak
 
-# Log files
-*.log
+# === macOS / Linux / Windows OS files ===
+.DS_Store
+Thumbs.db
+
+# === Project-specific ===
 repomix-output.xml
