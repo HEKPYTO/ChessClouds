@@ -147,7 +147,7 @@ export function ChessBoard({
             <div className="bg-amber-500 text-white text-center py-3 font-medium">
               Preview Mode
             </div>
-          ) : viewOnly ? (
+          ) : viewOnly && chess.isGameOver() ? (
             <div className="bg-amber-600 text-white text-center py-3 font-medium">
               Game Ended
             </div>
