@@ -108,7 +108,7 @@ export default function SignUp() {
                 <HomeIcon className="h-5 w-5" />
               </Button>
 
-              <ChessCloudIcon className='h-12 w-12'/>
+              <ChessCloudIcon className="h-12 w-12" />
 
               <ThemeSwitch />
             </div>

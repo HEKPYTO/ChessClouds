@@ -26,10 +26,16 @@ export const metadata: Metadata = {
     'The next-generation chess platform designed for high-performance gameplay with players worldwide.',
   icons: {
     icon: [
-      { url: 'icon/chess-cloud-light.ico', media: '(prefers-color-scheme: light)' },
-      { url: 'icon/chess-cloud-dark.ico', media: '(prefers-color-scheme: dark)' }
-    ]
-  }
+      {
+        url: 'icon/chess-cloud-light.ico',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: 'icon/chess-cloud-dark.ico',
+        media: '(prefers-color-scheme: dark)',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

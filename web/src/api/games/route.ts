@@ -9,7 +9,7 @@
 //     const gameId = searchParams.get('gameId');
 
 //     if (gameId) {
-      
+
 //       const game = await db
 //         .select()
 //         .from(activegames)
@@ -22,7 +22,7 @@
 
 //       return NextResponse.json(game[0]);
 //     } else {
-      
+
 //       const games = await db.select().from(activegames);
 //       return NextResponse.json(games);
 //     }
@@ -47,7 +47,6 @@
 //       );
 //     }
 
-    
 //     const existingGame = await db
 //       .select()
 //       .from(activegames)
@@ -61,7 +60,6 @@
 //       );
 //     }
 
-    
 //     const newGame = await db
 //       .insert(activegames)
 //       .values({
@@ -93,7 +91,6 @@
 //       );
 //     }
 
-    
 //     const game = await db
 //       .select()
 //       .from(activegames)
@@ -104,15 +101,13 @@
 //       return NextResponse.json({ error: 'Game not found' }, { status: 404 });
 //     }
 
-    
 //     await db.insert(gamehistory).values({
 //       gameid: game[0].gameid,
 //       playera: game[0].white,
 //       playerb: game[0].black,
-//       pgn: '', 
+//       pgn: '',
 //     });
 
-    
 //     await db.delete(activegames).where(eq(activegames.gameid, gameId));
 
 //     return NextResponse.json({ success: true });

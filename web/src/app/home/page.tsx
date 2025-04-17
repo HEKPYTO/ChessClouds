@@ -179,7 +179,7 @@ export default function HomePage() {
 
   const handleViewFriend = () => {
     router.push('/dashboard?tab=friends');
-  }
+  };
 
   const getTurnFromFen = (fen: string, playingAs: 'w' | 'b' = 'w') => {
     try {
