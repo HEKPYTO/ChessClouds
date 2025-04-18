@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation';
 import LoadingScreen from '@/components/LoadingScreen';
 import { toast } from 'sonner';
 import { testEngine } from '@/lib/engine';
+import { useMatchmaking } from '@/lib/MatchmakingContext';
 
 export default function HomePage() {
   const router = useRouter();
@@ -32,6 +33,8 @@ export default function HomePage() {
   const [showEngineOptions, setShowEngineOptions] = useState(false);
   const [isEngineAvailable, setIsEngineAvailable] = useState(false);
   const [isTestingEngine, setIsTestingEngine] = useState(true);
+  const { isMatchmaking, startMatchmaking, cancelMatchmaking } = useMatchmaking();
+
 
   const [gamesInPlay] = useState([
     {
@@ -180,7 +183,15 @@ export default function HomePage() {
   }
 
   const handlePlayNow = () => {
-    window.location.href = '/game';
+    if (isMatchmaking) {
+      cancelMatchmaking();
+      toast.info('Matchmaking canceled');
+    } else {
+      startMatchmaking(username);
+      toast.success('Finding a match...', {
+        description: 'We\'ll connect you with an opponent soon'
+      });
+    }
   };
 
   const handlePlayFriend = () => {
@@ -293,7 +304,18 @@ export default function HomePage() {
                         hover:translate-y-[2px] transition-all"
               onClick={handlePlayNow}
             >
-              Play Now
+              {isMatchmaking ? (
+                <>
+                  Finding
+                  <span className="inline-flex ml-1">
+                    <span className="animate-bounce mx-0.5" style={{animationDelay: '0ms'}}>.</span>
+                    <span className="animate-bounce mx-0.5" style={{animationDelay: '150ms'}}>.</span>
+                    <span className="animate-bounce mx-0.5" style={{animationDelay: '300ms'}}>.</span>
+                  </span>
+                </>
+              ) : (
+                <>Play Now</>
+              )}
               <ChevronRightIcon className="ml-2 h-4 w-4" />
             </Button>
 
