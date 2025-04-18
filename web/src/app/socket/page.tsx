@@ -8,6 +8,7 @@ import { SocketService } from '@/lib/socketService';
 import LoadingScreen from '@/components/LoadingScreen';
 import { toast } from 'sonner';
 import type { GameOutcome } from '@/types/socket-types';
+import { getUserInfo } from '@/lib/auth/googleAuth';
 
 export default function SocketGame() {
   const [chess] = useState(new Chess());
@@ -51,7 +52,8 @@ export default function SocketGame() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
 
-  const userId = playingAs === 'w' ? 'white' : 'black';
+  const userInfo = getUserInfo();
+  const userId = userInfo?.email?.split('@')[0] || 'anonymous';
 
   const updateState = useCallback(() => {
     setFen(chess.fen());
@@ -128,11 +130,11 @@ export default function SocketGame() {
     socketService.connect(gameId, userId);
 
     return () => {
-      socketService.onConnect(() => {});
-      socketService.onMove(() => {});
-      socketService.onHistory(() => {});
-      socketService.onGameEnd(() => {});
-      socketService.onError(() => {});
+      socketService.onConnect(() => { });
+      socketService.onMove(() => { });
+      socketService.onHistory(() => { });
+      socketService.onGameEnd(() => { });
+      socketService.onError(() => { });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chess, gameId, userId]);
