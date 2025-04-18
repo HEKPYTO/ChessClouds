@@ -2,7 +2,7 @@ use axum::{extract::State, http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
-use crate::game_state::{GameState, GameStateMap};
+use crate::state::{ActiveGame, AppState};
 
 #[derive(Deserialize, Serialize, Debug, TS)]
 #[ts(export)]
@@ -13,14 +13,15 @@ pub struct InitBody {
 }
 
 pub async fn post_init(
-    State(state): State<GameStateMap>,
+    State(state): State<AppState>,
     Json(body): Json<InitBody>,
 ) -> (StatusCode, &'static str) {
     tracing::info!("/POST init");
     if state
+        .active_games
         .insert(
             body.game_id,
-            GameState::new(body.white_user_id, body.black_user_id),
+            ActiveGame::new(body.white_user_id, body.black_user_id),
         )
         .is_err()
     {
