@@ -116,7 +116,6 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
   } = gameProps;
 
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
-  const [copySuccess, setCopySuccess] = useState(false);
   const [showGameInfo, setShowGameInfo] = useState(false);
   const moveListRef = useRef<HTMLDivElement>(null);
 
@@ -174,15 +173,6 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
   const gameStatus = getGameStatus(chess, gameOver, gameOutcome);
   const turnColor = chess.turn();
   const isPlayerTurn = turnColor === playingAs;
-
-  const copyInviteLink = () => {
-    const inviteLink = `${
-      window.location.origin
-    }/socket?game_id=${gameId}&playas=${playingAs === 'w' ? 'b' : 'w'}`;
-    navigator.clipboard.writeText(inviteLink);
-    setCopySuccess(true);
-    setTimeout(() => setCopySuccess(false), 2000);
-  };
 
   const toggleGameInfo = () => {
     setShowGameInfo(!showGameInfo);

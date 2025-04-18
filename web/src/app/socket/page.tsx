@@ -130,11 +130,11 @@ export default function SocketGame() {
     socketService.connect(gameId, userId);
 
     return () => {
-      socketService.onConnect(() => { });
-      socketService.onMove(() => { });
-      socketService.onHistory(() => { });
-      socketService.onGameEnd(() => { });
-      socketService.onError(() => { });
+      socketService.onConnect(() => {});
+      socketService.onMove(() => {});
+      socketService.onHistory(() => {});
+      socketService.onGameEnd(() => {});
+      socketService.onError(() => {});
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chess, gameId, userId]);

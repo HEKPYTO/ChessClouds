@@ -33,8 +33,17 @@ export default function HomePage() {
   const [showEngineOptions, setShowEngineOptions] = useState(false);
   const [isEngineAvailable, setIsEngineAvailable] = useState(false);
   const [isTestingEngine, setIsTestingEngine] = useState(true);
-  const { isMatchmaking, startMatchmaking, cancelMatchmaking } = useMatchmaking();
+  const { 
+    isMatchmaking, 
+    startMatchmaking, 
+    cancelMatchmaking, 
+    playCooldownState,
+    cooldownDuration,
+    cooldownRemaining 
+  } = useMatchmaking();
 
+  const [cooldown, setCooldown] = useState(false);
+  const COOLDOWN_MS = 2000;
 
   const [gamesInPlay] = useState([
     {
@@ -183,6 +192,11 @@ export default function HomePage() {
   }
 
   const handlePlayNow = () => {
+    if (playCooldownState === 'cooldown' && !isMatchmaking) {
+      toast.info(`Please wait ${Math.ceil(cooldownRemaining/1000)} seconds before trying again`);
+      return;
+    }
+    
     if (isMatchmaking) {
       cancelMatchmaking();
       toast.info('Matchmaking canceled');
@@ -298,11 +312,14 @@ export default function HomePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Button
-              className="w-full flex justify-center items-center
+              className={`w-full flex justify-center items-center
                         bg-amber-600 hover:bg-amber-700 text-white px-6 rounded-md
                         shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e]
-                        hover:translate-y-[2px] transition-all"
+                        hover:translate-y-[2px] transition-all
+                        ${playCooldownState === 'cooldown' && !isMatchmaking ? 
+                          'bg-gray-400 dark:bg-gray-600 cursor-not-allowed shadow-none' : ''}`}
               onClick={handlePlayNow}
+              disabled={playCooldownState === 'cooldown' && !isMatchmaking}
             >
               {isMatchmaking ? (
                 <>
@@ -313,6 +330,8 @@ export default function HomePage() {
                     <span className="animate-bounce mx-0.5" style={{animationDelay: '300ms'}}>.</span>
                   </span>
                 </>
+              ) : playCooldownState === 'cooldown' ? (
+                <>Wait {Math.ceil(cooldownRemaining/1000)}s</>
               ) : (
                 <>Play Now</>
               )}

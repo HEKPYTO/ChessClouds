@@ -241,16 +241,16 @@ export default function DevPage() {
       setIsMatchmaking(true);
       setMatchmakingError(null);
       logMessage(`Starting matchmaking for user: ${userId}`);
-      
+
       const matchmakingService = MatchMakingService.getInstance();
       const { game_id, color } = await matchmakingService.findMatch(userId);
-      
+
       setGameId(game_id);
       logMessage(`Match found! Game ID: ${game_id}, Playing as: ${color}`);
       toast.success('Match found!', {
         description: `Game ID: ${game_id}, Playing as: ${color}`,
       });
-      
+
       // Optional: Auto-connect to game
       // window.location.href = `/socket?game_id=${game_id}&playas=${color}`;
     } catch (error) {
@@ -268,7 +268,7 @@ export default function DevPage() {
     matchmakingService.cancelMatch();
     setIsMatchmaking(false);
     logMessage('Matchmaking canceled');
-  };  
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -498,7 +498,6 @@ export default function DevPage() {
               >
                 Open Game in This Browser
               </a>
-
             </div>
           </CardContent>
         </Card>
