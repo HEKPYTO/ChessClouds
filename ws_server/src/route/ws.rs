@@ -17,7 +17,7 @@ use uuid::Uuid;
 use crate::{
     message::{ClientMessage, Error, ServerMessage},
     state::{ActiveGame, ActiveGameMap, AppState},
-    DEFERRED_REMOVAL_DURATION, MAX_CHANNEL_CAPACITY,
+    DEFERRED_CLEAN_UP_DURATION, MAX_CHANNEL_CAPACITY,
 };
 use futures_util::{
     sink::SinkExt,
@@ -117,13 +117,15 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
     {
         // both players disconnect, initiate deferred clean up
         tokio::spawn(async move {
+            tracing::info!("initiating deferred clean up for {}", connection.game_id);
+
             state
                 .active_games
                 .get(&connection.game_id)
                 .expect("game should exist")
                 .deferred_removal = true; // set deferred clean up flag
 
-            tokio::time::sleep(Duration::from_secs(DEFERRED_REMOVAL_DURATION)).await;
+            tokio::time::sleep(Duration::from_secs(DEFERRED_CLEAN_UP_DURATION)).await;
 
             // check whether deferred clean up flag is still set
             if state
@@ -131,6 +133,7 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                 .read(&connection.game_id, |_, v| v.deferred_removal)
                 .unwrap_or(false)
             {
+                tracing::info!("cleaning up state for {}", connection.game_id);
                 state
                     .active_games
                     .remove(&connection.game_id)
