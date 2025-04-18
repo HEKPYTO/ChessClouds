@@ -199,7 +199,7 @@ export default function SocketGame() {
 
   const handlePrevious = useCallback(() => {
     if (previewIndex === null && chess.history().length > 0) {
-      setPreviewIndex(chess.history().length - 1);
+      setPreviewIndex(chess.history().length - 2);
     } else if (previewIndex !== null && previewIndex > 0) {
       setPreviewIndex(previewIndex - 1);
     }
