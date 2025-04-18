@@ -48,6 +48,7 @@ pub enum Color {
 }
 
 #[derive(Serialize, Debug, TS)]
+#[serde(tag = "result", content = "value")]
 #[ts(export)]
 pub enum MatchResponse {
     Ok { game_id: String, color: Color },
