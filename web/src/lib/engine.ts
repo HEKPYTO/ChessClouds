@@ -23,7 +23,7 @@ async function fetchWithRetry<T extends EngineType>(
       await new Promise((resolve) => setTimeout(resolve, delay));
       return fetchWithRetry<T>(url, options, retries - 1);
     }
-    throw new Error(`Request failed: ${resp.status}`);
+    console.log(`Request failed: ${resp.status}`);
   }
   return resp.json() as Promise<T>;
 }
