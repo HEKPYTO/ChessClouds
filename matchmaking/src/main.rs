@@ -9,6 +9,7 @@ use dotenvy::dotenv;
 use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 use tokio::sync::{mpsc, oneshot};
+use ts_rs::TS;
 
 const MAX_CHANNEL_SIZE: usize = 4096;
 const HOST: &'static str = "0.0.0.0:8001";
@@ -33,18 +34,21 @@ impl Drop for AutoDrop {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, TS)]
+#[ts(export)]
 pub struct MatchRequest {
     pub user_id: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, TS)]
+#[ts(export)]
 pub enum Color {
     White,
     Black,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, TS)]
+#[ts(export)]
 pub enum MatchResponse {
     Ok { game_id: String, color: Color },
     Err(String),
