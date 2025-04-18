@@ -224,7 +224,11 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
             <CardContent className="text-center p-4">
               <div className="flex justify-between items-center mb-2">
                 <div className="font-medium text-base text-amber-800 dark:text-amber-200">
-                  {username} vs Computer
+                  {playingAs === 'w' ? (
+                    `${username} vs Computer`
+                  ) : (
+                    `Computer vs ${username}`
+                  )}
                 </div>
                 {getEngineStatusBadge()}
               </div>
@@ -463,7 +467,11 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
               <CardContent className="text-center px-4">
                 <div className="flex justify-between items-center mb-2">
                   <div className="font-medium text-base text-amber-800 dark:text-amber-200">
-                    {username} vs Computer
+                    {playingAs === 'w' ? (
+                      `${username} vs Computer`
+                    ) : (
+                      `Computer vs ${username}`
+                    )}
                   </div>
                   {getEngineStatusBadge()}
                 </div>
@@ -490,10 +498,10 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
               </CardContent>
             </Card>
 
-            <div className="flex-1 bg-amber-50 dark:bg-slate-800 rounded-lg border border-amber-200/50 dark:border-amber-800/30 overflow-hidden shadow-md flex flex-col h-[400px]">
+            <div className="flex-1 bg-amber-50 dark:bg-slate-800 rounded-lg border border-amber-200/50 dark:border-amber-800/30 overflow-hidden shadow-md flex flex-col h-[420px]">
               <div
                 ref={moveListRef}
-                className="overflow-y-auto flex-grow max-h-[365px] px-4 font-mono text-sm"
+                className="overflow-y-auto flex-grow max-h-[325px] px-4 font-mono text-sm"
               >
                 <div className="pt-2" />
                 <table className="w-full table-fixed">
