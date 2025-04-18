@@ -20,27 +20,26 @@ import { getUserInfo, isAuthenticated } from '@/lib/auth/googleAuth';
 export default function HomePage() {
   const [pressedKey, setPressedKey] = useState<string | null>(null);
   const router = useRouter();
-  
-  const { 
-    isMatchmaking, 
-    startMatchmaking, 
-    cancelMatchmaking, 
+
+  const {
+    isMatchmaking,
+    startMatchmaking,
+    cancelMatchmaking,
     playCooldownState,
-    cooldownRemaining 
+    cooldownRemaining,
   } = useMatchmaking();
-  
+
   const userInfo = getUserInfo();
   const username = userInfo?.email?.split('@')[0] || 'anonymous';
   const authenticated = isAuthenticated();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      
       if (pressedKey !== null) return;
-      
+
       if (e.key.toLowerCase() === 'p') {
         setPressedKey('p');
-        
+
         handlePlayNow();
       } else if (e.key.toLowerCase() === 's') {
         setPressedKey('s');
@@ -52,7 +51,6 @@ export default function HomePage() {
     };
 
     const handleKeyUp = () => {
-      
       if (pressedKey !== null) {
         setTimeout(() => setPressedKey(null), 50);
       }
@@ -65,6 +63,7 @@ export default function HomePage() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, pressedKey, isMatchmaking, playCooldownState]);
 
   const handleSignUp = () => {
@@ -80,24 +79,27 @@ export default function HomePage() {
   };
 
   const handlePlayNow = () => {
-    
     if (pressedKey === 'p') return;
-    
+
     setPressedKey('p');
-    
+
     if (playCooldownState === 'cooldown' && !isMatchmaking) {
-      toast.info(`Please wait ${Math.ceil(cooldownRemaining/1000)} seconds before trying again`);
+      toast.info(
+        `Please wait ${Math.ceil(
+          cooldownRemaining / 1000
+        )} seconds before trying again`
+      );
       setTimeout(() => setPressedKey(null), 150);
       return;
     }
-    
+
     if (isMatchmaking) {
       cancelMatchmaking();
       toast.info('Matchmaking canceled');
       setTimeout(() => setPressedKey(null), 150);
       return;
     }
-    
+
     if (!authenticated) {
       setTimeout(() => {
         router.push('/signin');
@@ -105,11 +107,10 @@ export default function HomePage() {
       }, 150);
       return;
     }
-    
-    
+
     startMatchmaking(username);
     toast.success('Finding a match...', {
-      description: 'We\'ll connect you with an opponent soon'
+      description: "We'll connect you with an opponent soon",
     });
     setTimeout(() => setPressedKey(null), 150);
   };
@@ -156,9 +157,24 @@ export default function HomePage() {
                 <>
                   Finding
                   <span className="inline-flex ml-1">
-                    <span className="animate-bounce mx-0.5" style={{animationDelay: '0ms'}}>.</span>
-                    <span className="animate-bounce mx-0.5" style={{animationDelay: '150ms'}}>.</span>
-                    <span className="animate-bounce mx-0.5" style={{animationDelay: '300ms'}}>.</span>
+                    <span
+                      className="animate-bounce mx-0.5"
+                      style={{ animationDelay: '0ms' }}
+                    >
+                      .
+                    </span>
+                    <span
+                      className="animate-bounce mx-0.5"
+                      style={{ animationDelay: '150ms' }}
+                    >
+                      .
+                    </span>
+                    <span
+                      className="animate-bounce mx-0.5"
+                      style={{ animationDelay: '300ms' }}
+                    >
+                      .
+                    </span>
                   </span>
                   <span
                     className={`ml-1 text-xs px-1 rounded transition-colors ${
@@ -171,7 +187,7 @@ export default function HomePage() {
                   </span>
                 </>
               ) : playCooldownState === 'cooldown' ? (
-                <>Wait {Math.ceil(cooldownRemaining/1000)}s</>
+                <>Wait {Math.ceil(cooldownRemaining / 1000)}s</>
               ) : (
                 <>
                   <PlayIcon className="mr-2 h-5 w-5" /> Play now

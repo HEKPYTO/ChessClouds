@@ -26,14 +26,13 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
-  const { 
-    isMatchmaking, 
-    startMatchmaking, 
-    cancelMatchmaking, 
+  const {
+    isMatchmaking,
+    startMatchmaking,
+    cancelMatchmaking,
     playCooldownState,
-    cooldownDuration,
-    cooldownRemaining 
-  } = useMatchmaking();  
+    cooldownRemaining,
+  } = useMatchmaking();
   const userInfo = getUserInfo();
   const username = userInfo?.email?.split('@')[0] || 'anonymous';
 
@@ -72,7 +71,6 @@ export default function Navbar() {
     const handleScroll = () => setScrolled(window.scrollY > 10);
     const handleKeyUp = () => setPressedKey(null);
     const handleKeyDown = (e: KeyboardEvent) => {
-
       if (e.repeat) return;
 
       const key = e.key.toLowerCase();
@@ -130,9 +128,13 @@ export default function Navbar() {
     setPressedKey('p');
     setMobileMenuOpen(false);
     setPressedKey(null);
-    
+
     if (playCooldownState === 'cooldown' && !isMatchmaking) {
-      toast.info(`Please wait ${Math.ceil(cooldownRemaining/1000)} seconds before trying again`);
+      toast.info(
+        `Please wait ${Math.ceil(
+          cooldownRemaining / 1000
+        )} seconds before trying again`
+      );
       return;
     }
 
@@ -150,7 +152,7 @@ export default function Navbar() {
     toast.success('Finding a match...', {
       description: "We'll connect you with a player soon",
     });
-    
+
     try {
       await startMatchmaking(username);
     } finally {
@@ -276,21 +278,35 @@ export default function Navbar() {
 
           {/* Play/Cancel */}
           <div className="hidden sm:block">
-            <Button 
+            <Button
               className={`h-9 text-sm text-white rounded-md transition-all hover:translate-y-[2px] 
                 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 
                 shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]
-                ${pressedKey === 'p' ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600' : ''}`} 
-              onClick={handlePlayClick} 
+                ${
+                  pressedKey === 'p'
+                    ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
+                    : ''
+                }`}
+              onClick={handlePlayClick}
               onMouseUp={() => setPressedKey(null)}
               disabled={playCooldownState === 'cooldown' && !isMatchmaking}
             >
               {isMatchmaking ? (
-                <>Finding{loadingDots}<span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">P</span></>
+                <>
+                  Finding{loadingDots}
+                  <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
+                    P
+                  </span>
+                </>
               ) : playCooldownState === 'cooldown' ? (
                 <>Wait {Math.ceil(cooldownRemaining / 1000)}s</>
               ) : (
-                <>Play now<span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">P</span></>
+                <>
+                  Play now
+                  <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
+                    P
+                  </span>
+                </>
               )}
             </Button>
           </div>
@@ -373,11 +389,21 @@ export default function Navbar() {
               onClick={handlePlayClick}
             >
               {isMatchmaking ? (
-                <>Finding{loadingDots}<span className="ml-1 text-xs px-1 rounded bg-red-700 dark:bg-red-600">P</span></>
+                <>
+                  Finding{loadingDots}
+                  <span className="ml-1 text-xs px-1 rounded bg-red-700 dark:bg-red-600">
+                    P
+                  </span>
+                </>
               ) : playCooldownState === 'cooldown' ? (
-                <>Wait {Math.ceil(cooldownRemaining/1000)}s</>
+                <>Wait {Math.ceil(cooldownRemaining / 1000)}s</>
               ) : (
-                <>Play now<span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">P</span></>
+                <>
+                  Play now
+                  <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
+                    P
+                  </span>
+                </>
               )}
             </Button>
           </div>
