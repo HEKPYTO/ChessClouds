@@ -2,11 +2,12 @@ use std::sync::Arc;
 
 use scc::HashMap;
 use shakmaty::{Chess, Color};
+use sqlx::{Pool, Postgres};
 use tokio::sync::broadcast;
 
 use crate::{message::ServerMessage, MAX_CHANNEL_CAPACITY};
 
-pub struct GameState {
+pub struct ActiveGame {
     pub white_user_id: String,
     pub black_user_id: String,
     pub white_connected: bool,
@@ -16,10 +17,10 @@ pub struct GameState {
     pub moves: Vec<String>,
 }
 
-impl GameState {
+impl ActiveGame {
     pub fn new(white_user_id: String, black_user_id: String) -> Self {
         let (tx, _) = broadcast::channel(MAX_CHANNEL_CAPACITY);
-        GameState {
+        ActiveGame {
             white_user_id,
             black_user_id,
             white_connected: false,
@@ -57,4 +58,10 @@ impl GameState {
     }
 }
 
-pub type GameStateMap = Arc<HashMap<String, GameState>>;
+pub type ActiveGameMap = Arc<HashMap<String, ActiveGame>>;
+
+#[derive(Clone)]
+pub struct AppState {
+    pub active_games: ActiveGameMap,
+    pub pool: Pool<Postgres>,
+}
