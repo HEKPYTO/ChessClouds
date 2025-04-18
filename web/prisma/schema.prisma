@@ -1,18 +1,10 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-model diesel_schema_migrations {
-  version String   @id @db.VarChar(50)
-  run_on  DateTime @default(now()) @db.Timestamp(6)
-
-  @@map("__diesel_schema_migrations")
 }
 
 model activegames {
@@ -28,4 +20,12 @@ model gamehistory {
   playerb   String
   pgn       String
   createdat DateTime? @default(now()) @db.Timestamp(6)
+  status    GameStatus  @default(ONGOING)
+}
+
+enum GameStatus {
+  WHITE_WINS    @map("White Wins")
+  BLACK_WINS    @map("Black Wins")
+  DRAW          @map("Draw")
+  ONGOING       @map("On Going")
 }
