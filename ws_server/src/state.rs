@@ -12,7 +12,7 @@ pub struct ActiveGame {
     pub black_user_id: String,
     pub white_connected: bool,
     pub black_connected: bool,
-    pub deferred_removal: bool,
+    pub clean_up_task: Option<tokio::task::JoinHandle<()>>,
     pub board: Chess,
     pub tx_broadcast: broadcast::Sender<ServerMessage>,
     pub moves: Vec<String>,
@@ -26,7 +26,7 @@ impl ActiveGame {
             black_user_id,
             white_connected: false,
             black_connected: false,
-            deferred_removal: false,
+            clean_up_task: None,
             board: Chess::default(),
             tx_broadcast: tx,
             moves: Vec::new(),
@@ -34,9 +34,9 @@ impl ActiveGame {
     }
 
     pub fn connect(&mut self, color: Color) {
-        if self.deferred_removal {
-            self.deferred_removal = false; // clear deferred removal upon connection
-            tracing::info!("cancelling deferred clean up");
+        if let Some(task) = self.clean_up_task.take() {
+            tracing::info!("aborting deferred clean up");
+            task.abort();
         }
         match color {
             Color::Black => {
