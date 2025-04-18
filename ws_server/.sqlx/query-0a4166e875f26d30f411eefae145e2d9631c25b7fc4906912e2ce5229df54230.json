@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT GameID, Black, White FROM ActiveGames WHERE GameId = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "gameid",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "black",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "white",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "0a4166e875f26d30f411eefae145e2d9631c25b7fc4906912e2ce5229df54230"
+}
