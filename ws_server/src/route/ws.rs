@@ -140,19 +140,20 @@ fn get_connection_from_map(
     user_id: &str,
 ) -> Option<Result<Connection>> {
     state.active_games.read(game_id, |_, v| {
-        if v.black_user_id == *user_id && !v.black_connected {
+        if v.black_user_id.as_str() == user_id && !v.black_connected {
             return Ok(Connection {
                 game_id: game_id.to_owned(),
                 color: Color::Black,
                 tx_broadcast: v.tx_broadcast.clone(),
             });
-        } else if v.white_user_id == *user_id && !v.white_connected {
+        } else if v.white_user_id.as_str() == user_id && !v.white_connected {
             return Ok(Connection {
                 game_id: game_id.to_owned(),
                 color: Color::White,
                 tx_broadcast: v.tx_broadcast.clone(),
             });
         }
+        tracing::error!("connection not found in appstate");
         Err(Error::Unauthorized)
     })
 }
@@ -161,7 +162,9 @@ async fn auth_socket(socket: &mut SplitStream<WebSocket>, state: &AppState) -> R
     while let Some(Ok(Message::Text(text))) = socket.next().await {
         let client_msg: ClientMessage = match serde_json::from_str(text.as_str()) {
             Ok(msg) => msg,
-            Err(_) => return Err(Error::Deserialization),
+            Err(_) => {
+                tracing::error!("auth deserialization failed");
+                return Err(Error::Deserialization)},
         };
 
         if let ClientMessage::Auth { game_id, user_id } = client_msg {
@@ -192,10 +195,12 @@ async fn auth_socket(socket: &mut SplitStream<WebSocket>, state: &AppState) -> R
                                 .active_games
                                 .insert(game_id.clone(), ActiveGame::new(row.white, row.black));
 
+                            tracing::info!("adding to app state");
                             return get_connection_from_map(state, &game_id, &user_id)
                                 .expect("game should exist");
                         }
                         Err(_) => {
+                            tracing::error!("auth row not found in DB");
                             return Err(Error::Unauthorized);
                         }
                     }
@@ -204,6 +209,7 @@ async fn auth_socket(socket: &mut SplitStream<WebSocket>, state: &AppState) -> R
         }
     }
 
+    tracing::error!("auth failed outside while let");
     Err(Error::Unauthorized)
 }
 
