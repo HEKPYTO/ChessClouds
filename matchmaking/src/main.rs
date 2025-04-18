@@ -4,11 +4,12 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use axum::{http::StatusCode, routing::post, Json, Router};
+use axum::{http::{header, Method, StatusCode}, routing::post, Json, Router};
 use dotenvy::dotenv;
 use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 use tokio::sync::{mpsc, oneshot};
+use tower_http::cors::{CorsLayer, AllowOrigin};
 use ts_rs::TS;
 
 const MAX_CHANNEL_SIZE: usize = 4096;
@@ -182,13 +183,25 @@ async fn main() {
         .await
         .unwrap();
 
+    let cors = CorsLayer::new()
+        .allow_origin(AllowOrigin::any())
+        .allow_methods([Method::POST])
+        .allow_headers([
+            header::CONTENT_TYPE,
+            header::ACCEPT,
+            header::ORIGIN,
+            header::AUTHORIZATION,
+        ])
+        .allow_credentials(false);
+
     let app = Router::new().route(
         "/match",
         post({
             let cloned_queue = player_queue.clone();
             move |body| post_match(notify_tx, cloned_queue, body)
         }),
-    );
+    )
+    .layer(cors);
 
     tokio::spawn(matcher(notify_rx, player_queue.clone(), pool));
 
