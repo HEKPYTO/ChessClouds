@@ -1,25 +1,18 @@
 [package]
-name = "ws_server"
+name = "matchmaking"
 version = "0.1.0"
 edition = "2021"
-default-run = "ws_server"
 
 [dependencies]
-anyhow = "1.0.97"
+anyhow = "1.0.98"
 axum = { version = "0.8.3", features = ["ws"] }
 axum-macros = "0.5.0"
 dotenvy = "0.15.7"
-futures-util = "0.3.31"
-reqwest = { version = "0.12.15", features = ["json"] }
-scc = "2.3.3"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
-shakmaty = { version = "0.27.3", features = ["serde"] }
 sqlx = { version = "0.8.5", features = ["macros", "postgres", "runtime-tokio", "tls-native-tls", "uuid"] }
 tokio = { version = "1.44.1", features = ["full"] }
-tokio-tungstenite = "0.26.2"
-tower-http = { version = "0.5.2", features = ["cors"] }
 tracing = "0.1.41"
 tracing-subscriber = "0.3.19"
 ts-rs = "10.1.0"
-uuid = "1.16.0"
+uuid = { version = "1.16.0", features = ["v4"] }
