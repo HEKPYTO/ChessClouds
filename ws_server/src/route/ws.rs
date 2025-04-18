@@ -1,4 +1,4 @@
-use std::{sync::Arc, time::Duration};
+use std::{clone, sync::Arc, time::Duration};
 
 use axum::{
     extract::{
@@ -116,39 +116,42 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
         .expect("game should exist")
     {
         // both players disconnect, initiate deferred clean up
-        tokio::spawn(async move {
-            tracing::info!("initiating deferred clean up for {}", connection.game_id);
+        if state
+            .active_games
+            .read(&connection.game_id, |_, v| v.clean_up_task.is_none())
+            .expect("game should exist")
+        {
+            let cloned_state = state.clone();
+            let cloned_game_id = connection.game_id.clone();
+
+            let join_handle = tokio::spawn(async move {
+                tracing::info!("initiating deferred clean up for {}", cloned_game_id);
+
+                tokio::time::sleep(Duration::from_secs(DEFERRED_CLEAN_UP_DURATION)).await;
+
+                tracing::info!("cleaning up state for {}", cloned_game_id);
+
+                cloned_state
+                    .active_games
+                    .remove(&cloned_game_id)
+                    .expect("game should exist");
+                if let Err(e) = sqlx::query!(
+                    "DELETE FROM ActiveGames WHERE GameID = $1",
+                    Uuid::parse_str(&cloned_game_id).expect("game_id should be a valid UUID")
+                )
+                .execute(&cloned_state.pool)
+                .await
+                {
+                    tracing::error!("removing active game failed: {e}");
+                }
+            });
 
             state
                 .active_games
                 .get(&connection.game_id)
                 .expect("game should exist")
-                .deferred_removal = true; // set deferred clean up flag
-
-            tokio::time::sleep(Duration::from_secs(DEFERRED_CLEAN_UP_DURATION)).await;
-
-            // check whether deferred clean up flag is still set
-            if state
-                .active_games
-                .read(&connection.game_id, |_, v| v.deferred_removal)
-                .unwrap_or(false)
-            {
-                tracing::info!("cleaning up state for {}", connection.game_id);
-                state
-                    .active_games
-                    .remove(&connection.game_id)
-                    .expect("game should exist");
-                if let Err(e) = sqlx::query!(
-                    "DELETE FROM ActiveGames WHERE GameID = $1",
-                    Uuid::parse_str(&connection.game_id).expect("game_id should be a valid UUID")
-                )
-                .execute(&state.pool)
-                .await
-                {
-                    tracing::error!("removing active game failed: {e}");
-                }
-            }
-        });
+                .clean_up_task = Some(join_handle);
+        }
     }
 }
 
