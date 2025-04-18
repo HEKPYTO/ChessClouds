@@ -12,10 +12,11 @@ use tokio::sync::{
     broadcast,
     mpsc::{self, Receiver, Sender},
 };
+use uuid::Uuid;
 
 use crate::{
-    game_state::GameStateMap,
     message::{ClientMessage, Error, ServerMessage},
+    state::{ActiveGame, ActiveGameMap, AppState},
     MAX_CHANNEL_CAPACITY,
 };
 use futures_util::{
@@ -31,7 +32,7 @@ struct Connection {
     pub tx_broadcast: broadcast::Sender<ServerMessage>,
 }
 
-pub async fn ws_handler(ws: WebSocketUpgrade, State(state): State<GameStateMap>) -> Response {
+pub async fn ws_handler(ws: WebSocketUpgrade, State(state): State<AppState>) -> Response {
     ws.on_upgrade(|socket| handle_socket(socket, state))
 }
 
@@ -46,7 +47,7 @@ async fn send_msg(
         .await
 }
 
-async fn handle_socket(socket: WebSocket, state: GameStateMap) {
+async fn handle_socket(socket: WebSocket, state: AppState) {
     tracing::info!("socket connected");
 
     let (mut writer, mut reader) = socket.split();
@@ -68,11 +69,13 @@ async fn handle_socket(socket: WebSocket, state: GameStateMap) {
     };
 
     state
+        .active_games
         .get(&connection.game_id)
         .expect("game should exist")
         .connect(connection.color);
 
     let move_history = state
+        .active_games
         .read(&connection.game_id, |_, v| v.moves.clone())
         .expect("game should exist");
     if send_msg(&mut writer, &ServerMessage::MoveHistory(move_history))
@@ -86,14 +89,12 @@ async fn handle_socket(socket: WebSocket, state: GameStateMap) {
 
     let mut read_task = tokio::spawn(handle_socket_read(
         reader,
-        state.clone(),
+        state.active_games.clone(),
         connection.clone(),
         tx_local,
     ));
     let mut write_task = tokio::spawn(handle_socket_write(writer, rx_broadcast, rx_local));
 
-    // let _ = write_task.await;
-    // read_task.abort();
     tokio::select! {
         _ = &mut read_task => write_task.abort(),
         _ = &mut write_task => read_task.abort()
@@ -102,16 +103,61 @@ async fn handle_socket(socket: WebSocket, state: GameStateMap) {
     tracing::info!("socket closing {} {}", connection.game_id, connection.color);
 
     state
+        .active_games
         .get(&connection.game_id)
         .expect("game should exist")
         .disconnect(connection.color);
-    // TODO: clean up things
+
+    // TODO: remove active game from app state similar to comment below
+    //
+    // if state
+    //     .active_games
+    //     .read(&connection.game_id, |_, v| {
+    //         !v.black_connected && !v.white_connected
+    //     })
+    //     .expect("game should exist")
+    // {
+    //     // both players disconnect, clean up
+    //     state
+    //         .active_games
+    //         .remove(&connection.game_id)
+    //         .expect("game should exist");
+    //     if let Err(e) = sqlx::query!(
+    //         "DELETE FROM ActiveGames WHERE GameID = $1",
+    //         Uuid::parse_str(&connection.game_id).expect("game_id should be a valid UUID")
+    //     )
+    //     .execute(&state.pool)
+    //     .await
+    //     {
+    //         tracing::error!("removing active game failed: {e}");
+    //     }
+    // }
 }
 
-async fn auth_socket(
-    socket: &mut SplitStream<WebSocket>,
-    state: &GameStateMap,
-) -> Result<Connection> {
+fn get_connection_from_map(
+    state: &AppState,
+    game_id: &str,
+    user_id: &str,
+) -> Option<Result<Connection>> {
+    state.active_games.read(game_id, |_, v| {
+        if v.black_user_id == *user_id && !v.black_connected {
+            return Ok(Connection {
+                game_id: game_id.to_owned(),
+                color: Color::Black,
+                tx_broadcast: v.tx_broadcast.clone(),
+            });
+        } else if v.white_user_id == *user_id && !v.white_connected {
+            return Ok(Connection {
+                game_id: game_id.to_owned(),
+                color: Color::White,
+                tx_broadcast: v.tx_broadcast.clone(),
+            });
+        }
+        Err(Error::Unauthorized)
+    })
+}
+
+async fn auth_socket(socket: &mut SplitStream<WebSocket>, state: &AppState) -> Result<Connection> {
     while let Some(Ok(Message::Text(text))) = socket.next().await {
         let client_msg: ClientMessage = match serde_json::from_str(text.as_str()) {
             Ok(msg) => msg,
@@ -119,24 +165,42 @@ async fn auth_socket(
         };
 
         if let ClientMessage::Auth { game_id, user_id } = client_msg {
-            return state
-                .read(&game_id, |_, v| {
-                    if v.black_user_id == user_id && !v.black_connected {
-                        return Ok(Connection {
-                            game_id: game_id.clone(),
-                            color: Color::Black,
-                            tx_broadcast: v.tx_broadcast.clone(),
-                        });
-                    } else if v.white_user_id == user_id && !v.white_connected {
-                        return Ok(Connection {
-                            game_id: game_id.clone(),
-                            color: Color::White,
-                            tx_broadcast: v.tx_broadcast.clone(),
-                        });
+            // find active game in server's HashMap first
+            match get_connection_from_map(state, &game_id, &user_id) {
+                Some(conn) => return conn,
+
+                // if not found, find from DB and add to HashMap
+                None => {
+                    let game_uuid = match Uuid::parse_str(&game_id) {
+                        Ok(uuid) => uuid,
+                        Err(_) => {
+                            tracing::error!("Failed to parse GameID UUID");
+                            return Err(Error::Unauthorized);
+                        }
+                    };
+
+                    let row = sqlx::query!(
+                        "SELECT GameID, Black, White FROM ActiveGames WHERE GameId = $1",
+                        game_uuid
+                    )
+                    .fetch_one(&state.pool)
+                    .await;
+
+                    match row {
+                        Ok(row) => {
+                            let _ = state
+                                .active_games
+                                .insert(game_id.clone(), ActiveGame::new(row.white, row.black));
+
+                            return get_connection_from_map(state, &game_id, &user_id)
+                                .expect("game should exist");
+                        }
+                        Err(_) => {
+                            return Err(Error::Unauthorized);
+                        }
                     }
-                    Err(Error::Unauthorized)
-                })
-                .unwrap_or(Err(Error::Unauthorized));
+                }
+            }
         }
     }
 
@@ -145,7 +209,7 @@ async fn auth_socket(
 
 async fn handle_socket_read(
     mut reader: SplitStream<WebSocket>,
-    state: GameStateMap,
+    state: ActiveGameMap,
     connection: Arc<Connection>,
     #[allow(unused_variables)] tx_local: Sender<ServerMessage>,
 ) {

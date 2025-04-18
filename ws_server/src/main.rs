@@ -1,22 +1,24 @@
-use std::sync::Arc;
+use std::{env, sync::Arc};
 
 use axum::{
+    http::{header, HeaderValue, Method},
     routing::{any, get, post},
     Router,
-    http::{HeaderValue, Method, header},
 };
+use dotenvy::dotenv;
 use scc::HashMap;
+use sqlx::postgres::PgPoolOptions;
 use tower_http::cors::CorsLayer;
 use ws_server::{
-    game_state::GameStateMap,
     route::{games::get_games, init::post_init, ws::ws_handler},
-    HOST,
+    state::AppState,
+    HOST, MAX_DB_CONNECTIONS,
 };
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
-    let state: GameStateMap = Arc::new(HashMap::new());
+    dotenv().ok();
 
     let cors = CorsLayer::new()
         .allow_origin([
@@ -31,6 +33,17 @@ async fn main() {
             header::AUTHORIZATION,
         ])
         .allow_credentials(true);
+
+    let pool = PgPoolOptions::new()
+        .max_connections(MAX_DB_CONNECTIONS)
+        .connect(&env::var("DATABASE_URL").expect("expecting DATABASE_URL in .env"))
+        .await
+        .unwrap();
+
+    let state = AppState {
+        active_games: Arc::new(HashMap::default()),
+        pool,
+    };
 
     let app = Router::new()
         .route("/ws", any(ws_handler))
