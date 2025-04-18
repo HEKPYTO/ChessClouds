@@ -12,6 +12,7 @@ pub struct ActiveGame {
     pub black_user_id: String,
     pub white_connected: bool,
     pub black_connected: bool,
+    pub deferred_removal: bool,
     pub board: Chess,
     pub tx_broadcast: broadcast::Sender<ServerMessage>,
     pub moves: Vec<String>,
@@ -25,6 +26,7 @@ impl ActiveGame {
             black_user_id,
             white_connected: false,
             black_connected: false,
+            deferred_removal: false,
             board: Chess::default(),
             tx_broadcast: tx,
             moves: Vec::new(),
@@ -32,6 +34,7 @@ impl ActiveGame {
     }
 
     pub fn connect(&mut self, color: Color) {
+        self.deferred_removal = false; // clear deferred removal upon connection
         match color {
             Color::Black => {
                 assert!(!self.black_connected);
