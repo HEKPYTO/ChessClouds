@@ -108,30 +108,28 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
         .expect("game should exist")
         .disconnect(connection.color);
 
-    // TODO: remove active game from app state similar to comment below
-    //
-    // if state
-    //     .active_games
-    //     .read(&connection.game_id, |_, v| {
-    //         !v.black_connected && !v.white_connected
-    //     })
-    //     .expect("game should exist")
-    // {
-    //     // both players disconnect, clean up
-    //     state
-    //         .active_games
-    //         .remove(&connection.game_id)
-    //         .expect("game should exist");
-    //     if let Err(e) = sqlx::query!(
-    //         "DELETE FROM ActiveGames WHERE GameID = $1",
-    //         Uuid::parse_str(&connection.game_id).expect("game_id should be a valid UUID")
-    //     )
-    //     .execute(&state.pool)
-    //     .await
-    //     {
-    //         tracing::error!("removing active game failed: {e}");
-    //     }
-    // }
+    if state
+        .active_games
+        .read(&connection.game_id, |_, v| {
+            !v.black_connected && !v.white_connected
+        })
+        .expect("game should exist")
+    {
+        // both players disconnect, clean up
+        state
+            .active_games
+            .remove(&connection.game_id)
+            .expect("game should exist");
+        if let Err(e) = sqlx::query!(
+            "DELETE FROM ActiveGames WHERE GameID = $1",
+            Uuid::parse_str(&connection.game_id).expect("game_id should be a valid UUID")
+        )
+        .execute(&state.pool)
+        .await
+        {
+            tracing::error!("removing active game failed: {e}");
+        }
+    }
 }
 
 fn get_connection_from_map(
@@ -164,7 +162,8 @@ async fn auth_socket(socket: &mut SplitStream<WebSocket>, state: &AppState) -> R
             Ok(msg) => msg,
             Err(_) => {
                 tracing::error!("auth deserialization failed");
-                return Err(Error::Deserialization)},
+                return Err(Error::Deserialization);
+            }
         };
 
         if let ClientMessage::Auth { game_id, user_id } = client_msg {
