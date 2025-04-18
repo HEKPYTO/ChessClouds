@@ -279,6 +279,13 @@ export class SocketService {
 
   onGameEnd(callback: GameEndCallback): void {
     this.onGameEndCallback = callback;
+
+    if (callback) {
+      this.onGameEndCallback = (outcome) => {
+        this.manualDisconnect = true;
+        callback(outcome);
+      };
+    }
   }
 
   disconnect(): void {
