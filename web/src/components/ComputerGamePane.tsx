@@ -224,11 +224,9 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
             <CardContent className="text-center p-4">
               <div className="flex justify-between items-center mb-2">
                 <div className="font-medium text-base text-amber-800 dark:text-amber-200">
-                  {playingAs === 'w' ? (
-                    `${username} vs Computer`
-                  ) : (
-                    `Computer vs ${username}`
-                  )}
+                  {playingAs === 'w'
+                    ? `${username} vs Computer`
+                    : `Computer vs ${username}`}
                 </div>
                 {getEngineStatusBadge()}
               </div>
@@ -467,11 +465,9 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
               <CardContent className="text-center px-4">
                 <div className="flex justify-between items-center mb-2">
                   <div className="font-medium text-base text-amber-800 dark:text-amber-200">
-                    {playingAs === 'w' ? (
-                      `${username} vs Computer`
-                    ) : (
-                      `Computer vs ${username}`
-                    )}
+                    {playingAs === 'w'
+                      ? `${username} vs Computer`
+                      : `Computer vs ${username}`}
                   </div>
                   {getEngineStatusBadge()}
                 </div>
