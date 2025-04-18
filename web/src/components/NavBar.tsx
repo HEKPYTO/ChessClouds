@@ -129,23 +129,21 @@ export default function Navbar() {
   const handlePlayClick = async () => {
     setPressedKey('p');
     setMobileMenuOpen(false);
+    setPressedKey(null);
     
     if (playCooldownState === 'cooldown' && !isMatchmaking) {
       toast.info(`Please wait ${Math.ceil(cooldownRemaining/1000)} seconds before trying again`);
-      setPressedKey(null);
       return;
     }
 
     if (isMatchmaking) {
       toast.info('Matchmaking canceled');
       await cancelMatchmaking();
-      setPressedKey(null);
       return;
     }
 
     if (!authenticated) {
       setTimeout(() => router.push('/signin'), 150);
-      setPressedKey(null);
       return;
     }
 
@@ -280,20 +278,17 @@ export default function Navbar() {
           <div className="hidden sm:block">
             <Button 
               className={`h-9 text-sm text-white rounded-md transition-all hover:translate-y-[2px] 
-                ${isMatchmaking ?
-                    `bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 shadow-[0_3px_0_0_#b91c1c] hover:shadow-[0_1px_0_0_#991b1b] ${pressedKey === 'p' ? 'transform translate-y-[3px] shadow-none bg-red-700 dark:bg-red-600' : ''}` :
-                    playCooldownState === 'cooldown' ?
-                      `bg-gray-400 dark:bg-gray-600 cursor-not-allowed shadow-none` :
-                      `bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] ${pressedKey === 'p' ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600' : ''}`
-                }`} 
+                bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 
+                shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]
+                ${pressedKey === 'p' ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600' : ''}`} 
               onClick={handlePlayClick} 
               onMouseUp={() => setPressedKey(null)}
               disabled={playCooldownState === 'cooldown' && !isMatchmaking}
             >
               {isMatchmaking ? (
-                <>Finding{loadingDots}<span className="ml-1 text-xs px-1 rounded bg-red-700 dark:bg-red-600">P</span></>
+                <>Finding{loadingDots}<span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">P</span></>
               ) : playCooldownState === 'cooldown' ? (
-                <>Wait {Math.ceil(cooldownRemaining/1000)}s</>
+                <>Wait {Math.ceil(cooldownRemaining / 1000)}s</>
               ) : (
                 <>Play now<span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">P</span></>
               )}
@@ -371,22 +366,19 @@ export default function Navbar() {
             <Button
               className={`w-full mt-2 text-sm text-white rounded-md transition-all hover:translate-y-[2px] ${
                 isMatchmaking
-                  ? 'bg-red-600 hover:bg-red-700 shadow-[0_3px_0_0_#b91c1c] hover:shadow-[0_1px_0_0_#991b1b]'
+                  ? 'bg-amber-600 hover:bg-amber-700 shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]'
                   : 'bg-amber-600 hover:bg-amber-700 shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]'
               }`}
               disabled={playCooldownState === 'cooldown' && !isMatchmaking}
               onClick={handlePlayClick}
             >
-              {isMatchmaking ? 'Cancel' : 'Play now'}
-              <span
-                className={`ml-1 text-xs px-1 rounded ${
-                  isMatchmaking
-                    ? 'bg-red-700 dark:bg-red-600'
-                    : 'bg-amber-700 dark:bg-amber-600'
-                }`}
-              >
-                P
-              </span>
+              {isMatchmaking ? (
+                <>Finding{loadingDots}<span className="ml-1 text-xs px-1 rounded bg-red-700 dark:bg-red-600">P</span></>
+              ) : playCooldownState === 'cooldown' ? (
+                <>Wait {Math.ceil(cooldownRemaining/1000)}s</>
+              ) : (
+                <>Play now<span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">P</span></>
+              )}
             </Button>
           </div>
         </div>
