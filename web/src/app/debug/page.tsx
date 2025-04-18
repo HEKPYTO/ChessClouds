@@ -11,6 +11,7 @@ import {
   ClipboardIcon,
 } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
+import { MatchMakingService } from '@/lib/matchmakingService';
 
 export type Color = 'Black' | 'White';
 export type GameOutcome = { Decisive: { winner: Color } } | 'Draw';
@@ -41,6 +42,9 @@ export default function DevPage() {
   const [moveToSend, setMoveToSend] = useState('e4');
   const [copySuccess, setCopySuccess] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
+
+  const [isMatchmaking, setIsMatchmaking] = useState(false);
+  const [matchmakingError, setMatchmakingError] = useState<string | null>(null);
 
   const logMessage = (message: string) => {
     setMessages((prev) => [
@@ -232,6 +236,40 @@ export default function DevPage() {
     };
   }, [socket]);
 
+  const findMatch = async () => {
+    try {
+      setIsMatchmaking(true);
+      setMatchmakingError(null);
+      logMessage(`Starting matchmaking for user: ${userId}`);
+      
+      const matchmakingService = MatchMakingService.getInstance();
+      const { game_id, color } = await matchmakingService.findMatch(userId);
+      
+      setGameId(game_id);
+      logMessage(`Match found! Game ID: ${game_id}, Playing as: ${color}`);
+      toast.success('Match found!', {
+        description: `Game ID: ${game_id}, Playing as: ${color}`,
+      });
+      
+      // Optional: Auto-connect to game
+      // window.location.href = `/socket?game_id=${game_id}&playas=${color}`;
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      setMatchmakingError(errorMsg);
+      logMessage(`Matchmaking error: ${errorMsg}`);
+      toast.error('Matchmaking failed', { description: errorMsg });
+    } finally {
+      setIsMatchmaking(false);
+    }
+  };
+
+  const cancelMatchmaking = () => {
+    const matchmakingService = MatchMakingService.getInstance();
+    matchmakingService.cancelMatch();
+    setIsMatchmaking(false);
+    logMessage('Matchmaking canceled');
+  };  
+
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-6 text-amber-900 dark:text-amber-100 font-display">
@@ -329,6 +367,32 @@ export default function DevPage() {
                 Authenticate
               </Button>
             </div>
+
+            <div className="flex gap-2">
+              {isMatchmaking ? (
+                <Button
+                  onClick={cancelMatchmaking}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white shadow-[0_3px_0_0_#b91c1c] hover:shadow-[0_1px_0_0_#991b1b] hover:translate-y-[2px]
+                    dark:bg-red-500 dark:hover:bg-red-600 dark:shadow-[0_3px_0_0_#991b1b] dark:hover:shadow-[0_1px_0_0_#7f1d1d]"
+                >
+                  Cancel Matchmaking
+                </Button>
+              ) : (
+                <Button
+                  onClick={findMatch}
+                  className="flex-1 bg-amber-600 hover:bg-amber-700 text-white shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
+                    dark:bg-amber-500 dark:hover:bg-amber-600 dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
+                >
+                  Find Match
+                </Button>
+              )}
+            </div>
+
+            {matchmakingError && (
+              <div className="mt-2 text-red-600 dark:text-red-400 text-sm">
+                {matchmakingError}
+              </div>
+            )}
 
             <div>
               <label className="block text-sm mb-1 text-amber-700 dark:text-amber-300">
@@ -434,6 +498,7 @@ export default function DevPage() {
               >
                 Open Game in This Browser
               </a>
+
             </div>
           </CardContent>
         </Card>
