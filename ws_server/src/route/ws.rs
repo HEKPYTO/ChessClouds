@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use axum::{
     extract::{
@@ -17,7 +17,7 @@ use uuid::Uuid;
 use crate::{
     message::{ClientMessage, Error, ServerMessage},
     state::{ActiveGame, ActiveGameMap, AppState},
-    MAX_CHANNEL_CAPACITY,
+    DEFERRED_REMOVAL_DURATION, MAX_CHANNEL_CAPACITY,
 };
 use futures_util::{
     sink::SinkExt,
@@ -115,20 +115,37 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
         })
         .expect("game should exist")
     {
-        // both players disconnect, clean up
-        state
-            .active_games
-            .remove(&connection.game_id)
-            .expect("game should exist");
-        if let Err(e) = sqlx::query!(
-            "DELETE FROM ActiveGames WHERE GameID = $1",
-            Uuid::parse_str(&connection.game_id).expect("game_id should be a valid UUID")
-        )
-        .execute(&state.pool)
-        .await
-        {
-            tracing::error!("removing active game failed: {e}");
-        }
+        // both players disconnect, initiate deferred clean up
+        tokio::spawn(async move {
+            state
+                .active_games
+                .get(&connection.game_id)
+                .expect("game should exist")
+                .deferred_removal = true; // set deferred clean up flag
+
+            tokio::time::sleep(Duration::from_secs(DEFERRED_REMOVAL_DURATION)).await;
+
+            // check whether deferred clean up flag is still set
+            if state
+                .active_games
+                .read(&connection.game_id, |_, v| v.deferred_removal)
+                .unwrap_or(false)
+            {
+                state
+                    .active_games
+                    .remove(&connection.game_id)
+                    .expect("game should exist");
+                if let Err(e) = sqlx::query!(
+                    "DELETE FROM ActiveGames WHERE GameID = $1",
+                    Uuid::parse_str(&connection.game_id).expect("game_id should be a valid UUID")
+                )
+                .execute(&state.pool)
+                .await
+                {
+                    tracing::error!("removing active game failed: {e}");
+                }
+            }
+        });
     }
 }
 
