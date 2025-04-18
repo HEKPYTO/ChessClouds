@@ -34,7 +34,10 @@ impl ActiveGame {
     }
 
     pub fn connect(&mut self, color: Color) {
-        self.deferred_removal = false; // clear deferred removal upon connection
+        if self.deferred_removal {
+            self.deferred_removal = false; // clear deferred removal upon connection
+            tracing::info!("cancelling deferred clean up");
+        }
         match color {
             Color::Black => {
                 assert!(!self.black_connected);
