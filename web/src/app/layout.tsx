@@ -1,8 +1,9 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Playfair_Display, Roboto_Mono, Inter } from 'next/font/google';
-import ClientLayout from '@/components/ClientLayout';
+import ClientLayout from '@/lib/ClientLayout';
 import { Toaster } from '@/components/ui/sonner';
+import { MatchmakingProvider } from '@/lib/MatchmakingContext';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -78,9 +79,10 @@ export default function RootLayout({
               [background-size:20px_20px]
             "
           />
-
-          <ClientLayout>{children}</ClientLayout>
-          <Toaster richColors />
+          <MatchmakingProvider>
+            <ClientLayout>{children}</ClientLayout>
+            <Toaster richColors />
+          </MatchmakingProvider>
         </div>
       </body>
     </html>

@@ -12,27 +12,48 @@ import {
   SparklesIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/outline';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { useMatchmaking } from '@/lib/MatchmakingContext';
+import { getUserInfo, isAuthenticated } from '@/lib/auth/googleAuth';
 
 export default function HomePage() {
   const [pressedKey, setPressedKey] = useState<string | null>(null);
+  const router = useRouter();
+
+  const {
+    isMatchmaking,
+    startMatchmaking,
+    cancelMatchmaking,
+    playCooldownState,
+    cooldownRemaining,
+  } = useMatchmaking();
+
+  const userInfo = getUserInfo();
+  const username = userInfo?.email?.split('@')[0] || 'anonymous';
+  const authenticated = isAuthenticated();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (pressedKey !== null) return;
+
       if (e.key.toLowerCase() === 'p') {
         setPressedKey('p');
-        setTimeout(() => {
-          window.location.href = '/play';
-        }, 150);
+
+        handlePlayNow();
       } else if (e.key.toLowerCase() === 's') {
         setPressedKey('s');
         setTimeout(() => {
-          window.location.href = '/signup';
+          router.push('/signup');
+          setPressedKey(null);
         }, 150);
       }
     };
 
     const handleKeyUp = () => {
-      setPressedKey(null);
+      if (pressedKey !== null) {
+        setTimeout(() => setPressedKey(null), 50);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -42,26 +63,56 @@ export default function HomePage() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router, pressedKey, isMatchmaking, playCooldownState]);
 
   const handleSignUp = () => {
     setPressedKey('s');
     setTimeout(() => {
-      window.location.href = '/signup';
+      router.push('/signup');
       setPressedKey(null);
     }, 150);
   };
 
   const handleLearnMore = () => {
-    window.location.href = '/learn';
+    router.push('/learn');
   };
 
   const handlePlayNow = () => {
+    if (pressedKey === 'p') return;
+
     setPressedKey('p');
-    setTimeout(() => {
-      window.location.href = '/play';
-      setPressedKey(null);
-    }, 150);
+
+    if (playCooldownState === 'cooldown' && !isMatchmaking) {
+      toast.info(
+        `Please wait ${Math.ceil(
+          cooldownRemaining / 1000
+        )} seconds before trying again`
+      );
+      setTimeout(() => setPressedKey(null), 150);
+      return;
+    }
+
+    if (isMatchmaking) {
+      cancelMatchmaking();
+      toast.info('Matchmaking canceled');
+      setTimeout(() => setPressedKey(null), 150);
+      return;
+    }
+
+    if (!authenticated) {
+      setTimeout(() => {
+        router.push('/signin');
+        setPressedKey(null);
+      }, 150);
+      return;
+    }
+
+    startMatchmaking(username);
+    toast.success('Finding a match...', {
+      description: "We'll connect you with an opponent soon",
+    });
+    setTimeout(() => setPressedKey(null), 150);
   };
 
   const pgn = '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. O-O Nf6 5. d3 d6';
@@ -100,17 +151,57 @@ export default function HomePage() {
                   : ''
               }`}
               onClick={handlePlayNow}
+              disabled={playCooldownState === 'cooldown' && !isMatchmaking}
             >
-              <PlayIcon className="mr-2 h-5 w-5" /> Play now
-              <span
-                className={`ml-1 text-xs px-1 rounded transition-colors ${
-                  pressedKey === 'p'
-                    ? 'bg-amber-800 dark:bg-amber-700'
-                    : 'bg-amber-700 dark:bg-amber-600'
-                }`}
-              >
-                P
-              </span>
+              {isMatchmaking ? (
+                <>
+                  Finding
+                  <span className="inline-flex ml-1">
+                    <span
+                      className="animate-bounce mx-0.5"
+                      style={{ animationDelay: '0ms' }}
+                    >
+                      .
+                    </span>
+                    <span
+                      className="animate-bounce mx-0.5"
+                      style={{ animationDelay: '150ms' }}
+                    >
+                      .
+                    </span>
+                    <span
+                      className="animate-bounce mx-0.5"
+                      style={{ animationDelay: '300ms' }}
+                    >
+                      .
+                    </span>
+                  </span>
+                  <span
+                    className={`ml-1 text-xs px-1 rounded transition-colors ${
+                      pressedKey === 'p'
+                        ? 'bg-amber-800 dark:bg-amber-700'
+                        : 'bg-amber-700 dark:bg-amber-600'
+                    }`}
+                  >
+                    P
+                  </span>
+                </>
+              ) : playCooldownState === 'cooldown' ? (
+                <>Wait {Math.ceil(cooldownRemaining / 1000)}s</>
+              ) : (
+                <>
+                  <PlayIcon className="mr-2 h-5 w-5" /> Play now
+                  <span
+                    className={`ml-1 text-xs px-1 rounded transition-colors ${
+                      pressedKey === 'p'
+                        ? 'bg-amber-800 dark:bg-amber-700'
+                        : 'bg-amber-700 dark:bg-amber-600'
+                    }`}
+                  >
+                    P
+                  </span>
+                </>
+              )}
             </Button>
             <Button
               variant="outline"
