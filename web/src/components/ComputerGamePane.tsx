@@ -18,6 +18,7 @@ import {
   SignalIcon,
   ExclamationTriangleIcon,
   SignalSlashIcon,
+  HomeIcon,
 } from '@heroicons/react/24/outline';
 import { UserInfo } from '@/types/googleAuthTypes';
 import { getUserInfo } from '@/lib/auth/googleAuth';
@@ -212,8 +213,8 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
     }
   };
 
-  const handlePlayAgain = () => {
-    window.location.href = `/computer?color=${playingAs === 'w' ? 'b' : 'w'}`;
+  const handleHome = () => {
+    window.location.href = `/home`;
   };
 
   return (
@@ -344,10 +345,10 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
                 variant="outline"
                 size="sm"
                 className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-slate-700 dark:text-green-400 dark:border-green-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
-                onClick={handlePlayAgain}
+                onClick={handleHome}
                 aria-label="Play Again"
               >
-                <ArrowPathIcon className="h-5 w-5" />
+                <HomeIcon className="h-5 w-5" />
               </Button>
             ) : (
               <Button
@@ -646,10 +647,10 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
                       variant="outline"
                       size="sm"
                       className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-slate-700 dark:text-green-400 dark:border-green-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
-                      onClick={handlePlayAgain}
+                      onClick={handleHome}
                       aria-label="Play Again"
                     >
-                      <ArrowPathIcon className="h-5 w-5" />
+                      <HomeIcon className="h-5 w-5" />
                     </Button>
                   ) : (
                     <Button

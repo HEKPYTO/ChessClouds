@@ -24,6 +24,7 @@ import LoadingScreen from '@/components/LoadingScreen';
 import { toast } from 'sonner';
 import { testEngine } from '@/lib/engine';
 import { useMatchmaking } from '@/lib/MatchmakingContext';
+import { createGame } from '../actions/gameActions';
 
 export default function HomePage() {
   const router = useRouter();
@@ -231,12 +232,36 @@ export default function HomePage() {
 
   const handlePlayAsWhite = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push('/computer?color=w');
+    createAndRedirectToGame('w');
   };
 
   const handlePlayAsBlack = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push('/computer?color=b');
+    createAndRedirectToGame('b');
+  };
+
+  const createAndRedirectToGame = async (color: 'w' | 'b') => {
+    try {
+      const computerName = 'computer';
+      const playerName = username;
+      const playerA = color === 'w' ? playerName : computerName;
+      const playerB = color === 'w' ? computerName : playerName;
+
+      const result = await createGame(playerA, playerB);
+
+      if (result.success && result.gameId) {
+        router.push(`/computer?color=${color}&game_id=${result.gameId}`);
+      } else {
+        toast.error('Failed to create game', {
+          description: 'Please try again later',
+        });
+      }
+    } catch (error) {
+      toast.error('Error starting game', {
+        description: 'An unexpected error occurred',
+      });
+      console.error('Error creating game:', error);
+    }
   };
 
   const getTurnFromFen = (fen: string, playingAs: 'w' | 'b' = 'w') => {
