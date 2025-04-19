@@ -7,8 +7,17 @@ import ComputerGamePane from '@/components/ComputerGamePane';
 import LoadingScreen from '@/components/LoadingScreen';
 import { toast } from 'sonner';
 import { testEngine, getBestMove } from '@/lib/engine';
+import {
+  updateGamePgn,
+  updateGameStatus,
+  getGame,
+} from '@/app/actions/gameActions';
+import { getUserInfo } from '@/lib/auth/googleAuth';
+import { GameStatus } from '@prisma/client';
+import { useRouter } from 'next/navigation';
 
 export default function ComputerGame() {
+  const router = useRouter();
   const [chess] = useState(new Chess());
   const [fen, setFen] = useState(chess.fen());
   const [lastMove, setLastMove] = useState<[Square, Square]>();
@@ -23,20 +32,81 @@ export default function ComputerGame() {
     'connected' | 'degraded' | 'disconnected' | 'pending'
   >('pending');
   const [isThinking, setIsThinking] = useState(false);
+  const [gameId, setGameId] = useState<string | null>(null);
 
   const moveHistory = useRef<string[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSuccessRef = useRef<number | null>(null);
+  const userInfo = getUserInfo();
+  const username = userInfo?.email?.split('@')[0] || 'anonymous';
 
   useEffect(() => {
     const params =
       typeof window !== 'undefined'
         ? new URLSearchParams(window.location.search)
         : null;
+
     const color = params?.get('color');
     if (color === 'w' || color === 'b') setPlayingAs(color);
-    setIsLoading(false);
-  }, []);
+
+    const urlGameId = params?.get('game_id');
+
+    const initializeGame = async () => {
+      try {
+        if (urlGameId) {
+          setGameId(urlGameId);
+
+          const gameResult = await getGame(urlGameId);
+          if (gameResult.success && gameResult.game) {
+            if (gameResult.game.pgn) {
+              try {
+                chess.loadPgn(gameResult.game.pgn);
+                moveHistory.current = chess.history();
+
+                const history = chess.history({ verbose: true });
+                if (history.length > 0) {
+                  const last = history[history.length - 1];
+                  setLastMove([last.from as Square, last.to as Square]);
+                }
+
+                setFen(chess.fen());
+              } catch (err) {
+                console.error('Error loading PGN:', err);
+              }
+            }
+
+            if (gameResult.game.status !== 'ONGOING') {
+              setGameOver(true);
+            }
+
+            setIsLoading(false);
+            return;
+          } else {
+            console.error('Failed to load game data');
+            toast.error('Failed to load game', {
+              description: 'Redirecting to home page',
+            });
+            setTimeout(() => router.push('/home'), 2000);
+            return;
+          }
+        } else {
+          toast.error('No game ID provided', {
+            description: 'Redirecting to home page',
+          });
+          setTimeout(() => router.push('/home'), 2000);
+        }
+      } catch (err) {
+        console.error('Error initializing game:', err);
+        toast.error('Error loading game', {
+          description: 'Please try again later',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeGame();
+  }, [playingAs, username, chess, router]);
 
   useEffect(() => {
     const updateStatusByAge = () => {
@@ -54,7 +124,7 @@ export default function ComputerGame() {
         setEngineStatus('disconnected');
         setError('Chess engine unreachable (timeout)');
         toast.error('Engine disconnected', {
-          description: 'No response from engine for over 60 s',
+          description: 'No response from engine for over 60 s',
         });
       } else if (age >= 30000) {
         if (engineStatus !== 'degraded') {
@@ -101,8 +171,28 @@ export default function ComputerGame() {
 
   const updateState = useCallback(() => {
     setFen(chess.fen());
-    setGameOver(chess.isGameOver());
-  }, [chess]);
+
+    if (gameId) {
+      const pgn = chess.pgn();
+      updateGamePgn(gameId, pgn).catch(console.error);
+    }
+
+    const ended = chess.isGameOver();
+    setGameOver((prev) => prev || ended);
+
+    if (ended && gameId) {
+      let status: GameStatus = 'ONGOING';
+
+      if (chess.isCheckmate()) {
+        status = chess.turn() === 'w' ? 'BLACK_WINS' : 'WHITE_WINS';
+      } else if (chess.isDraw()) {
+        status = 'DRAW';
+      }
+
+      if (status !== 'ONGOING')
+        updateGameStatus(gameId, status).catch(console.error);
+    }
+  }, [chess, gameId]);
 
   const makeComputerMove = useCallback(async () => {
     if (gameOver || chess.turn() === playingAs || isThinking) return;
@@ -200,7 +290,7 @@ export default function ComputerGame() {
   const handlePrevious = useCallback(() => {
     if (previewIndex === null) {
       if (moveHistory.current.length)
-        setPreviewIndex(moveHistory.current.length - 1);
+        setPreviewIndex(moveHistory.current.length - 2);
     } else if (previewIndex > 0) {
       setPreviewIndex(previewIndex - 1);
     }
@@ -243,8 +333,17 @@ export default function ComputerGame() {
   const handleResign = useCallback(() => {
     if (gameOver) return;
     setGameOver(true);
+
+    if (gameId) {
+      const status: GameStatus =
+        playingAs === 'w' ? 'BLACK_WINS' : 'WHITE_WINS';
+      updateGameStatus(gameId, status).catch((err) => {
+        console.error('Failed to update game status on resign:', err);
+      });
+    }
+
     toast.info('Game ended', { description: 'You resigned the game' });
-  }, [gameOver]);
+  }, [gameOver, gameId, playingAs]);
 
   const handleRetry = useCallback(() => {
     if (engineStatus !== 'disconnected') return;
