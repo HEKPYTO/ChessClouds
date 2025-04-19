@@ -1,11 +1,14 @@
 'use client';
 
+import { getUserHistoryGames } from '@/app/actions/gameActions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardTabProps } from '@/types/dashboard-props';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const HISTORY_PER_PAGE = 10;
-const FRIEND_PER_PAGE = 5;
+// const FRIEND_PER_PAGE = 5;
 
 const mockGameHistory = [
   {
@@ -100,35 +103,66 @@ const mockGameHistory = [
   },
 ];
 
-const mockFriends = [
-  { id: 1, name: 'martin-xiii', rating: 1800, status: 'online' },
-  { id: 2, name: 'dj-ron-passano', rating: 1350, status: 'offline' },
-  { id: 3, name: 'Jdomenusrex', rating: 446, status: 'playing' },
-  { id: 4, name: 'knight_rider', rating: 550, status: 'online' },
-  { id: 5, name: 'chess_lover99', rating: 700, status: 'offline' },
-];
+// const mockFriends = [
+//   { id: 1, name: 'martin-xiii', rating: 1800, status: 'online' },
+//   { id: 2, name: 'dj-ron-passano', rating: 1350, status: 'offline' },
+//   { id: 3, name: 'Jdomenusrex', rating: 446, status: 'playing' },
+//   { id: 4, name: 'knight_rider', rating: 550, status: 'online' },
+//   { id: 5, name: 'chess_lover99', rating: 700, status: 'offline' },
+// ];
 
-export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
+// ! TODO: IMPLEMENT HISTORY
+
+export default function OverviewTab({
+  setActiveTab,
+  username,
+}: DashboardTabProps) {
   const handleViewGames = () => {
     setActiveTab('games');
   };
 
-  const handleViewFriends = () => {
-    setActiveTab('friends');
-  };
+  // const handleViewFriends = () => {
+  //   setActiveTab('friends');
+  // };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'online':
-        return 'bg-green-600';
-      case 'playing':
-        return 'bg-amber-600';
-      case 'offline':
-        return 'bg-slate-400';
-      default:
-        return 'bg-slate-400';
-    }
-  };
+  // const getStatusColor = (status: string) => {
+  //   switch (status) {
+  //     case 'online':
+  //       return 'bg-green-600';
+  //     case 'playing':
+  //       return 'bg-amber-600';
+  //     case 'offline':
+  //       return 'bg-slate-400';
+  //     default:
+  //       return 'bg-slate-400';
+  //   }
+  // };
+
+  const [gameHistory, setGameHistory] = useState<
+    Awaited<ReturnType<typeof getUserHistoryGames>>['games']
+  >([]);
+  const [loadingGameHistory, setLoadingGameHistory] = useState(true);
+
+  useEffect(() => {
+    const fetchGameHistory = async () => {
+      try {
+        setLoadingGameHistory(true);
+        const { success, games = [] } = await getUserHistoryGames(username);
+        if (success) {
+          setGameHistory(games);
+        } else {
+          toast.error('Failed to load game history');
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error('Error loading game history');
+      } finally {
+        setLoadingGameHistory(false);
+      }
+    };
+
+    if (username) fetchGameHistory();
+  }, [username]);
 
   return (
     <>
@@ -264,7 +298,7 @@ export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
         </div>
 
         {/* Friends */}
-        <div className="w-full xl:w-80 flex-shrink-0">
+        {/* <div className="w-full xl:w-80 flex-shrink-0">
           <Card className="w-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-md">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold text-amber-900 dark:text-amber-100 flex justify-between items-center">
@@ -334,7 +368,7 @@ export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
       </div>
     </>
   );
