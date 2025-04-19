@@ -45,44 +45,44 @@ export default function ComputerGame() {
       typeof window !== 'undefined'
         ? new URLSearchParams(window.location.search)
         : null;
-
+  
     const color = params?.get('color');
     if (color === 'w' || color === 'b') setPlayingAs(color);
-
+  
     const urlGameId = params?.get('game_id');
-
+  
     const initializeGame = async () => {
       try {
         if (urlGameId) {
           setGameId(urlGameId);
-
+  
           const gameResult = await getGame(urlGameId);
           if (gameResult.success && gameResult.game) {
             if (gameResult.game.pgn) {
               try {
                 chess.loadPgn(gameResult.game.pgn);
                 moveHistory.current = chess.history();
-
+  
                 const history = chess.history({ verbose: true });
                 if (history.length > 0) {
                   const last = history[history.length - 1];
                   setLastMove([last.from as Square, last.to as Square]);
                 }
-
+  
                 setFen(chess.fen());
               } catch (err) {
                 console.error('Error loading PGN:', err);
               }
             }
-
+  
             if (gameResult.game.status !== 'ONGOING') {
               setGameOver(true);
             }
-
+  
             setIsLoading(false);
             return;
           } else {
-            console.error('Failed to load game data');
+            console.error('Failed to load game data:', gameResult.error);
             toast.error('Failed to load game', {
               description: 'Redirecting to home page',
             });
@@ -104,7 +104,7 @@ export default function ComputerGame() {
         setIsLoading(false);
       }
     };
-
+  
     initializeGame();
   }, [playingAs, username, chess, router]);
 

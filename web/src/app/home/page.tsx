@@ -215,14 +215,14 @@ export default function HomePage() {
       const playerName = username;
       const white = color === 'w' ? playerName : computerName;
       const black = color === 'w' ? computerName : playerName;
-
+  
       const result = await createGame(white, black);
-
+  
       if (result.success && result.gameId) {
         router.push(`/computer?color=${color}&game_id=${result.gameId}`);
       } else {
         toast.error('Failed to create game', {
-          description: 'Please try again later',
+          description: result.error || 'Please try again later',
         });
       }
     } catch (error) {
