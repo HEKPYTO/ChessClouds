@@ -95,7 +95,7 @@ async fn matcher(
             let game_id = uuid::Uuid::new_v4();
 
             if let Err(e) = sqlx::query!(
-                r#"INSERT INTO GameState (GameID, Black, White) VALUES ($1, $2, $3)"#,
+                r#"INSERT INTO GameState (GameID, Black, White, PGN) VALUES ($1, $2, $3, '')"#,
                 game_id,
                 player2.user_id,
                 player1.user_id
