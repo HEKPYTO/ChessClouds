@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect, useRef } from 'react';
 import { Chess } from 'chess.js';
 import type { Square } from 'chess.js';
@@ -17,7 +15,7 @@ import {
   SignalSlashIcon,
 } from '@heroicons/react/24/outline';
 import { Badge } from '@/components/ui/badge';
-import { GameOutcome } from '@/types/socket-types';
+import { GameOutcome } from '@/types/shared';
 
 interface GameProps {
   chess: Chess;
@@ -38,7 +36,7 @@ interface GameProps {
   gameId: string;
   playingAs: 'w' | 'b';
   gameOver?: boolean;
-  gameOutcome?: GameOutcome;
+  gameOutcome?: GameOutcome | 'Draw';
   reconnect?: () => void;
 }
 
@@ -50,18 +48,17 @@ interface PaneProps {
 function getGameStatus(
   chess: Chess,
   gameOver?: boolean,
-  gameOutcome?: GameOutcome | null
+  gameOutcome?: GameOutcome | 'Draw'
 ): string {
   if (gameOver && gameOutcome) {
-    switch (gameOutcome.type) {
-      case 'Decisive':
-        return gameOutcome.winner === 'w' ? 'White wins' : 'Black wins';
-      case 'Draw':
-        return 'Game ended in a draw';
-      case 'Ongoing':
-        return 'Game in progress';
-      default:
-        return 'Game ended';
+    if (gameOutcome === 'Draw') {
+      return 'Game ended in a draw';
+    } else if ('Decisive' in gameOutcome) {
+      return gameOutcome.Decisive?.winner === 'White'
+        ? 'White wins'
+        : 'Black wins';
+    } else {
+      return 'Game ended';
     }
   }
 
@@ -176,6 +173,22 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
 
   const toggleGameInfo = () => {
     setShowGameInfo(!showGameInfo);
+  };
+
+  const isPlayerWinner = () => {
+    if (!gameOutcome) return false;
+
+    if (gameOutcome === 'Draw') return false;
+
+    if ('Decisive' in gameOutcome) {
+      const winnerColor = gameOutcome.Decisive?.winner;
+      return (
+        (playingAs === 'w' && winnerColor === 'White') ||
+        (playingAs === 'b' && winnerColor === 'Black')
+      );
+    }
+
+    return false;
   };
 
   return (
@@ -407,18 +420,20 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
                     )}
                   </div>
                   <div className="mb-2 text-sm font-medium">
-                    {gameStatus.includes('wins') ? (
-                      <span
-                        className={
-                          gameStatus
-                            .toLowerCase()
-                            .includes(playingAs === 'w' ? 'white' : 'black')
-                            ? 'text-green-600 dark:text-green-400'
-                            : 'text-red-600 dark:text-red-400'
-                        }
-                      >
-                        {gameStatus}
-                      </span>
+                    {gameOver ? (
+                      gameOutcome === 'Draw' ? (
+                        <span className="text-amber-700 dark:text-amber-300">
+                          {gameStatus}
+                        </span>
+                      ) : isPlayerWinner() ? (
+                        <span className="text-green-600 dark:text-green-400">
+                          {gameStatus}
+                        </span>
+                      ) : (
+                        <span className="text-red-600 dark:text-red-400">
+                          {gameStatus}
+                        </span>
+                      )
                     ) : (
                       <span className="text-amber-700 dark:text-amber-300">
                         {gameStatus}
@@ -663,18 +678,20 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
                       )}
                     </div>
                     <div className="mb-2 text-sm font-medium">
-                      {gameStatus.includes('wins') ? (
-                        <span
-                          className={
-                            gameStatus
-                              .toLowerCase()
-                              .includes(playingAs === 'w' ? 'white' : 'black')
-                              ? 'text-green-600 dark:text-green-400'
-                              : 'text-red-600 dark:text-red-400'
-                          }
-                        >
-                          {gameStatus}
-                        </span>
+                      {gameOver ? (
+                        gameOutcome === 'Draw' ? (
+                          <span className="text-amber-700 dark:text-amber-300">
+                            {gameStatus}
+                          </span>
+                        ) : isPlayerWinner() ? (
+                          <span className="text-green-600 dark:text-green-400">
+                            {gameStatus}
+                          </span>
+                        ) : (
+                          <span className="text-red-600 dark:text-red-400">
+                            {gameStatus}
+                          </span>
+                        )
                       ) : (
                         <span className="text-amber-700 dark:text-amber-300">
                           {gameStatus}

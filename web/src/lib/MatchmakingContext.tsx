@@ -9,6 +9,7 @@ import React, {
   useEffect,
 } from 'react';
 import { MatchMakingService } from '@/lib/matchmakingService';
+import { toast } from 'sonner';
 
 type CooldownState = 'ready' | 'cooldown' | 'active';
 
@@ -26,17 +27,23 @@ const MatchmakingContext = createContext<MatchmakingContextType | undefined>(
   undefined
 );
 
+const MAX_RETRY_ATTEMPTS = 3;
+const RETRY_DELAY = 2000;
+const COOLDOWN_DURATION = 5000;
+
 export function MatchmakingProvider({ children }: { children: ReactNode }) {
   const [isMatchmaking, setIsMatchmaking] = useState(false);
   const [matchmakingError, setMatchmakingError] = useState<string | null>(null);
   const [playCooldownState, setPlayCooldownState] =
     useState<CooldownState>('ready');
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
 
   const cooldownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cooldownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const cooldownStartTimeRef = useRef<number>(0);
-  const cooldownDuration = 5000;
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const cooldownDuration = COOLDOWN_DURATION;
 
   useEffect(() => {
     return () => {
@@ -45,6 +52,9 @@ export function MatchmakingProvider({ children }: { children: ReactNode }) {
       }
       if (cooldownIntervalRef.current) {
         clearInterval(cooldownIntervalRef.current);
+      }
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
       }
     };
   }, []);
@@ -86,6 +96,28 @@ export function MatchmakingProvider({ children }: { children: ReactNode }) {
     }, cooldownDuration);
   };
 
+  const attemptMatchmaking = async (
+    userId: string
+  ): Promise<{ game_id: string; color: 'w' | 'b' }> => {
+    try {
+      const matchmakingService = MatchMakingService.getInstance();
+      return await matchmakingService.findMatch(userId);
+    } catch (error) {
+      const isNetworkError =
+        error instanceof Error &&
+        (error.message.includes('Failed to fetch') ||
+          error.message.includes('NetworkError') ||
+          error.message.includes('timeout'));
+
+      if (isNetworkError && retryCount < MAX_RETRY_ATTEMPTS) {
+        setRetryCount((prev) => prev + 1);
+        throw error;
+      }
+
+      throw error;
+    }
+  };
+
   const startMatchmaking = async (userId: string) => {
     if (isMatchmaking) return;
 
@@ -97,17 +129,41 @@ export function MatchmakingProvider({ children }: { children: ReactNode }) {
       setPlayCooldownState('active');
       setIsMatchmaking(true);
       setMatchmakingError(null);
+      setRetryCount(0);
 
-      const matchmakingService = MatchMakingService.getInstance();
-      const { game_id, color } = await matchmakingService.findMatch(userId);
+      let result;
+      try {
+        result = await attemptMatchmaking(userId);
+      } catch (error) {
+        if (retryCount < MAX_RETRY_ATTEMPTS) {
+          toast.info(
+            `Connection issue. Retrying... (${
+              retryCount + 1
+            }/${MAX_RETRY_ATTEMPTS})`
+          );
 
-      window.location.href = `/socket?game_id=${game_id}&playas=${color}`;
+          await new Promise((resolve) => {
+            retryTimeoutRef.current = setTimeout(() => {
+              resolve(null);
+            }, RETRY_DELAY * Math.pow(2, retryCount));
+          });
+
+          result = await attemptMatchmaking(userId);
+        } else {
+          throw error;
+        }
+      }
+
+      window.location.href = `/socket?game_id=${result.game_id}&playas=${result.color}`;
     } catch (error) {
-      setMatchmakingError(
-        error instanceof Error ? error.message : 'Match finding failed'
-      );
+      if (error instanceof Error && !error.message.includes('canceled')) {
+        setMatchmakingError(
+          error instanceof Error ? error.message : 'Match finding failed'
+        );
+        startCooldown();
+      }
+
       setIsMatchmaking(false);
-      startCooldown();
     }
   };
 

@@ -14,6 +14,7 @@ export class MatchMakingService {
   private severUrl: string;
   private requestInProgresss: boolean = false;
   private abortController: AbortController | null = null;
+  private timeoutId: NodeJS.Timeout | null = null;
 
   constructor(serverUrl: string = 'http://localhost:8001') {
     this.severUrl = serverUrl;
@@ -34,12 +35,20 @@ export class MatchMakingService {
     user_id: string
   ): Promise<{ game_id: string; color: 'w' | 'b' }> {
     if (this.requestInProgresss) {
-      throw new Error('Macthing is already in progress');
+      throw new Error('Matching is already in progress');
     }
 
     this.requestInProgresss = true;
     this.abortController = new AbortController();
     const signal = this.abortController.signal;
+
+    // Add a request timeout
+    const REQUEST_TIMEOUT = 15000; // 15 seconds
+    this.timeoutId = setTimeout(() => {
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+    }, REQUEST_TIMEOUT);
 
     try {
       const response = await fetch(`${this.severUrl}/match`, {
@@ -51,8 +60,15 @@ export class MatchMakingService {
         signal,
       });
 
+      // Clear the timeout since we got a response
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+        this.timeoutId = null;
+      }
+
       if (!response.ok) {
-        throw new Error('Failed to find match');
+        const errorText = await response.text();
+        throw new Error(`Server error: ${errorText || response.status}`);
       }
 
       const matchResponse = (await response.json()) as MatchResponse;
@@ -67,9 +83,15 @@ export class MatchMakingService {
         color: color === 'White' ? 'w' : 'b',
       };
     } catch (error) {
+      // Clear the timeout if there was an error
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+        this.timeoutId = null;
+      }
+
       if (error instanceof DOMException && error.name === 'AbortError') {
         console.log('Match finding aborted');
-        throw new Error('Match finding was canceled');
+        throw new Error('Match finding was canceled or timed out');
       }
       console.error('Matchmaking error:', error);
       throw error;
@@ -84,6 +106,11 @@ export class MatchMakingService {
       this.abortController.abort();
       this.requestInProgresss = false;
       this.abortController = null;
+    }
+
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
     }
   }
 }

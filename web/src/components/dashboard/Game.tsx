@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,62 +10,80 @@ import {
   MagnifyingGlassIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/outline';
+import { getUserHistoryGames } from '@/app/actions/gameActions';
+import { gamestate } from '@prisma/client';
+import { toast } from 'sonner';
+import LoadingScreen from '../LoadingScreen';
 
-const mockGameHistory = Array(50)
-  .fill(null)
-  .map((_, i) => {
-    const opponents = [
-      'martin-xiii',
-      'dj-ron-passano',
-      'Jdomenusrex',
-      'knight_rider',
-      'chess_lover99',
-      'tactical_genius',
-      'queen_gambit',
-      'pawn_star',
-      'rook_roller',
-      'bishop_boss',
-    ];
-    const opponentRatings = [
-      1800, 1350, 446, 550, 700, 625, 520, 830, 490, 675,
-    ];
-    const playerRatings = [659, 659, 292, 456, 659, 456, 292, 659, 456, 292];
-    const results = ['1-0', '0-1', '½-½'];
-    const randomDate = new Date(2025, 0, 1);
-    randomDate.setDate(randomDate.getDate() + Math.floor(Math.random() * 90));
-
-    const opponentIndex = i % opponents.length;
-
-    return {
-      id: i + 1,
-      opponent: opponents[opponentIndex],
-      opponentRating: opponentRatings[opponentIndex],
-      playerRating: playerRatings[i % playerRatings.length],
-      result: results[Math.floor(Math.random() * results.length)],
-      date: `${
-        randomDate.getMonth() + 1
-      }/${randomDate.getDate()}/${randomDate.getFullYear()}`,
-      moves: Math.floor(Math.random() * 80) + 20,
-    };
-  });
-
-export default function GamesTab() {
+export default function GamesTab({ username }: { username: string }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [resultFilter, setResultFilter] = useState('All');
+  const [games, setGames] = useState<gamestate[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
 
-  const filteredGames = mockGameHistory.filter((game) => {
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        setIsLoading(true);
+        const result = await getUserHistoryGames(username);
+        if (result.success) {
+          setGames(result.games || []);
+        } else {
+          toast.error('Failed to load game history');
+        }
+      } catch (error) {
+        console.error('Error fetching games:', error);
+        toast.error('Error loading game history');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchGames();
+  }, [username]);
+
+  const getGameResult = (game: gamestate): string => {
+    if (game.status === 'DRAW') return '½-½';
+    if (game.status === 'WHITE_WINS')
+      return game.white === username ? '1-0' : '0-1';
+    if (game.status === 'BLACK_WINS')
+      return game.black === username ? '1-0' : '0-1';
+    return '-';
+  };
+
+  const getOpponent = (game: gamestate): string => {
+    return game.white === username ? game.black : game.white;
+  };
+
+  const getMoveCount = (pgn: string): number => {
+    const moves = pgn.match(
+      /\b([PNBRQK]?[a-h]?[1-8]?x?[a-h][1-8](?:=[NBRQ])?|O-O(?:-O)?|[a-h][1-8])\b/g
+    );
+    return moves ? moves.length : 0;
+  };
+
+  const getFormattedDate = (createdat: Date | null): string => {
+    if (!createdat) return '-';
+    const date = new Date(createdat);
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  };
+
+  const filteredGames = games.filter((game) => {
+    const opponent = getOpponent(game);
+    const result = getGameResult(game);
+
     const matchesSearch =
       searchTerm === '' ||
-      game.opponent.toLowerCase().includes(searchTerm.toLowerCase());
+      opponent.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesResult =
       resultFilter === 'All' ||
-      (resultFilter === 'Win' && game.result === '1-0') ||
-      (resultFilter === 'Loss' && game.result === '0-1') ||
-      (resultFilter === 'Draw' && game.result === '½-½');
+      (resultFilter === 'Win' && result === '1-0') ||
+      (resultFilter === 'Loss' && result === '0-1') ||
+      (resultFilter === 'Draw' && result === '½-½');
 
     return matchesSearch && matchesResult;
   });
@@ -99,9 +117,12 @@ export default function GamesTab() {
     return 'text-amber-600 dark:text-amber-400';
   };
 
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
-      {/* Game History Card */}
       <div className="w-full lg:flex-1 order-2 lg:order-1">
         <Card className="w-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -127,27 +148,50 @@ export default function GamesTab() {
                     </tr>
                   </thead>
                   <tbody>
-                    {paginatedGames.map((game, i) => (
-                      <tr
-                        key={i}
-                        className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-slate-700/30 transition-colors"
-                      >
-                        <td className="py-2 px-2 font-medium truncate max-w-[100px] sm:max-w-none">
-                          {game.opponent}
+                    {isLoading ? (
+                      <tr>
+                        <td colSpan={4} className="text-center py-6">
+                          Loading game history...
                         </td>
-                        <td
-                          className={`py-2 px-2 font-medium ${getResultClass(
-                            game.result
-                          )}`}
-                        >
-                          {game.result}
-                        </td>
-                        <td className="hidden sm:table-cell py-2 px-2">
-                          {game.date}
-                        </td>
-                        <td className="py-2 px-2 text-center">{game.moves}</td>
                       </tr>
-                    ))}
+                    ) : paginatedGames.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="text-center py-6">
+                          No games found
+                        </td>
+                      </tr>
+                    ) : (
+                      paginatedGames.map((game) => {
+                        const result = getGameResult(game);
+                        const opponent = getOpponent(game);
+                        const moveCount = getMoveCount(game.pgn);
+                        const date = getFormattedDate(game.createdat);
+
+                        return (
+                          <tr
+                            key={game.gameid}
+                            className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-slate-700/30 transition-colors"
+                          >
+                            <td className="py-2 px-2 font-medium truncate max-w-[100px] sm:max-w-none">
+                              {opponent}
+                            </td>
+                            <td
+                              className={`py-2 px-2 font-medium ${getResultClass(
+                                result
+                              )}`}
+                            >
+                              {result}
+                            </td>
+                            <td className="hidden sm:table-cell py-2 px-2">
+                              {date}
+                            </td>
+                            <td className="py-2 px-2 text-center">
+                              {moveCount}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -192,7 +236,6 @@ export default function GamesTab() {
         </Card>
       </div>
 
-      {/* Search Games Card */}
       <div className="w-full lg:w-80 lg:flex-shrink-0 order-1 lg:order-2">
         <Card className="w-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-md">
           <CardHeader className="pb-2">
@@ -223,16 +266,16 @@ export default function GamesTab() {
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <Button
-                  variant={resultFilter === 'All' ? 'default' : 'outline'}
+                  variant={resultFilter === 'Draw' ? 'default' : 'outline'}
                   size="sm"
                   className={
-                    resultFilter === 'All'
+                    resultFilter === 'Draw'
                       ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-[0_2px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[1px] dark:bg-amber-500 dark:hover:bg-amber-600 dark:shadow-[0_2px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]'
                       : 'border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 shadow-[0_2px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[1px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_2px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]'
                   }
-                  onClick={() => setResultFilter('All')}
+                  onClick={() => setResultFilter('Draw')}
                 >
-                  All
+                  Draws
                 </Button>
                 <Button
                   variant={resultFilter === 'Win' ? 'default' : 'outline'}
