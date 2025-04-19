@@ -1,20 +1,18 @@
 'use server';
 
-import { GameStatus, PrismaClient } from '@prisma/client';
+import { GameStatus } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
+import { getLastTime } from '@/lib/time';
 
 /**
  * Create a new game in the gamestate table
  */
 export async function createGame(white: string, black: string) {
-  const gameId = uuidv4();
-
   try {
     const game = await prisma.gamestate.create({
       data: {
-        gameid: gameId,
+        gameid: uuidv4(),
         white,
         black,
         pgn: '',
@@ -82,19 +80,18 @@ export async function getGame(gameId: string) {
 /**
  * Get user's game history (not ONGOING STATUS)
  */
-export async function getUserHistoryGames(
-  username: string,
-  limit = 10,
-  offset = 0
-) {
+export async function getUserHistoryGames(username: string, offset = 0) {
   try {
     const games = await prisma.gamestate.findMany({
       where: {
         OR: [{ white: username }, { black: username }],
-        NOT: { status: 'ONGOING' },
+        NOT: {
+          status: 'ONGOING',
+        },
       },
-      orderBy: { createdat: 'desc' },
-      take: limit,
+      orderBy: {
+        createdat: 'desc',
+      },
       skip: offset,
     });
 
@@ -115,20 +112,14 @@ export async function getUserOngoingGames(username: string) {
         OR: [{ white: username }, { black: username }],
         status: 'ONGOING',
       },
-      select: {
-        gameid: true,
-        white: true,
-        black: true,
-        pgn: true,
-        createdat: true,
-        status: true,
+      orderBy: {
+        createdat: 'desc',
       },
-      orderBy: { createdat: 'desc' },
     });
 
     const processedGames = games.map((game) => {
       const lastMove = getLastMoveFromPgn(game.pgn);
-      const lastMoveTime = getLastMoveTime(game.createdat);
+      const lastMoveTime = getLastTime(game.createdat);
 
       return {
         ...game,
@@ -165,23 +156,4 @@ function getLastMoveFromPgn(pgn: string): string {
   }
 
   return '';
-}
-
-function getLastMoveTime(createdat: Date | null): string {
-  if (!createdat) return 'recently';
-
-  const now = new Date();
-  const moveTime = new Date(createdat);
-  const diffMs = now.getTime() - moveTime.getTime();
-
-  const diffMins = Math.round(diffMs / 60000);
-
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours}h ago`;
-
-  const diffDays = Math.floor(diffHours / 24);
-  return `${diffDays}d ago`;
 }

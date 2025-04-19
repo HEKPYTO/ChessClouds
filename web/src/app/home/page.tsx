@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  BellIcon,
-  UserGroupIcon,
   LockClosedIcon,
   ChevronRightIcon,
   Cog6ToothIcon,
@@ -30,6 +28,9 @@ import {
   getUserOngoingGames,
 } from '../actions/gameActions';
 import { gamestate } from '@prisma/client';
+import { getLastTime } from '@/lib/time';
+
+const HISTORY_LIMIT = 5;
 
 export default function HomePage() {
   const router = useRouter();
@@ -82,7 +83,7 @@ export default function HomePage() {
     const fetchGameHistory = async () => {
       try {
         setLoadingGameHistory(true);
-        const { success, games = [] } = await getUserHistoryGames(username, 5);
+        const { success, games = [] } = await getUserHistoryGames(username);
         if (success) {
           setGameHistory(games);
         } else {
@@ -98,15 +99,6 @@ export default function HomePage() {
 
     if (username) fetchGameHistory();
   }, [username]);
-
-  const [stats] = useState({
-    rating: 1682,
-    gamesPlayed: 152,
-    winRate: 62,
-    currentStreak: 3,
-    bestRating: 1745,
-    tournamentCount: 5,
-  });
 
   const testEngineAvailability = async () => {
     try {
@@ -186,12 +178,8 @@ export default function HomePage() {
     }
   };
 
-  const handleViewFriend = () => {
-    router.push('/dashboard?tab=friends');
-  };
-
   const handleViewAllHistory = () => {
-    router.push('/dashboard?tabe=games');
+    router.push('/dashboard?tab=games');
   };
 
   const handleComputerClick = () => {
@@ -215,9 +203,11 @@ export default function HomePage() {
       const playerName = username;
       const white = color === 'w' ? playerName : computerName;
       const black = color === 'w' ? computerName : playerName;
-  
+
+      console.log(white, black);
+
       const result = await createGame(white, black);
-  
+
       if (result.success && result.gameId) {
         router.push(`/computer?color=${color}&game_id=${result.gameId}`);
       } else {
@@ -282,31 +272,6 @@ export default function HomePage() {
         </h1>
 
         <div className="flex space-x-3 items-center">
-          <Button
-            variant="outline"
-            className="h-10 w-10 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
-            shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
-            dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-            dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
-            onClick={handleViewFriend}
-          >
-            <UserGroupIcon className="h-5 w-5" />
-          </Button>
-
-          <Button
-            variant="outline"
-            className="h-10 w-10 p-0 rounded-md border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
-            shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
-            dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
-            dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]
-            relative"
-          >
-            <BellIcon className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 bg-amber-600 dark:bg-amber-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              2
-            </span>
-          </Button>
-
           <Button
             className="h-10 w-10 p-0 rounded-md bg-amber-600 hover:bg-amber-700 text-white transition-all 
             shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e] hover:translate-y-[2px]
@@ -486,7 +451,9 @@ export default function HomePage() {
                               {getTurnFromPgn(game.pgn) ===
                               (game.white === username ? 'w' : 'b')
                                 ? 'Your turn'
-                                : "Opponent's turn"}
+                                : `${
+                                    game.white === username ? 'Black' : 'White'
+                                  } turn`}
                             </span>
                           </div>
                           <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
@@ -552,15 +519,13 @@ export default function HomePage() {
                 </thead>
                 <tbody>
                   {gameHistory !== undefined &&
-                    gameHistory.map((game) => (
+                    gameHistory.slice(0, HISTORY_LIMIT).map((game) => (
                       <tr
                         key={game.gameid}
                         className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-slate-700/30 transition-colors"
                       >
                         <td className="text-left py-2 pl-2">
-                          {game.black === username
-                            ? game.white
-                            : game.black}
+                          {game.black === username ? game.white : game.black}
                         </td>
                         <td
                           className={`text-left py-2 ${
@@ -586,9 +551,7 @@ export default function HomePage() {
                             : 'Loss'}
                         </td>
                         <td className="text-center py-2">
-                          {game.createdat
-                            ? new Date(game.createdat).toLocaleDateString()
-                            : '—'}
+                          {game.createdat ? getLastTime(game.createdat) : '—'}
                         </td>
                         <td
                           className={`text-right py-2 pr-2 ${
@@ -634,7 +597,28 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col items-center bg-amber-50/80 dark:bg-slate-700/50 p-4 rounded-lg border border-amber-200/40 dark:border-amber-800/20">
                 <div className="text-3xl font-bold text-amber-900 dark:text-amber-100">
-                  {stats.rating}
+                  {gameHistory === undefined
+                    ? 500
+                    : Math.max(
+                        100,
+                        500 -
+                          10 *
+                            gameHistory.filter(
+                              (g) =>
+                                (g.status === 'WHITE_WINS' &&
+                                  g.black === username) ||
+                                (g.status === 'BLACK_WINS' &&
+                                  g.white === username)
+                            ).length +
+                          10 *
+                            gameHistory.filter(
+                              (g) =>
+                                (g.status === 'WHITE_WINS' &&
+                                  g.white === username) ||
+                                (g.status === 'BLACK_WINS' &&
+                                  g.black === username)
+                            ).length
+                      )}
                 </div>
                 <div className="text-sm text-amber-700 dark:text-amber-300">
                   Rating
@@ -643,7 +627,7 @@ export default function HomePage() {
 
               <div className="flex flex-col items-center bg-amber-50/80 dark:bg-slate-700/50 p-4 rounded-lg border border-amber-200/40 dark:border-amber-800/20">
                 <div className="text-3xl font-bold text-amber-900 dark:text-amber-100">
-                  {stats.gamesPlayed}
+                  {gameHistory?.length ?? 0}
                 </div>
                 <div className="text-sm text-amber-700 dark:text-amber-300">
                   Games Played
@@ -652,7 +636,22 @@ export default function HomePage() {
 
               <div className="flex flex-col items-center bg-amber-50/80 dark:bg-slate-700/50 p-4 rounded-lg border border-amber-200/40 dark:border-amber-800/20">
                 <div className="text-3xl font-bold text-amber-900 dark:text-amber-100">
-                  {stats.winRate}%
+                  {gameHistory === undefined
+                    ? 0
+                    : gameHistory.length
+                    ? Math.round(
+                        (100 *
+                          gameHistory.filter(
+                            (g) =>
+                              (g.status === 'WHITE_WINS' &&
+                                g.white === username) ||
+                              (g.status === 'BLACK_WINS' &&
+                                g.black === username)
+                          ).length) /
+                          gameHistory.length
+                      )
+                    : 0}
+                  %
                 </div>
                 <div className="text-sm text-amber-700 dark:text-amber-300">
                   Win Rate
@@ -661,7 +660,19 @@ export default function HomePage() {
 
               <div className="flex flex-col items-center bg-amber-50/80 dark:bg-slate-700/50 p-4 rounded-lg border border-amber-200/40 dark:border-amber-800/20">
                 <div className="text-3xl font-bold text-amber-900 dark:text-amber-100">
-                  {stats.currentStreak}
+                  {gameHistory === undefined
+                    ? 0
+                    : ((i) => (i === -1 ? gameHistory.length : i))(
+                        gameHistory.findIndex(
+                          (g) =>
+                            !(
+                              (g.status === 'WHITE_WINS' &&
+                                g.white === username) ||
+                              (g.status === 'BLACK_WINS' &&
+                                g.black === username)
+                            )
+                        )
+                      )}
                 </div>
                 <div className="text-sm text-amber-700 dark:text-amber-300">
                   Current Streak

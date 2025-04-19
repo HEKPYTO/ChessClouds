@@ -1,6 +1,3 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { isAuthenticated } from '@/lib/auth/googleAuth';
 
@@ -11,32 +8,11 @@ interface ChessCloudIconProps {
 export default function ChessCloudIcon({
   className = '',
 }: ChessCloudIconProps) {
-  const [mounted, setMounted] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleClick = () => {
     router.push(isAuthenticated() ? '/home' : '/');
   };
-
-  if (!mounted) {
-    return (
-      <div
-        onClick={handleClick}
-        className="
-          h-8 w-8
-          rounded
-          bg-amber-600 dark:bg-amber-500
-          mr-2
-          shadow-[0_8px_16px_rgba(180,83,9,0.2)] dark:shadow-[0_8px_16px_rgba(245,158,11,0.3)]
-          animate-[float_8s_ease-in-out_infinite] dark:animate-[float_2s_ease-in-out_infinite]
-        "
-      />
-    );
-  }
 
   return (
     <div

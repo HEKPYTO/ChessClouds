@@ -5,6 +5,8 @@ import { Chess } from 'chess.js';
 import type { Square } from 'chess.js';
 import ComputerGamePane from '@/components/ComputerGamePane';
 import LoadingScreen from '@/components/LoadingScreen';
+import UnauthorizedPage from '@/components/Unauthorized';
+import ErrorPage from '@/components/Error';
 import { toast } from 'sonner';
 import { testEngine, getBestMove } from '@/lib/engine';
 import {
@@ -14,10 +16,11 @@ import {
 } from '@/app/actions/gameActions';
 import { getUserInfo } from '@/lib/auth/googleAuth';
 import { GameStatus } from '@prisma/client';
-import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 export default function ComputerGame() {
-  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [chess] = useState(new Chess());
   const [fen, setFen] = useState(chess.fen());
   const [lastMove, setLastMove] = useState<[Square, Square]>();
@@ -33,80 +36,99 @@ export default function ComputerGame() {
   >('pending');
   const [isThinking, setIsThinking] = useState(false);
   const [gameId, setGameId] = useState<string | null>(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   const moveHistory = useRef<string[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSuccessRef = useRef<number | null>(null);
+
   const userInfo = getUserInfo();
   const username = userInfo?.email?.split('@')[0] || 'anonymous';
 
   useEffect(() => {
-    const params =
-      typeof window !== 'undefined'
-        ? new URLSearchParams(window.location.search)
-        : null;
-  
-    const color = params?.get('color');
-    if (color === 'w' || color === 'b') setPlayingAs(color);
-  
-    const urlGameId = params?.get('game_id');
-  
+    const urlGameId = searchParams.get('game_id');
+    const colorParam = searchParams.get('color');
+
+    if (!urlGameId) {
+      toast.error('No game ID provided');
+      setIsLoading(false);
+      return;
+    }
+
+    if (colorParam !== 'w' && colorParam !== 'b') {
+      toast.error('Invalid color parameter');
+      setIsLoading(false);
+      return;
+    }
+
+    setPlayingAs(colorParam);
+    setGameId(urlGameId);
+
     const initializeGame = async () => {
       try {
-        if (urlGameId) {
-          setGameId(urlGameId);
-  
-          const gameResult = await getGame(urlGameId);
-          if (gameResult.success && gameResult.game) {
-            if (gameResult.game.pgn) {
-              try {
-                chess.loadPgn(gameResult.game.pgn);
-                moveHistory.current = chess.history();
-  
-                const history = chess.history({ verbose: true });
-                if (history.length > 0) {
-                  const last = history[history.length - 1];
-                  setLastMove([last.from as Square, last.to as Square]);
-                }
-  
-                setFen(chess.fen());
-              } catch (err) {
-                console.error('Error loading PGN:', err);
-              }
+        const gameResult = await getGame(urlGameId);
+
+        if (!gameResult.success || !gameResult.game) {
+          console.error('Failed to load game data:', gameResult.error);
+          toast.error('Failed to load game');
+          setHasError(true);
+          return;
+        }
+
+        const game = gameResult.game;
+
+        const userIsWhite = game.white === username;
+        const userIsBlack = game.black === username;
+        const computerIsWhite = game.white === 'computer';
+        const computerIsBlack = game.black === 'computer';
+
+        const isAuthorizedPlayer =
+          (colorParam === 'w' && userIsWhite && computerIsBlack) ||
+          (colorParam === 'b' && userIsBlack && computerIsWhite);
+
+        if (!isAuthorizedPlayer) {
+          toast.error('You are not authorized to play this game');
+          setIsAuthorized(false);
+          setIsLoading(false);
+          return;
+        }
+
+        setIsAuthorized(true);
+
+        if (game.pgn) {
+          try {
+            chess.loadPgn(game.pgn);
+            moveHistory.current = chess.history();
+
+            const history = chess.history({ verbose: true });
+            if (history.length > 0) {
+              const last = history[history.length - 1];
+              setLastMove([last.from as Square, last.to as Square]);
             }
-  
-            if (gameResult.game.status !== 'ONGOING') {
-              setGameOver(true);
-            }
-  
-            setIsLoading(false);
-            return;
-          } else {
-            console.error('Failed to load game data:', gameResult.error);
-            toast.error('Failed to load game', {
-              description: 'Redirecting to home page',
-            });
-            setTimeout(() => router.push('/home'), 2000);
+
+            setFen(chess.fen());
+          } catch (err) {
+            console.error('Error loading PGN:', err);
+            setHasError(true);
             return;
           }
-        } else {
-          toast.error('No game ID provided', {
-            description: 'Redirecting to home page',
-          });
-          setTimeout(() => router.push('/home'), 2000);
+        }
+
+        if (game.status !== 'ONGOING') {
+          setGameOver(true);
         }
       } catch (err) {
         console.error('Error initializing game:', err);
-        toast.error('Error loading game', {
-          description: 'Please try again later',
-        });
+        toast.error('Error loading game');
+        setHasError(true);
       } finally {
         setIsLoading(false);
       }
     };
-  
+
     initializeGame();
-  }, [playingAs, username, chess, router]);
+  }, [searchParams, username, chess]);
 
   useEffect(() => {
     const updateStatusByAge = () => {
@@ -274,10 +296,10 @@ export default function ComputerGame() {
   );
 
   useEffect(() => {
-    if (!isLoading && playingAs === 'b') {
+    if (!isLoading && isAuthorized && playingAs === 'b') {
       makeComputerMove();
     }
-  }, [isLoading, playingAs, makeComputerMove]);
+  }, [isLoading, isAuthorized, playingAs, makeComputerMove]);
 
   const previewMove = useCallback((i: number) => {
     setPreviewIndex(i >= moveHistory.current.length ? null : i);
@@ -392,7 +414,19 @@ export default function ComputerGame() {
     handleRetry,
   };
 
-  if (isLoading) return <LoadingScreen />;
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  if (hasError) {
+    return (
+      <ErrorPage message="There was a problem loading this game" code="500" />
+    );
+  }
+
+  if (!isAuthorized) {
+    return <UnauthorizedPage />;
+  }
 
   return (
     <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
