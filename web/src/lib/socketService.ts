@@ -19,10 +19,6 @@ export class SocketService {
   private onHistoryCallback: HistoryCallback | null = null;
   private onGameEndCallback: GameEndCallback | null = null;
   private authenticated: boolean = false;
-  private reconnectAttempt: number = 0;
-  private maxReconnectAttempts: number = 5;
-  private reconnectTimer: NodeJS.Timeout | null = null;
-  private manualDisconnect: boolean = false;
   private connecting: boolean = false;
   private serverUrl: string;
 
@@ -60,8 +56,6 @@ export class SocketService {
     this.gameId = gameId;
     this.userId = userId;
     this.authenticated = false;
-    this.reconnectAttempt = 0;
-    this.manualDisconnect = false;
 
     if (this.connecting) {
       console.log('Connection attempt already in progress');
@@ -106,7 +100,6 @@ export class SocketService {
               break;
             case 'AuthSuccess':
               this.authenticated = true;
-              this.reconnectAttempt = 0;
               if (this.onConnectCallback) this.onConnectCallback();
               console.log('Authentication successful');
               break;
@@ -151,17 +144,10 @@ export class SocketService {
           }`
         );
 
-        if (this.onErrorCallback && !this.manualDisconnect) {
+        if (this.onErrorCallback) {
           this.onErrorCallback(
             'Connection closed: ' + (event.reason || 'Unknown reason')
           );
-        }
-
-        if (
-          !this.manualDisconnect &&
-          this.reconnectAttempt < this.maxReconnectAttempts
-        ) {
-          this.scheduleReconnect();
         }
       };
     } catch (error) {
@@ -171,47 +157,6 @@ export class SocketService {
         this.onErrorCallback('Failed to create connection: ' + String(error));
       }
     }
-  }
-
-  private scheduleReconnect(): void {
-    const baseDelay = 1000;
-    const maxDelay = 10000;
-    const delay = Math.min(
-      baseDelay * Math.pow(1.5, this.reconnectAttempt),
-      maxDelay
-    );
-    const jitter = 0.2 * delay * (Math.random() - 0.5);
-    const finalDelay = Math.floor(delay + jitter);
-
-    console.log(
-      `Scheduling reconnect attempt ${
-        this.reconnectAttempt + 1
-      } in ${finalDelay}ms`
-    );
-
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-    }
-
-    this.reconnectTimer = setTimeout(() => {
-      if (
-        this.reconnectAttempt < this.maxReconnectAttempts &&
-        !this.manualDisconnect
-      ) {
-        console.log(
-          `Reconnect attempt ${this.reconnectAttempt + 1}/${
-            this.maxReconnectAttempts
-          }`
-        );
-        this.reconnectAttempt++;
-        this.createSocketConnection();
-      } else if (!this.manualDisconnect) {
-        console.error('Maximum reconnection attempts reached');
-        if (this.onErrorCallback) {
-          this.onErrorCallback('Maximum reconnection attempts reached');
-        }
-      }
-    }, finalDelay);
   }
 
   private authenticate(): void {
@@ -282,20 +227,12 @@ export class SocketService {
 
     if (callback) {
       this.onGameEndCallback = (outcome) => {
-        this.manualDisconnect = true;
         callback(outcome);
       };
     }
   }
 
   disconnect(): void {
-    this.manualDisconnect = true;
-
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-
     if (this.socket) {
       if (
         this.socket.readyState === WebSocket.OPEN ||
