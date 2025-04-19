@@ -148,14 +148,6 @@ export async function getUserOngoingGames(username: string) {
 /**
  * Get turn from pgn
  */
-export function getTurnFromPgn(pgn: string): 'w' | 'b' {
-  const moves =
-    pgn.match(
-      /\b([PNBRQK]?[a-h]?[1-8]?x?[a-h][1-8](?:=[NBRQ])?|O-O(?:-O)?|[a-h][1-8])\b/g
-    ) || [];
-  return moves.length % 2 === 0 ? 'w' : 'b';
-}
-
 function getLastMoveFromPgn(pgn: string): string {
   if (!pgn || pgn.trim() === '') return '';
 
