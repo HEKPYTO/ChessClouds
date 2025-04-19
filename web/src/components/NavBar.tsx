@@ -7,6 +7,9 @@ import { XMarkIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { isAuthenticated } from '@/lib/auth/googleAuth';
 import { usePathname, useRouter } from 'next/navigation';
 import ChessCloudIcon from './ChessCloud';
+import { useMatchmaking } from '@/lib/MatchmakingContext';
+import { getUserInfo } from '@/lib/auth/googleAuth';
+import { toast } from 'sonner';
 
 type NavItem = {
   name: string;
@@ -23,6 +26,15 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+  const {
+    isMatchmaking,
+    startMatchmaking,
+    cancelMatchmaking,
+    playCooldownState,
+    cooldownRemaining,
+  } = useMatchmaking();
+  const userInfo = getUserInfo();
+  const username = userInfo?.email?.split('@')[0] || 'anonymous';
 
   const navigationItems: NavItem[] = [
     { name: 'Features', href: '/features' },
@@ -34,74 +46,124 @@ export default function Navbar() {
 
   const isDashboardPage = pathname.startsWith('/dashboard');
 
+  const loadingDots = (
+    <span className="inline-flex ml-1">
+      <span className="animate-bounce mx-0.5" style={{ animationDelay: '0ms' }}>
+        .
+      </span>
+      <span
+        className="animate-bounce mx-0.5"
+        style={{ animationDelay: '150ms' }}
+      >
+        .
+      </span>
+      <span
+        className="animate-bounce mx-0.5"
+        style={{ animationDelay: '300ms' }}
+      >
+        .
+      </span>
+    </span>
+  );
+
   useEffect(() => {
     setAuthenticated(isAuthenticated());
-
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    const handleKeyUp = () => setPressedKey(null);
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.repeat) return;
+
       const key = e.key.toLowerCase();
       if (key === 'p') {
         setPressedKey('p');
-        setTimeout(() => {
-          router.push(authenticated ? '/play' : '/signin');
-        }, 150);
+        if (authenticated) {
+          if (isMatchmaking) {
+            cancelMatchmaking();
+            toast.info('Matchmaking canceled');
+          } else {
+            startMatchmaking(username);
+            toast.success('Finding a match...', {
+              description: "We'll connect you with a player soon",
+            });
+          }
+        } else {
+          setTimeout(() => router.push('/signin'), 150);
+        }
       } else if (key === 'd' && authenticated && !isDashboardPage) {
         setPressedKey('d');
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 150);
+        setTimeout(() => router.push('/dashboard'), 150);
       } else if (key === 'h' && authenticated && isDashboardPage) {
         setPressedKey('h');
-        setTimeout(() => {
-          router.push('/home');
-        }, 150);
+        setTimeout(() => router.push('/home'), 150);
       } else if (key === 's' && !authenticated) {
         setPressedKey('s');
-        setTimeout(() => {
-          router.push('/signup');
-        }, 150);
+        setTimeout(() => router.push('/signup'), 150);
       }
-    };
-
-    const handleKeyUp = () => {
-      setPressedKey(null);
     };
 
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
-
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [router, authenticated, pathname, isDashboardPage]);
+  }, [
+    authenticated,
+    isMatchmaking,
+    isDashboardPage,
+    username,
+    router,
+    cancelMatchmaking,
+    startMatchmaking,
+  ]);
 
   const handleNavClick = (path: string) => {
     setMobileMenuOpen(false);
     router.push(path);
   };
 
-  const handlePlayClick = () => {
+  const handlePlayClick = async () => {
     setPressedKey('p');
     setMobileMenuOpen(false);
-    setTimeout(() => {
-      router.push(authenticated ? '/play' : '/signin');
-    }, 150);
+    setPressedKey(null);
+
+    if (playCooldownState === 'cooldown' && !isMatchmaking) {
+      toast.info(
+        `Please wait ${Math.ceil(
+          cooldownRemaining / 1000
+        )} seconds before trying again`
+      );
+      return;
+    }
+
+    if (isMatchmaking) {
+      toast.info('Matchmaking canceled');
+      await cancelMatchmaking();
+      return;
+    }
+
+    if (!authenticated) {
+      setTimeout(() => router.push('/signin'), 150);
+      return;
+    }
+
+    toast.success('Finding a match...', {
+      description: "We'll connect you with a player soon",
+    });
+
+    try {
+      await startMatchmaking(username);
+    } finally {
+      setPressedKey(null);
+    }
   };
 
   const handleDashboardSignUpClick = () => {
     setMobileMenuOpen(false);
     if (authenticated) {
-      if (isDashboardPage) {
-        router.push('/home');
-      } else {
-        router.push('/dashboard');
-      }
+      router.push(isDashboardPage ? '/home' : '/dashboard');
     } else {
       router.push('/signup');
     }
@@ -116,9 +178,7 @@ export default function Navbar() {
       }, 300);
     } else {
       setMobileMenuOpen(true);
-      setTimeout(() => {
-        setAnimating(false);
-      }, 50);
+      setTimeout(() => setAnimating(false), 50);
     }
   };
 
@@ -139,7 +199,9 @@ export default function Navbar() {
           pointerEvents: 'none',
         }}
       />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* Logo & Desktop Nav */}
         <div className="flex items-center">
           <button
             onClick={() => handleNavClick(authenticated ? '/home' : '/')}
@@ -150,13 +212,11 @@ export default function Navbar() {
               ChessClouds
             </span>
           </button>
-
-          {/* Desktop navigation - only visible on xl screens */}
           <nav className="hidden xl:flex ml-10 space-x-8">
             {navigationItems.map((item) =>
               item.hasChildren ? (
-                <div className="relative group" key={item.name}>
-                  <button className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 flex items-center cursor-pointer">
+                <div key={item.name} className="relative group">
+                  <button className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 flex items-center">
                     {item.name}
                     <svg
                       className="ml-1 h-4 w-4"
@@ -177,7 +237,7 @@ export default function Navbar() {
                 <button
                   key={item.name}
                   onClick={() => handleNavClick(item.href)}
-                  className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50 cursor-pointer"
+                  className="text-sm text-amber-800 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50"
                 >
                   {item.name}
                 </button>
@@ -186,17 +246,15 @@ export default function Navbar() {
           </nav>
         </div>
 
+        {/* Desktop Actions */}
         <div className="flex items-center space-x-3">
-          {/* Theme Switcher - Always visible */}
           <ThemeSwitch />
 
-          {/* Desktop button: Dashboard if authenticated, otherwise Sign up */}
+          {/* Dashboard / Sign up */}
           <div className="hidden md:block">
             <Button
               variant="outline"
-              className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all 
-              shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px]
-              dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] ${
+              className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] ${
                 pressedKey === (isDashboardPage ? 'h' : 'd')
                   ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
                   : ''
@@ -206,46 +264,56 @@ export default function Navbar() {
             >
               {isDashboardPage ? 'Home' : 'Dashboard'}
               <span
-                className={`ml-1 text-xs px-1 rounded transition-colors ${
+                className={`ml-1 text-xs px-1 rounded ${
                   pressedKey === (isDashboardPage ? 'h' : 'd')
                     ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
                     : 'bg-amber-100 dark:bg-slate-800'
                 }`}
               >
-                {isDashboardPage ? 'H' : 'D'}
+                {' '}
+                {isDashboardPage ? 'H' : 'D'}{' '}
               </span>
             </Button>
           </div>
 
-          {/* Play now button - visible on small and up screens */}
+          {/* Play/Cancel */}
           <div className="hidden sm:block">
             <Button
-              className={`h-9 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md transition-all 
-                shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px]
-                dark:bg-amber-500 dark:hover:bg-amber-600 dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f] ${
+              className={`h-9 text-sm text-white rounded-md transition-all hover:translate-y-[2px] 
+                bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 
+                shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]
+                ${
                   pressedKey === 'p'
                     ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
                     : ''
                 }`}
               onClick={handlePlayClick}
               onMouseUp={() => setPressedKey(null)}
+              disabled={playCooldownState === 'cooldown' && !isMatchmaking}
             >
-              Play now
-              <span
-                className={`ml-1 text-xs px-1 rounded transition-colors ${
-                  pressedKey === 'p'
-                    ? 'bg-amber-800 dark:bg-amber-700'
-                    : 'bg-amber-700 dark:bg-amber-600'
-                }`}
-              >
-                P
-              </span>
+              {isMatchmaking ? (
+                <>
+                  Finding{loadingDots}
+                  <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
+                    P
+                  </span>
+                </>
+              ) : playCooldownState === 'cooldown' ? (
+                <>Wait {Math.ceil(cooldownRemaining / 1000)}s</>
+              ) : (
+                <>
+                  Play now
+                  <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
+                    P
+                  </span>
+                </>
+              )}
             </Button>
           </div>
 
-          {/* Hamburger Menu Button - hidden on xl screens */}
+          {/* Mobile Menu Toggle */}
           <button
-            className="xl:hidden flex items-center justify-center h-9 w-9 p-0 border border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 rounded-md transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
+            className="xl:hidden flex items-center justify-center h-9 w-9 border border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 rounded-md transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
             onClick={toggleMobileMenu}
             disabled={animating}
             aria-label="Menu"
@@ -270,7 +338,7 @@ export default function Navbar() {
             <button
               key={item.name}
               onClick={() => handleNavClick(item.href)}
-              className="block w-full text-left py-2 px-3 text-base text-amber-800 hover:bg-amber-100/70 hover:text-amber-950 dark:text-amber-200 dark:hover:bg-slate-800/70 dark:hover:text-amber-50 rounded-md flex items-center justify-between"
+              className="w-full text-left py-2 px-3 text-base text-amber-800 hover:bg-amber-100/70 dark:text-amber-200 dark:hover:bg-slate-800/70 rounded-md flex justify-between"
             >
               <span>{item.name}</span>
               {item.hasChildren && (
@@ -290,37 +358,54 @@ export default function Navbar() {
               )}
             </button>
           ))}
-          <div className="pt-2 border-t border-amber-200/30 dark:border-slate-700/30 flex flex-col gap-2">
-            {/* Mobile Menu: Dashboard if authenticated, otherwise Sign up */}
-            <div className="md:hidden">
-              <Button
-                variant="outline"
-                className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
-                onClick={handleDashboardSignUpClick}
-              >
-                {isDashboardPage
-                  ? 'Home'
-                  : authenticated
-                  ? 'Dashboard'
-                  : 'Sign up'}
-                <span className="ml-1 text-xs px-1 rounded bg-amber-100 dark:bg-slate-800">
-                  {isDashboardPage ? 'H' : authenticated ? 'D' : 'S'}
-                </span>
-              </Button>
-            </div>
 
-            {/* Mobile Menu: Play now button */}
-            <div className="sm:hidden">
-              <Button
-                className="w-full mt-1 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-md shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[2px] dark:bg-amber-500 dark:hover:bg-amber-600 dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
-                onClick={handlePlayClick}
-              >
-                Play now
-                <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
-                  P
-                </span>
-              </Button>
-            </div>
+          {/* Mobile Dashboard/Signup */}
+          <div className="md:hidden">
+            <Button
+              variant="outline"
+              className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
+              onClick={handleDashboardSignUpClick}
+            >
+              {isDashboardPage
+                ? 'Home'
+                : authenticated
+                ? 'Dashboard'
+                : 'Sign up'}
+              <span className="ml-1 text-xs px-1 rounded bg-amber-100 dark:bg-slate-800">
+                {isDashboardPage ? 'H' : authenticated ? 'D' : 'S'}
+              </span>
+            </Button>
+          </div>
+
+          {/* Mobile Play */}
+          <div className="sm:hidden">
+            <Button
+              className={`w-full mt-2 text-sm text-white rounded-md transition-all hover:translate-y-[2px] ${
+                isMatchmaking
+                  ? 'bg-amber-600 hover:bg-amber-700 shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]'
+                  : 'bg-amber-600 hover:bg-amber-700 shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]'
+              }`}
+              disabled={playCooldownState === 'cooldown' && !isMatchmaking}
+              onClick={handlePlayClick}
+            >
+              {isMatchmaking ? (
+                <>
+                  Finding{loadingDots}
+                  <span className="ml-1 text-xs px-1 rounded bg-red-700 dark:bg-red-600">
+                    P
+                  </span>
+                </>
+              ) : playCooldownState === 'cooldown' ? (
+                <>Wait {Math.ceil(cooldownRemaining / 1000)}s</>
+              ) : (
+                <>
+                  Play now
+                  <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
+                    P
+                  </span>
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </div>

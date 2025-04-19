@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{clone, sync::Arc, time::Duration};
 
 use axum::{
     extract::{
@@ -17,7 +17,7 @@ use uuid::Uuid;
 use crate::{
     message::{ClientMessage, Error, ServerMessage},
     state::{ActiveGame, ActiveGameMap, AppState},
-    MAX_CHANNEL_CAPACITY,
+    DEFERRED_CLEAN_UP_DURATION, MAX_CHANNEL_CAPACITY,
 };
 use futures_util::{
     sink::SinkExt,
@@ -108,30 +108,51 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
         .expect("game should exist")
         .disconnect(connection.color);
 
-    // TODO: remove active game from app state similar to comment below
-    //
-    // if state
-    //     .active_games
-    //     .read(&connection.game_id, |_, v| {
-    //         !v.black_connected && !v.white_connected
-    //     })
-    //     .expect("game should exist")
-    // {
-    //     // both players disconnect, clean up
-    //     state
-    //         .active_games
-    //         .remove(&connection.game_id)
-    //         .expect("game should exist");
-    //     if let Err(e) = sqlx::query!(
-    //         "DELETE FROM ActiveGames WHERE GameID = $1",
-    //         Uuid::parse_str(&connection.game_id).expect("game_id should be a valid UUID")
-    //     )
-    //     .execute(&state.pool)
-    //     .await
-    //     {
-    //         tracing::error!("removing active game failed: {e}");
-    //     }
-    // }
+    if state
+        .active_games
+        .read(&connection.game_id, |_, v| {
+            !v.black_connected && !v.white_connected
+        })
+        .expect("game should exist")
+    {
+        // both players disconnect, initiate deferred clean up
+        if state
+            .active_games
+            .read(&connection.game_id, |_, v| v.clean_up_task.is_none())
+            .expect("game should exist")
+        {
+            let cloned_state = state.clone();
+            let cloned_game_id = connection.game_id.clone();
+
+            let join_handle = tokio::spawn(async move {
+                tracing::info!("initiating deferred clean up for {}", cloned_game_id);
+
+                tokio::time::sleep(Duration::from_secs(DEFERRED_CLEAN_UP_DURATION)).await;
+
+                tracing::info!("cleaning up state for {}", cloned_game_id);
+
+                cloned_state
+                    .active_games
+                    .remove(&cloned_game_id)
+                    .expect("game should exist");
+                if let Err(e) = sqlx::query!(
+                    "DELETE FROM ActiveGames WHERE GameID = $1",
+                    Uuid::parse_str(&cloned_game_id).expect("game_id should be a valid UUID")
+                )
+                .execute(&cloned_state.pool)
+                .await
+                {
+                    tracing::error!("removing active game failed: {e}");
+                }
+            });
+
+            state
+                .active_games
+                .get(&connection.game_id)
+                .expect("game should exist")
+                .clean_up_task = Some(join_handle);
+        }
+    }
 }
 
 fn get_connection_from_map(
@@ -140,19 +161,20 @@ fn get_connection_from_map(
     user_id: &str,
 ) -> Option<Result<Connection>> {
     state.active_games.read(game_id, |_, v| {
-        if v.black_user_id == *user_id && !v.black_connected {
+        if v.black_user_id.as_str() == user_id && !v.black_connected {
             return Ok(Connection {
                 game_id: game_id.to_owned(),
                 color: Color::Black,
                 tx_broadcast: v.tx_broadcast.clone(),
             });
-        } else if v.white_user_id == *user_id && !v.white_connected {
+        } else if v.white_user_id.as_str() == user_id && !v.white_connected {
             return Ok(Connection {
                 game_id: game_id.to_owned(),
                 color: Color::White,
                 tx_broadcast: v.tx_broadcast.clone(),
             });
         }
+        tracing::error!("connection not found in appstate");
         Err(Error::Unauthorized)
     })
 }
@@ -161,7 +183,10 @@ async fn auth_socket(socket: &mut SplitStream<WebSocket>, state: &AppState) -> R
     while let Some(Ok(Message::Text(text))) = socket.next().await {
         let client_msg: ClientMessage = match serde_json::from_str(text.as_str()) {
             Ok(msg) => msg,
-            Err(_) => return Err(Error::Deserialization),
+            Err(_) => {
+                tracing::error!("auth deserialization failed");
+                return Err(Error::Deserialization);
+            }
         };
 
         if let ClientMessage::Auth { game_id, user_id } = client_msg {
@@ -192,10 +217,12 @@ async fn auth_socket(socket: &mut SplitStream<WebSocket>, state: &AppState) -> R
                                 .active_games
                                 .insert(game_id.clone(), ActiveGame::new(row.white, row.black));
 
+                            tracing::info!("adding to app state");
                             return get_connection_from_map(state, &game_id, &user_id)
                                 .expect("game should exist");
                         }
                         Err(_) => {
+                            tracing::error!("auth row not found in DB");
                             return Err(Error::Unauthorized);
                         }
                     }
@@ -204,6 +231,7 @@ async fn auth_socket(socket: &mut SplitStream<WebSocket>, state: &AppState) -> R
         }
     }
 
+    tracing::error!("auth failed outside while let");
     Err(Error::Unauthorized)
 }
 
