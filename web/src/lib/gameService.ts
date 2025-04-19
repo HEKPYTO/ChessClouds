@@ -42,7 +42,7 @@
 //   }
 
 //   if (playerId) {
-//     whereConditions.OR = [{ playera: playerId }, { playerb: playerId }];
+//     whereConditions.OR = [{ white: playerId }, { black: playerId }];
 //   }
 
 //   return prisma.gamehistory.findMany({
@@ -55,12 +55,12 @@
 
 // export const createGameHistory = async (
 //   gameId: string,
-//   playerA: string,
-//   playerB: string,
+//   white: string,
+//   black: string,
 //   pgn: string
 // ) => {
 //   return prisma.gamehistory.create({
-//     data: { gameid: gameId, playera: playerA, playerb: playerB, pgn },
+//     data: { gameid: gameId, white: white, black: black, pgn },
 //   });
 // };
 
@@ -76,8 +76,8 @@
 //   await prisma.gamehistory.create({
 //     data: {
 //       gameid: game.gameid,
-//       playera: game.white,
-//       playerb: game.black,
+//       white: game.white,
+//       black: game.black,
 //       pgn,
 //     },
 //   });

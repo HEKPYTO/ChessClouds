@@ -8,8 +8,8 @@
 //  */
 // export interface GameHistoryEntry {
 //   gameId: string;
-//   playerA: string;
-//   playerB: string;
+//   white: string;
+//   black: string;
 //   pgn: string;
 //   createdAt: Date;
 //   status: GameStatus;
