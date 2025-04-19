@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO ActiveGames (GameID, Black, White) VALUES ($1, $2, $3)",
+  "query": "INSERT INTO GameState (GameID, Black, White) VALUES ($1, $2, $3)",
   "describe": {
     "columns": [],
     "parameters": {
@@ -12,5 +12,5 @@
     },
     "nullable": []
   },
-  "hash": "b56eb881f600de5902a7793f31abaad90d2d31bb0b014b4d75e97b4c1dfafc0e"
+  "hash": "eb1ba2d8661b99b897a330e5e2619536efd300649ff71579844dbafb4b52de12"
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "DELETE FROM ActiveGames WHERE GameID = $1",
+  "query": "UPDATE GameState SET Status = 'Abort' WHERE GameID = $1",
   "describe": {
     "columns": [],
     "parameters": {
@@ -10,5 +10,5 @@
     },
     "nullable": []
   },
-  "hash": "a3c7b0aed18944560b13a0452e0259132bd09b2984e43f6910cb447a784746c6"
+  "hash": "abee11b95d025cec50eeb7d12fbbad1379043ae1529773a971d59e5ee9afa658"
 }
