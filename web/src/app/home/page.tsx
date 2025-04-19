@@ -213,10 +213,10 @@ export default function HomePage() {
     try {
       const computerName = 'computer';
       const playerName = username;
-      const playerA = color === 'w' ? playerName : computerName;
-      const playerB = color === 'w' ? computerName : playerName;
+      const white = color === 'w' ? playerName : computerName;
+      const black = color === 'w' ? computerName : playerName;
 
-      const result = await createGame(playerA, playerB);
+      const result = await createGame(white, black);
 
       if (result.success && result.gameId) {
         router.push(`/computer?color=${color}&game_id=${result.gameId}`);
@@ -251,8 +251,8 @@ export default function HomePage() {
       return;
     }
 
-    const opponent = game.playera === username ? game.playerb : game.playera;
-    const userColor = game.playera === username ? 'w' : 'b';
+    const opponent = game.white === username ? game.black : game.white;
+    const userColor = game.white === username ? 'w' : 'b';
 
     const isComputerGame = opponent === 'computer';
 
@@ -463,7 +463,7 @@ export default function HomePage() {
                             <LatestChessBoard
                               className="w-full h-full"
                               pgn={game.pgn}
-                              color={game.playera === username ? 'w' : 'b'}
+                              color={game.white === username ? 'w' : 'b'}
                             />
                           </div>
                         </div>
@@ -471,20 +471,20 @@ export default function HomePage() {
                           <div className="flex justify-between items-center mb-1">
                             <h3 className="font-medium text-amber-900 dark:text-amber-100">
                               vs{' '}
-                              {game.playera === username
-                                ? game.playerb
-                                : game.playera}
+                              {game.white === username
+                                ? game.black
+                                : game.white}
                             </h3>
                             <span
                               className={`text-xs px-2 py-0.5 rounded-full ${
                                 getTurnFromPgn(game.pgn) ===
-                                (game.playera === username ? 'w' : 'b')
+                                (game.white === username ? 'w' : 'b')
                                   ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
                                   : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
                               }`}
                             >
                               {getTurnFromPgn(game.pgn) ===
-                              (game.playera === username ? 'w' : 'b')
+                              (game.white === username ? 'w' : 'b')
                                 ? 'Your turn'
                                 : "Opponent's turn"}
                             </span>
@@ -558,16 +558,16 @@ export default function HomePage() {
                         className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-slate-700/30 transition-colors"
                       >
                         <td className="text-left py-2 pl-2">
-                          {game.playerb === username
-                            ? game.playera
-                            : game.playerb}
+                          {game.black === username
+                            ? game.white
+                            : game.black}
                         </td>
                         <td
                           className={`text-left py-2 ${
                             (game.status === 'WHITE_WINS' &&
-                              game.playera === username) ||
+                              game.white === username) ||
                             (game.status === 'BLACK_WINS' &&
-                              game.playerb === username)
+                              game.black === username)
                               ? 'text-green-600 dark:text-green-400' // Win
                               : game.status === 'DRAW'
                               ? 'text-amber-600 dark:text-amber-400' // Draw
@@ -577,9 +577,9 @@ export default function HomePage() {
                           {game.status === 'DRAW'
                             ? 'Draw'
                             : (game.status === 'WHITE_WINS' &&
-                                game.playera === username) ||
+                                game.white === username) ||
                               (game.status === 'BLACK_WINS' &&
-                                game.playerb === username)
+                                game.black === username)
                             ? 'Win'
                             : game.status === 'ONGOING'
                             ? 'In progress'
@@ -593,9 +593,9 @@ export default function HomePage() {
                         <td
                           className={`text-right py-2 pr-2 ${
                             (game.status === 'WHITE_WINS' &&
-                              game.playera === username) ||
+                              game.white === username) ||
                             (game.status === 'BLACK_WINS' &&
-                              game.playerb === username)
+                              game.black === username)
                               ? 'text-green-600 dark:text-green-400' // Win
                               : game.status === 'DRAW'
                               ? 'text-amber-600 dark:text-amber-400' // Draw

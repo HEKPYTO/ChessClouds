@@ -6,23 +6,23 @@ import { v4 as uuidv4 } from 'uuid';
 const prisma = new PrismaClient();
 
 /**
- * Create a new game in the gamehistory table
+ * Create a new game in the gamestate table
  */
-export async function createGame(playerA: string, playerB: string) {
+export async function createGame(white: string, black: string) {
   const gameId = uuidv4();
 
   try {
     const game = await prisma.gamestate.create({
       data: {
         gameid: gameId,
-        playera: playerA,
-        playerb: playerB,
+        white,
+        black,
         pgn: '',
         status: 'ONGOING',
       },
     });
 
-    return { success: true, gameId: game.gameid as string };
+    return { success: true, gameId: game.gameid };
   } catch (error) {
     console.error('Error creating game:', error);
     return { success: false, error: 'Failed to create game' };
@@ -90,7 +90,7 @@ export async function getUserHistoryGames(
   try {
     const games = await prisma.gamestate.findMany({
       where: {
-        OR: [{ playera: username }, { playerb: username }],
+        OR: [{ white: username }, { black: username }],
         NOT: { status: 'ONGOING' },
       },
       orderBy: { createdat: 'desc' },
@@ -106,19 +106,19 @@ export async function getUserHistoryGames(
 }
 
 /**
- * Get user's game history (ALL on GOING STATUS)
+ * Get user's ongoing games
  */
 export async function getUserOngoingGames(username: string) {
   try {
     const games = await prisma.gamestate.findMany({
       where: {
-        OR: [{ playera: username }, { playerb: username }],
+        OR: [{ white: username }, { black: username }],
         status: 'ONGOING',
       },
       select: {
         gameid: true,
-        playera: true,
-        playerb: true,
+        white: true,
+        black: true,
         pgn: true,
         createdat: true,
         status: true,
@@ -126,13 +126,13 @@ export async function getUserOngoingGames(username: string) {
       orderBy: { createdat: 'desc' },
     });
 
-    // Process games to extract last move information
     const processedGames = games.map((game) => {
       const lastMove = getLastMoveFromPgn(game.pgn);
       const lastMoveTime = getLastMoveTime(game.createdat);
 
       return {
         ...game,
+        opponent: game.white === username ? game.black : game.white,
         lastMove: lastMove || 'Game started',
         lastMoveTime: lastMoveTime,
       };
@@ -145,11 +145,20 @@ export async function getUserOngoingGames(username: string) {
   }
 }
 
-// Helper function to extract the last move from PGN notation
+/**
+ * Get turn from pgn
+ */
+export function getTurnFromPgn(pgn: string): 'w' | 'b' {
+  const moves =
+    pgn.match(
+      /\b([PNBRQK]?[a-h]?[1-8]?x?[a-h][1-8](?:=[NBRQ])?|O-O(?:-O)?|[a-h][1-8])\b/g
+    ) || [];
+  return moves.length % 2 === 0 ? 'w' : 'b';
+}
+
 function getLastMoveFromPgn(pgn: string): string {
   if (!pgn || pgn.trim() === '') return '';
 
-  // Extract the last move notation
   const moveRegex =
     /\d+\.\s+([A-Za-z0-9\+\#\=\-]+)(?:\s+([A-Za-z0-9\+\#\=\-]+))?/g;
   let lastMatch;
@@ -166,7 +175,6 @@ function getLastMoveFromPgn(pgn: string): string {
   return '';
 }
 
-// Helper function to format the time since last move
 function getLastMoveTime(createdat: Date | null): string {
   if (!createdat) return 'recently';
 
@@ -174,7 +182,6 @@ function getLastMoveTime(createdat: Date | null): string {
   const moveTime = new Date(createdat);
   const diffMs = now.getTime() - moveTime.getTime();
 
-  // Convert to minutes
   const diffMins = Math.round(diffMs / 60000);
 
   if (diffMins < 1) return 'just now';

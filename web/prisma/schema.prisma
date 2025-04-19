@@ -8,18 +8,18 @@ datasource db {
 }
 
 model gamestate {
-  gameid    String    @id @db.Uuid
-  playera   String
-  playerb   String
+  gameid    String     @id @default(uuid()) @db.Uuid
+  white     String
+  black     String
   pgn       String
-  createdat DateTime? @default(now()) @db.Timestamp(6)
-  status    GameStatus  @default(ONGOING)
+  createdat DateTime?  @default(now()) @db.Timestamp(6)
+  status    GameStatus @default(ONGOING)
 }
 
 enum GameStatus {
-  WHITE_WINS    @map("White Wins")
-  BLACK_WINS    @map("Black Wins")
-  DRAW          @map("Draw")
-  ONGOING       @map("On Going")
-  ABORTED       @map("Abort")
+  WHITE_WINS @map("White Wins")
+  BLACK_WINS @map("Black Wins")
+  DRAW       @map("Draw")
+  ONGOING    @map("On Going")
+  ABORTED    @map("Abort")
 }
