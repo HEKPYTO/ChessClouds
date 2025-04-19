@@ -7,14 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model activegames {
-  gameid    String    @id @db.Uuid
-  black     String
-  white     String
-  createdat DateTime? @default(now()) @db.Timestamp(6)
-}
-
-model gamehistory {
+model gamestate {
   gameid    String    @id @db.Uuid
   playera   String
   playerb   String
@@ -28,4 +21,5 @@ enum GameStatus {
   BLACK_WINS    @map("Black Wins")
   DRAW          @map("Draw")
   ONGOING       @map("On Going")
+  ABORTED       @map("Abort")
 }

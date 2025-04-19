@@ -31,7 +31,7 @@ export default function Dashboard() {
   };
 
   const renderTabContent = () => {
-    const sharedProps = { setActiveTab };
+    const sharedProps = { setActiveTab, username };
     switch (activeTab) {
       case 'overview':
         return <OverviewTab {...sharedProps} />;
