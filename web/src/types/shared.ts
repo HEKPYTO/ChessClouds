@@ -33,7 +33,7 @@ export type ServerMessage =
   | { kind: 'MoveHistory'; value: string[] };
 
 export type MoveCallback = (move: string) => void;
-export type ConnectCallback = () => void;
+export type AuthCallback = () => void;
 export type ErrorCallback = (error: string) => void;
 export type HistoryCallback = (moves: string[]) => void;
 export type GameEndCallback = (outcome: GameOutcome | 'Draw') => void;
