@@ -64,14 +64,17 @@ export default function HomePage() {
           toast.error('Failed to load ongoing games');
         }
       } catch (err) {
-        console.error(err);
         toast.error('Error loading ongoing games');
       } finally {
         setLoadingOngoingGames(false);
       }
     };
-
-    if (username) fetchOngoingGames();
+  
+    if (username) {
+      fetchOngoingGames();
+      const interval = setInterval(fetchOngoingGames, 60000);
+      return () => clearInterval(interval);
+    }
   }, [username]);
 
   const [gameHistory, setGameHistory] = useState<
@@ -178,6 +181,10 @@ export default function HomePage() {
     }
   };
 
+  const handleSettingButton = () => {
+    router.push('/dashboard');
+  }
+
   const handleViewAllHistory = () => {
     router.push('/dashboard?tab=games');
   };
@@ -231,10 +238,6 @@ export default function HomePage() {
     return moves.length % 2 === 0 ? 'w' : 'b';
   };
 
-  if (isProcessingAuth || loadingGameHistory || loadingOngoingGames) {
-    return <LoadingScreen />;
-  }
-
   function handleContinueGame(game: gamestate) {
     if (!game || !game.gameid) {
       toast.error('Game information is missing');
@@ -251,6 +254,10 @@ export default function HomePage() {
     } else {
       router.push(`/socket?game_id=${game.gameid}&playas=${userColor}`);
     }
+  }
+
+  if (isProcessingAuth || loadingGameHistory) {
+    return <LoadingScreen />;
   }
 
   return (
@@ -277,6 +284,7 @@ export default function HomePage() {
             shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e] hover:translate-y-[2px]
             dark:bg-amber-500 dark:hover:bg-amber-600
             dark:shadow-[0_4px_0_0_#92400e] dark:hover:shadow-[0_2px_0_0_#78350f]"
+            onClick={handleSettingButton}
           >
             <Cog6ToothIcon className="h-5 w-5" />
           </Button>
@@ -457,8 +465,11 @@ export default function HomePage() {
                             </span>
                           </div>
                           <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
-                            Last move: {game.lastMove || 'Game started'} (
-                            {game.lastMoveTime})
+                            {  game.lastMove !== "Game started" ? (
+                                `Last move: ${game.lastMove} ${game.lastMoveTime}`
+                            ) : (
+                                `Game started: ${game.lastMoveTime}`
+                            )}
                           </p>
                           <Button
                             size="sm"
