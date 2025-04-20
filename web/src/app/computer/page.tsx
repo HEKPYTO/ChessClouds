@@ -105,6 +105,7 @@ export default function ComputerGame() {
           } catch (err) {
             setHasError(true);
             setIsLoading(false);
+            console.error('Error: ', err);
             return;
           }
         }
@@ -112,10 +113,11 @@ export default function ComputerGame() {
         if (game.status !== 'ONGOING') {
           setGameOver(true);
         }
-        
+
         setIsLoading(false);
-      } catch (err) {
+      } catch (error) {
         toast.error('Error loading game');
+        console.error(error);
         setHasError(true);
         setIsLoading(false);
       }
@@ -366,11 +368,11 @@ export default function ComputerGame() {
   const handleAbort = useCallback(() => {
     if (gameOver) return;
     setGameOver(true);
-  
+
     if (gameId) {
       updateGameStatus(gameId, 'ABORTED').catch(() => {});
     }
-  
+
     toast.info('Game aborted', { description: 'This game has been aborted' });
   }, [gameOver, gameId]);
 

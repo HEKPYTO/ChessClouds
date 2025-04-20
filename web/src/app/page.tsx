@@ -293,7 +293,8 @@ export default function HomePage() {
                 </h3>
               </div>
               <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
-                Collaborate gameing experiecne together, and share your strategies and projects. All included.
+                Collaborate gameing experiecne together, and share your
+                strategies and projects. All included.
               </p>
             </div>
           </div>
