@@ -337,6 +337,10 @@ export default function ComputerGame() {
   }, [previewIndex, chess]);
 
   const handleTakeBack = useCallback(() => {
+    if (previewIndex !== null) {
+      setPreviewIndex(null); // only allow when user is not latest move
+      return;
+    }
     if (gameOver || moveHistory.current.length < 2) return;
     chess.undo();
     chess.undo();

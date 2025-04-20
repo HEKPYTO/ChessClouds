@@ -135,15 +135,15 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                     .active_games
                     .remove(&cloned_game_id)
                     .expect("game should exist");
-                if let Err(e) = sqlx::query!(
-                    "UPDATE GameState SET Status = 'Abort' WHERE GameID = $1",
-                    Uuid::parse_str(&cloned_game_id).expect("game_id should be a valid UUID")
-                )
-                .execute(&cloned_state.pool)
-                .await
-                {
-                    tracing::error!("removing active game failed: {e}");
-                }
+                // if let Err(e) = sqlx::query!(
+                //     "UPDATE GameState SET Status = 'Abort' WHERE GameID = $1",
+                //     Uuid::parse_str(&cloned_game_id).expect("game_id should be a valid UUID")
+                // )
+                // .execute(&cloned_state.pool)
+                // .await
+                // {
+                //     tracing::error!("removing active game failed: {e}");
+                // }
             });
 
             state

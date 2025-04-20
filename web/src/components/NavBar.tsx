@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import ThemeSwitch from './ThemeSwitch';
@@ -45,6 +43,7 @@ export default function Navbar() {
   ];
 
   const isDashboardPage = pathname.startsWith('/dashboard');
+  const isGamePage = pathname.startsWith('/computer') || pathname.startsWith('/socket');
 
   const loadingDots = (
     <span className="inline-flex ml-1">
@@ -73,8 +72,16 @@ export default function Navbar() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
 
+      // Check if we're in a search field or other input
+      const activeElement = document.activeElement;
+      const isInputActive = activeElement?.tagName === 'INPUT' || 
+                           activeElement?.tagName === 'TEXTAREA' ||
+                           activeElement?.getAttribute('contenteditable') === 'true';
+      
+      if (isInputActive) return;
+
       const key = e.key.toLowerCase();
-      if (key === 'p') {
+      if (key === 'p' && !isGamePage) {
         setPressedKey('p');
         if (authenticated) {
           if (isMatchmaking) {
@@ -89,10 +96,10 @@ export default function Navbar() {
         } else {
           setTimeout(() => router.push('/signin'), 150);
         }
-      } else if (key === 'd' && authenticated && !isDashboardPage) {
+      } else if (key === 'd' && authenticated && !isDashboardPage && !isGamePage) {
         setPressedKey('d');
         setTimeout(() => router.push('/dashboard'), 150);
-      } else if (key === 'h' && authenticated && isDashboardPage) {
+      } else if (key === 'h' && authenticated && (isDashboardPage || isGamePage)) {
         setPressedKey('h');
         setTimeout(() => router.push('/home'), 150);
       } else if (key === 's' && !authenticated) {
@@ -113,6 +120,7 @@ export default function Navbar() {
     authenticated,
     isMatchmaking,
     isDashboardPage,
+    isGamePage,
     username,
     router,
     cancelMatchmaking,
@@ -158,6 +166,11 @@ export default function Navbar() {
     } finally {
       setPressedKey(null);
     }
+  };
+
+  const handleHomeClick = () => {
+    setMobileMenuOpen(false);
+    router.push('/home');
   };
 
   const handleDashboardSignUpClick = () => {
@@ -255,61 +268,67 @@ export default function Navbar() {
             <Button
               variant="outline"
               className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] ${
-                pressedKey === (isDashboardPage ? 'h' : 'd')
+                pressedKey === (isDashboardPage || isGamePage ? 'h' : 'd')
                   ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
                   : ''
               }`}
-              onClick={handleDashboardSignUpClick}
+              onClick={isGamePage ? handleHomeClick : handleDashboardSignUpClick}
               onMouseUp={() => setPressedKey(null)}
             >
-              {isDashboardPage ? 'Home' : 'Dashboard'}
+              {isGamePage 
+                ? 'Home'
+                : isDashboardPage 
+                  ? 'Home' 
+                  : 'Dashboard'}
               <span
                 className={`ml-1 text-xs px-1 rounded ${
-                  pressedKey === (isDashboardPage ? 'h' : 'd')
+                  pressedKey === (isDashboardPage || isGamePage ? 'h' : 'd')
                     ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
                     : 'bg-amber-100 dark:bg-slate-800'
                 }`}
               >
                 {' '}
-                {isDashboardPage ? 'H' : 'D'}{' '}
+                {isDashboardPage || isGamePage ? 'H' : 'D'}{' '}
               </span>
             </Button>
           </div>
 
           {/* Play/Cancel */}
-          <div className="hidden sm:block">
-            <Button
-              className={`h-9 text-sm text-white rounded-md transition-all hover:translate-y-[2px] 
-                bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 
-                shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]
-                ${
-                  pressedKey === 'p'
-                    ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
-                    : ''
-                }`}
-              onClick={handlePlayClick}
-              onMouseUp={() => setPressedKey(null)}
-              disabled={playCooldownState === 'cooldown' && !isMatchmaking}
-            >
-              {isMatchmaking ? (
-                <>
-                  Finding{loadingDots}
-                  <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
-                    P
-                  </span>
-                </>
-              ) : playCooldownState === 'cooldown' ? (
-                <>Wait {Math.ceil(cooldownRemaining / 1000)}s</>
-              ) : (
-                <>
-                  Play now
-                  <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
-                    P
-                  </span>
-                </>
-              )}
-            </Button>
-          </div>
+          {!isGamePage && (
+            <div className="hidden sm:block">
+              <Button
+                className={`h-9 text-sm text-white rounded-md transition-all hover:translate-y-[2px] 
+                  bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 
+                  shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]
+                  ${
+                    pressedKey === 'p'
+                      ? 'transform translate-y-[3px] shadow-none bg-amber-700 dark:bg-amber-600'
+                      : ''
+                  }`}
+                onClick={handlePlayClick}
+                onMouseUp={() => setPressedKey(null)}
+                disabled={playCooldownState === 'cooldown' && !isMatchmaking}
+              >
+                {isMatchmaking ? (
+                  <>
+                    Finding{loadingDots}
+                    <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
+                      P
+                    </span>
+                  </>
+                ) : playCooldownState === 'cooldown' ? (
+                  <>Wait {Math.ceil(cooldownRemaining / 1000)}s</>
+                ) : (
+                  <>
+                    Play now
+                    <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
+                      P
+                    </span>
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
 
           {/* Mobile Menu Toggle */}
           <button
@@ -364,49 +383,53 @@ export default function Navbar() {
             <Button
               variant="outline"
               className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
-              onClick={handleDashboardSignUpClick}
+              onClick={isGamePage ? handleHomeClick : handleDashboardSignUpClick}
             >
-              {isDashboardPage
+              {isGamePage
                 ? 'Home'
-                : authenticated
-                ? 'Dashboard'
-                : 'Sign up'}
+                : isDashboardPage
+                  ? 'Home'
+                  : authenticated
+                    ? 'Dashboard'
+                    : 'Sign up'}
               <span className="ml-1 text-xs px-1 rounded bg-amber-100 dark:bg-slate-800">
-                {isDashboardPage ? 'H' : authenticated ? 'D' : 'S'}
+                {isGamePage || isDashboardPage ? 'H' : authenticated ? 'D' : 'S'}
               </span>
             </Button>
           </div>
 
           {/* Mobile Play */}
-          <div className="sm:hidden">
-            <Button
-              className={`w-full mt-2 text-sm text-white rounded-md transition-all hover:translate-y-[2px] ${
-                isMatchmaking
-                  ? 'bg-amber-600 hover:bg-amber-700 shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]'
-                  : 'bg-amber-600 hover:bg-amber-700 shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]'
-              }`}
-              disabled={playCooldownState === 'cooldown' && !isMatchmaking}
-              onClick={handlePlayClick}
-            >
-              {isMatchmaking ? (
-                <>
-                  Finding{loadingDots}
-                  <span className="ml-1 text-xs px-1 rounded bg-red-700 dark:bg-red-600">
-                    P
-                  </span>
-                </>
-              ) : playCooldownState === 'cooldown' ? (
-                <>Wait {Math.ceil(cooldownRemaining / 1000)}s</>
-              ) : (
-                <>
-                  Play now
-                  <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
-                    P
-                  </span>
-                </>
-              )}
-            </Button>
-          </div>
+          {!isGamePage && (
+            <div className="sm:hidden">
+              <Button
+                className={`w-full mt-2 text-sm text-white rounded-md transition-all hover:translate-y-[2px] ${
+                  isMatchmaking
+                    ? 'bg-amber-600 hover:bg-amber-700 shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]'
+                    : 'bg-amber-600 hover:bg-amber-700 shadow-[0_3px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e]'
+                }`}
+                disabled={playCooldownState === 'cooldown' && !isMatchmaking}
+                onClick={handlePlayClick}
+              >
+                {isMatchmaking ? (
+                  <>
+                    Finding{loadingDots}
+                    <span className="ml-1 text-xs px-1 rounded bg-red-700 dark:bg-red-600">
+                      P
+                    </span>
+                  </>
+                ) : playCooldownState === 'cooldown' ? (
+                  <>Wait {Math.ceil(cooldownRemaining / 1000)}s</>
+                ) : (
+                  <>
+                    Play now
+                    <span className="ml-1 text-xs px-1 rounded bg-amber-700 dark:bg-amber-600">
+                      P
+                    </span>
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </header>
