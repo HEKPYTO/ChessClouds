@@ -1,12 +1,23 @@
-FROM oven/bun:1
-
+FROM oven/bun:1 AS builder
 WORKDIR /app
-
 COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN touch bun.lockb                         
+RUN bun install                                 
+RUN bun add tailwindcss @tailwindcss/postcss postcss autoprefixer
+RUN bun run build                               
 
+FROM oven/bun:1 AS runner
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN apt-get update && \
+    apt-get install -y openssl && \
+    rm -rf /var/lib/apt/lists/*
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/bun.lockb ./bun.lockb   
 RUN bun install --production
-
 ARG PORT
 EXPOSE ${PORT:-3000}
-
 CMD ["bun", "start"]
