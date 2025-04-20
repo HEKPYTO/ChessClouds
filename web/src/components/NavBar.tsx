@@ -43,7 +43,8 @@ export default function Navbar() {
   ];
 
   const isDashboardPage = pathname.startsWith('/dashboard');
-  const isGamePage = pathname.startsWith('/computer') || pathname.startsWith('/socket');
+  const isGamePage =
+    pathname.startsWith('/computer') || pathname.startsWith('/socket');
 
   const loadingDots = (
     <span className="inline-flex ml-1">
@@ -74,10 +75,11 @@ export default function Navbar() {
 
       // Check if we're in a search field or other input
       const activeElement = document.activeElement;
-      const isInputActive = activeElement?.tagName === 'INPUT' || 
-                           activeElement?.tagName === 'TEXTAREA' ||
-                           activeElement?.getAttribute('contenteditable') === 'true';
-      
+      const isInputActive =
+        activeElement?.tagName === 'INPUT' ||
+        activeElement?.tagName === 'TEXTAREA' ||
+        activeElement?.getAttribute('contenteditable') === 'true';
+
       if (isInputActive) return;
 
       const key = e.key.toLowerCase();
@@ -96,10 +98,19 @@ export default function Navbar() {
         } else {
           setTimeout(() => router.push('/signin'), 150);
         }
-      } else if (key === 'd' && authenticated && !isDashboardPage && !isGamePage) {
+      } else if (
+        key === 'd' &&
+        authenticated &&
+        !isDashboardPage &&
+        !isGamePage
+      ) {
         setPressedKey('d');
         setTimeout(() => router.push('/dashboard'), 150);
-      } else if (key === 'h' && authenticated && (isDashboardPage || isGamePage)) {
+      } else if (
+        key === 'h' &&
+        authenticated &&
+        (isDashboardPage || isGamePage)
+      ) {
         setPressedKey('h');
         setTimeout(() => router.push('/home'), 150);
       } else if (key === 's' && !authenticated) {
@@ -272,14 +283,12 @@ export default function Navbar() {
                   ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
                   : ''
               }`}
-              onClick={isGamePage ? handleHomeClick : handleDashboardSignUpClick}
+              onClick={
+                isGamePage ? handleHomeClick : handleDashboardSignUpClick
+              }
               onMouseUp={() => setPressedKey(null)}
             >
-              {isGamePage 
-                ? 'Home'
-                : isDashboardPage 
-                  ? 'Home' 
-                  : 'Dashboard'}
+              {isGamePage ? 'Home' : isDashboardPage ? 'Home' : 'Dashboard'}
               <span
                 className={`ml-1 text-xs px-1 rounded ${
                   pressedKey === (isDashboardPage || isGamePage ? 'h' : 'd')
@@ -383,17 +392,23 @@ export default function Navbar() {
             <Button
               variant="outline"
               className="w-full mt-2 border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
-              onClick={isGamePage ? handleHomeClick : handleDashboardSignUpClick}
+              onClick={
+                isGamePage ? handleHomeClick : handleDashboardSignUpClick
+              }
             >
               {isGamePage
                 ? 'Home'
                 : isDashboardPage
-                  ? 'Home'
-                  : authenticated
-                    ? 'Dashboard'
-                    : 'Sign up'}
+                ? 'Home'
+                : authenticated
+                ? 'Dashboard'
+                : 'Sign up'}
               <span className="ml-1 text-xs px-1 rounded bg-amber-100 dark:bg-slate-800">
-                {isGamePage || isDashboardPage ? 'H' : authenticated ? 'D' : 'S'}
+                {isGamePage || isDashboardPage
+                  ? 'H'
+                  : authenticated
+                  ? 'D'
+                  : 'S'}
               </span>
             </Button>
           </div>
