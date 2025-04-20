@@ -182,7 +182,7 @@ export default function GamesTab({ username }: { username: string }) {
                         return (
                           <tr
                             key={game.gameid}
-                            className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-slate-700/30 transition-colors"
+                            className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-slate-700/30 dark:hover:text-slate-100/80 transition-colors"
                           >
                             <td className="py-2 px-2 font-medium truncate max-w-[100px] sm:max-w-none">
                               {opponent}

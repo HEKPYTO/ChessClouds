@@ -302,11 +302,12 @@ export default function HomePage() {
             <Button
               className={`w-full flex justify-center items-center
                         bg-amber-600 hover:bg-amber-700 text-white px-6 rounded-md
+                        dark:bg-amber-500 dark:hover:bg-amber-600 
                         shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e]
                         hover:translate-y-[2px] transition-all
                         ${
                           playCooldownState === 'cooldown' && !isMatchmaking
-                            ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed shadow-none'
+                            ? 'bg-amber-700 dark:bg-amber-600 cursor-not-allowed'
                             : ''
                         }`}
               onClick={handlePlayNow}
@@ -531,7 +532,7 @@ export default function HomePage() {
                     gameHistory.slice(0, HISTORY_LIMIT).map((game) => (
                       <tr
                         key={game.gameid}
-                        className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-slate-700/30 transition-colors"
+                        className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-slate-700/30 dark:hover:text-slate-100/80 transition-colors"
                       >
                         <td className="text-left py-2 pl-2">
                           {game.black === username ? game.white : game.black}

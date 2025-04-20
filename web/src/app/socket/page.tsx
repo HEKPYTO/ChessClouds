@@ -110,6 +110,8 @@ export default function SocketGame() {
         if (!gameResult.success || !gameResult.game) {
           console.error('Failed to load game data:', gameResult.error);
           toast.error('Failed to load game');
+          setIsAuthorized(false);
+          setIsLoading(false);
           setHasError(true);
           return;
         }
@@ -393,14 +395,14 @@ export default function SocketGame() {
     return <ErrorPage message="No game ID provided" code="400" />;
   }
 
+  if (!isAuthorized) {
+    return <UnauthorizedPage />;
+  }
+
   if (hasError) {
     return (
       <ErrorPage message="There was a problem loading this game" code="500" />
     );
-  }
-
-  if (!isAuthorized) {
-    return <UnauthorizedPage />;
   }
 
   return (
