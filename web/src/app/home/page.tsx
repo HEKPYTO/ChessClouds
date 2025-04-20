@@ -63,13 +63,13 @@ export default function HomePage() {
         } else {
           toast.error('Failed to load ongoing games');
         }
-      } catch (err) {
+      } catch {
         toast.error('Error loading ongoing games');
       } finally {
         setLoadingOngoingGames(false);
       }
     };
-  
+
     if (username) {
       fetchOngoingGames();
       const interval = setInterval(fetchOngoingGames, 60000);
@@ -183,7 +183,7 @@ export default function HomePage() {
 
   const handleSettingButton = () => {
     router.push('/dashboard');
-  }
+  };
 
   const handleViewAllHistory = () => {
     router.push('/dashboard?tab=games');
@@ -465,11 +465,9 @@ export default function HomePage() {
                             </span>
                           </div>
                           <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
-                            {  game.lastMove !== "Game started" ? (
-                                `Last move: ${game.lastMove} ${game.lastMoveTime}`
-                            ) : (
-                                `Game started: ${game.lastMoveTime}`
-                            )}
+                            {game.lastMove !== 'Game started'
+                              ? `Last move: ${game.lastMove} ${game.lastMoveTime}`
+                              : `Game started: ${game.lastMoveTime}`}
                           </p>
                           <Button
                             size="sm"
