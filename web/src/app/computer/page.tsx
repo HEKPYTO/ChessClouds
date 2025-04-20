@@ -354,7 +354,7 @@ export default function ComputerGame() {
       setLastMove(undefined);
     }
     updateState();
-  }, [chess, gameOver, updateState]);
+  }, [chess, gameOver, updateState, previewIndex]);
 
   const handleResign = useCallback(() => {
     if (gameOver) return;
