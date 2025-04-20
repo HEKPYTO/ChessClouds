@@ -85,7 +85,7 @@ export default function ErrorPage({
                 onClick={() => router.back()}
                 className="border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900
                 shadow-[0_4px_0_0_#fcd34d] hover:shadow-[0_2px_0_0_#fcd34d] hover:translate-y-[2px]
-                dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
+                dark:bg-slate-800 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-900
                 dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
               >
                 <ArrowPathIcon className="mr-2 h-5 w-5" />

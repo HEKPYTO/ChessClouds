@@ -336,7 +336,7 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
             <Button
               variant="outline"
               size="sm"
-              className="w-10 h-10 p-1 bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200 hover:text-amber-900 dark:bg-slate-700 dark:text-amber-200 dark:border-amber-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
+              className="w-10 h-10 p-1 bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200 hover:text-amber-900 dark:bg-amber-600 dark:text-amber-200 dark:border-amber-600 dark:hover:bg-amber-600 shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
               onClick={handleTakeBack}
               disabled={gameOver || chess.history().length < 2}
               aria-label="Take Back"
@@ -347,7 +347,7 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-slate-700 dark:text-green-400 dark:border-green-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
+                className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-slate-700 dark:text-green-400 dark:bg-green-700 hover:dark:bg-green-800 dark:border-green-700 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
                 onClick={handleHome}
                 aria-label="Play Again"
               >
@@ -357,7 +357,7 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-10 h-10 p-1 bg-red-100 text-red-800 border-red-300 hover:bg-red-200 hover:text-red-900 dark:bg-slate-700 dark:text-red-400 dark:border-red-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#fca5a5] hover:shadow-[0_1px_0_0_#fca5a5] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#991b1b] dark:hover:shadow-[0_1px_0_0_#7f1d1d]"
+                className="w-10 h-10 p-1 bg-red-100 text-red-800 border-red-300 hover:bg-red-200 hover:text-red-900 dark:bg-red-600 dark:text-amber-200 dark:border-red-700 dark:hover:bg-red-600 shadow-[0_3px_0_0_#fca5a5] hover:shadow-[0_1px_0_0_#fca5a5] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#991b1b] dark:hover:shadow-[0_1px_0_0_#7f1d1d]"
                 onClick={handleResign}
                 aria-label="Resign"
               >
@@ -367,7 +367,7 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
             <Button
               variant="outline"
               size="sm"
-              className="w-10 h-10 p-1 bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200 hover:text-yellow-900 dark:bg-slate-700 dark:text-yellow-400 dark:border-yellow-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#fde68a] hover:shadow-[0_1px_0_0_#fde68a] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#854d0e] dark:hover:shadow-[0_1px_0_0_#713f12]"
+              className="w-10 h-10 p-1 bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200 hover:text-yellow-900 dark:bg-yellow-600 dark:text-yellow-400 dark:border-yellow-700 dark:hover:bg-yellow-600 shadow-[0_3px_0_0_#fde68a] hover:shadow-[0_1px_0_0_#fde68a] hover:translate-y-[1px] dark:shadow-yellow-500/50 dark:hover:shadow-yellow-500/75"
               onClick={handleAbort}
               disabled={gameOver}
               aria-label="Abort Game"
@@ -659,7 +659,7 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-slate-700 dark:text-green-400 dark:border-green-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
+                      className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-slate-700 dark:text-green-400 dark:border-green-700 dark:bg-green-700 hover:dark:bg-green-800 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
                       onClick={handleHome}
                       aria-label="Play Again"
                     >
@@ -679,7 +679,7 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-10 h-10 p-1 bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200 hover:text-yellow-900 dark:bg-slate-700 dark:text-yellow-400 dark:border-yellow-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#fde68a] hover:shadow-[0_1px_0_0_#fde68a] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#854d0e] dark:hover:shadow-[0_1px_0_0_#713f12]"
+                    className="w-10 h-10 p-1 bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200 hover:text-yellow-900 dark:bg-yellow-600 dark:text-yellow-400 dark:border-yellow-700 dark:hover:bg-yellow-600 shadow-[0_3px_0_0_#fde68a] hover:shadow-[0_1px_0_0_#fde68a] hover:translate-y-[1px] dark:shadow-yellow-500/50 dark:hover:shadow-yellow-500/75"
                     onClick={handleAbort}
                     disabled={gameOver}
                     aria-label="Abort Game"

@@ -27,7 +27,7 @@ const MatchmakingContext = createContext<MatchmakingContextType | undefined>(
   undefined
 );
 
-const MAX_RETRY_ATTEMPTS = 3;
+const MAX_RETRY_ATTEMPTS = 5;
 const RETRY_DELAY = 2000;
 const COOLDOWN_DURATION = 5000;
 
@@ -44,6 +44,8 @@ export function MatchmakingProvider({ children }: { children: ReactNode }) {
   const cooldownStartTimeRef = useRef<number>(0);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cooldownDuration = COOLDOWN_DURATION;
+
+  const isCancelledRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -125,6 +127,8 @@ export function MatchmakingProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    isCancelledRef.current = false
+
     try {
       setPlayCooldownState('active');
       setIsMatchmaking(true);
@@ -135,6 +139,9 @@ export function MatchmakingProvider({ children }: { children: ReactNode }) {
       try {
         result = await attemptMatchmaking(userId);
       } catch (error) {
+        if (isCancelledRef.current) {
+          return
+        }
         if (retryCount < MAX_RETRY_ATTEMPTS) {
           toast.info(
             `Connection issue. Retrying... (${
@@ -169,6 +176,7 @@ export function MatchmakingProvider({ children }: { children: ReactNode }) {
 
   const cancelMatchmaking = () => {
     const matchmakingService = MatchMakingService.getInstance();
+    isCancelledRef.current = true
     matchmakingService.cancelMatch();
     setIsMatchmaking(false);
     startCooldown();
