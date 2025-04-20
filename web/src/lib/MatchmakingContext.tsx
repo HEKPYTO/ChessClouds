@@ -127,7 +127,7 @@ export function MatchmakingProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    isCancelledRef.current = false
+    isCancelledRef.current = false;
 
     try {
       setPlayCooldownState('active');
@@ -140,7 +140,7 @@ export function MatchmakingProvider({ children }: { children: ReactNode }) {
         result = await attemptMatchmaking(userId);
       } catch (error) {
         if (isCancelledRef.current) {
-          return
+          return;
         }
         if (retryCount < MAX_RETRY_ATTEMPTS) {
           toast.info(
@@ -176,7 +176,7 @@ export function MatchmakingProvider({ children }: { children: ReactNode }) {
 
   const cancelMatchmaking = () => {
     const matchmakingService = MatchMakingService.getInstance();
-    isCancelledRef.current = true
+    isCancelledRef.current = true;
     matchmakingService.cancelMatch();
     setIsMatchmaking(false);
     startCooldown();
