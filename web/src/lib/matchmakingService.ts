@@ -16,8 +16,8 @@ export class MatchMakingService {
   private abortController: AbortController | null = null;
   private timeoutId: NodeJS.Timeout | null = null;
 
-  constructor(serverUrl: string = 'http://localhost:8001') {
-    this.severUrl = serverUrl;
+  constructor(serverUrl?: string) {
+    this.severUrl = serverUrl || process.env.NEXT_PUBLIC_MATCHMAKING_SERVER_URL || 'http://localhost:8001';
   }
 
   static getInstance(serverUrl?: string): MatchMakingService {

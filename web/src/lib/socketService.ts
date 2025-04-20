@@ -22,8 +22,8 @@ export class SocketService {
   private connecting: boolean = false;
   private serverUrl: string;
 
-  constructor(serverUrl: string = 'ws://localhost:8000/ws') {
-    this.serverUrl = serverUrl;
+  constructor(serverUrl?: string) {
+    this.serverUrl = serverUrl || process.env.NEXT_PUBLIC_WS_SERVER_URL || 'ws://localhost:8000/ws';
   }
 
   static getInstance(
