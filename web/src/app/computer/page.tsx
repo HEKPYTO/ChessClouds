@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Chess } from 'chess.js';
 import type { Square } from 'chess.js';
 import ComputerGamePane from '@/components/ComputerGamePane';
-import LoadingScreen from '@/components/LoadingScreen';
 import UnauthorizedPage from '@/components/Unauthorized';
 import ErrorPage from '@/components/Error';
 import { toast } from 'sonner';
@@ -20,6 +19,8 @@ import { useSearchParams } from 'next/navigation';
 
 export default function ComputerGame() {
   const searchParams = useSearchParams();
+  const gameId = searchParams.get('game_id');
+  const colorParam = searchParams.get('color');
 
   const [chess] = useState(new Chess());
   const [fen, setFen] = useState(chess.fen());
@@ -27,17 +28,15 @@ export default function ComputerGame() {
   const [selectVisible, setSelectVisible] = useState(false);
   const [pendingMove, setPendingMove] = useState<[Square, Square]>();
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [gameOver, setGameOver] = useState(false);
-  const [playingAs, setPlayingAs] = useState<'w' | 'b'>('w');
   const [engineStatus, setEngineStatus] = useState<
     'connected' | 'degraded' | 'disconnected' | 'pending'
   >('pending');
   const [isThinking, setIsThinking] = useState(false);
-  const [gameId, setGameId] = useState<string | null>(null);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const moveHistory = useRef<string[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -46,11 +45,10 @@ export default function ComputerGame() {
   const userInfo = getUserInfo();
   const username = userInfo?.email?.split('@')[0] || 'anonymous';
 
-  useEffect(() => {
-    const urlGameId = searchParams.get('game_id');
-    const colorParam = searchParams.get('color');
+  const playingAs: 'w' | 'b' = colorParam === 'b' ? 'b' : 'w';
 
-    if (!urlGameId) {
+  useEffect(() => {
+    if (!gameId) {
       toast.error('No game ID provided');
       setIsLoading(false);
       return;
@@ -62,22 +60,18 @@ export default function ComputerGame() {
       return;
     }
 
-    setPlayingAs(colorParam);
-    setGameId(urlGameId);
-
     const initializeGame = async () => {
       try {
-        const gameResult = await getGame(urlGameId);
+        const gameResult = await getGame(gameId);
 
         if (!gameResult.success || !gameResult.game) {
-          console.error('Failed to load game data:', gameResult.error);
           toast.error('Failed to load game');
           setHasError(true);
+          setIsLoading(false);
           return;
         }
 
         const game = gameResult.game;
-
         const userIsWhite = game.white === username;
         const userIsBlack = game.black === username;
         const computerIsWhite = game.white === 'computer';
@@ -109,8 +103,8 @@ export default function ComputerGame() {
 
             setFen(chess.fen());
           } catch (err) {
-            console.error('Error loading PGN:', err);
             setHasError(true);
+            setIsLoading(false);
             return;
           }
         }
@@ -118,17 +112,17 @@ export default function ComputerGame() {
         if (game.status !== 'ONGOING') {
           setGameOver(true);
         }
+        
+        setIsLoading(false);
       } catch (err) {
-        console.error('Error initializing game:', err);
         toast.error('Error loading game');
         setHasError(true);
-      } finally {
         setIsLoading(false);
       }
     };
 
     initializeGame();
-  }, [searchParams, username, chess]);
+  }, [gameId, colorParam, username, chess]);
 
   useEffect(() => {
     const updateStatusByAge = () => {
@@ -196,7 +190,7 @@ export default function ComputerGame() {
 
     if (gameId) {
       const pgn = chess.pgn();
-      updateGamePgn(gameId, pgn).catch(console.error);
+      updateGamePgn(gameId, pgn).catch(() => {});
     }
 
     const ended = chess.isGameOver();
@@ -212,7 +206,7 @@ export default function ComputerGame() {
       }
 
       if (status !== 'ONGOING')
-        updateGameStatus(gameId, status).catch(console.error);
+        updateGameStatus(gameId, status).catch(() => {});
     }
   }, [chess, gameId]);
 
@@ -338,7 +332,7 @@ export default function ComputerGame() {
 
   const handleTakeBack = useCallback(() => {
     if (previewIndex !== null) {
-      setPreviewIndex(null); // only allow when user is not latest move
+      setPreviewIndex(null);
       return;
     }
     if (gameOver || moveHistory.current.length < 2) return;
@@ -363,13 +357,22 @@ export default function ComputerGame() {
     if (gameId) {
       const status: GameStatus =
         playingAs === 'w' ? 'BLACK_WINS' : 'WHITE_WINS';
-      updateGameStatus(gameId, status).catch((err) => {
-        console.error('Failed to update game status on resign:', err);
-      });
+      updateGameStatus(gameId, status).catch(() => {});
     }
 
     toast.info('Game ended', { description: 'You resigned the game' });
   }, [gameOver, gameId, playingAs]);
+
+  const handleAbort = useCallback(() => {
+    if (gameOver) return;
+    setGameOver(true);
+  
+    if (gameId) {
+      updateGameStatus(gameId, 'ABORTED').catch(() => {});
+    }
+  
+    toast.info('Game aborted', { description: 'This game has been aborted' });
+  }, [gameOver, gameId]);
 
   const handleRetry = useCallback(() => {
     if (engineStatus !== 'disconnected') return;
@@ -416,10 +419,11 @@ export default function ComputerGame() {
     handleTakeBack,
     handleResign,
     handleRetry,
+    handleAbort,
   };
 
   if (isLoading) {
-    return <LoadingScreen />;
+    return null;
   }
 
   if (hasError) {

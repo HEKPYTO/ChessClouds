@@ -86,7 +86,7 @@ export async function getUserHistoryGames(username: string, offset = 0) {
       where: {
         OR: [{ white: username }, { black: username }],
         NOT: {
-          status: 'ONGOING',
+          status: { in: ['ONGOING', 'ABORTED'] },
         },
       },
       orderBy: {

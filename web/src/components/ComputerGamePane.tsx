@@ -19,6 +19,7 @@ import {
   ExclamationTriangleIcon,
   SignalSlashIcon,
   HomeIcon,
+  XCircleIcon,
 } from '@heroicons/react/24/outline';
 import { UserInfo } from '@/types/googleAuthTypes';
 import { getUserInfo } from '@/lib/auth/googleAuth';
@@ -45,6 +46,7 @@ interface GameProps {
   handleTakeBack: () => void;
   handleResign: () => void;
   handleRetry: () => void;
+  handleAbort: () => void;
 }
 
 interface PaneProps {
@@ -107,6 +109,7 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
     handleTakeBack,
     handleResign,
     handleRetry,
+    handleAbort,
   } = gameProps;
 
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
@@ -361,6 +364,16 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
                 <FlagIcon className="h-5 w-5" />
               </Button>
             )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-10 h-10 p-1 bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200 hover:text-yellow-900 dark:bg-slate-700 dark:text-yellow-400 dark:border-yellow-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#fde68a] hover:shadow-[0_1px_0_0_#fde68a] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#854d0e] dark:hover:shadow-[0_1px_0_0_#713f12]"
+              onClick={handleAbort}
+              disabled={gameOver}
+              aria-label="Abort Game"
+            >
+              <XCircleIcon className="h-5 w-5" />
+            </Button>
             {engineStatus === 'disconnected' && (
               <Button
                 variant="outline"
@@ -663,6 +676,16 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
                       <FlagIcon className="h-5 w-5" />
                     </Button>
                   )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-10 h-10 p-1 bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200 hover:text-yellow-900 dark:bg-slate-700 dark:text-yellow-400 dark:border-yellow-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#fde68a] hover:shadow-[0_1px_0_0_#fde68a] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#854d0e] dark:hover:shadow-[0_1px_0_0_#713f12]"
+                    onClick={handleAbort}
+                    disabled={gameOver}
+                    aria-label="Abort Game"
+                  >
+                    <XCircleIcon className="h-5 w-5" />
+                  </Button>
                   {engineStatus === 'disconnected' && (
                     <Button
                       variant="outline"
