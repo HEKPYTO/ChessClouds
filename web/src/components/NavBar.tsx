@@ -368,7 +368,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="xl:hidden flex items-center justify-center h-9 w-9 border border-amber-300 bg-white text-amber-800 hover:bg-amber-50 hover:text-amber-900 rounded-md transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
+            className="xl:hidden flex items-center justify-center h-9 w-9 border border-amber-300 bg-white dark:bg-slate-800 text-amber-800 hover:bg-amber-50 hover:text-amber-900 rounded-md transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
             onClick={toggleMobileMenu}
             disabled={animating}
             aria-label="Menu"
