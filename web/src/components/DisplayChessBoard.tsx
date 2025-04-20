@@ -138,3 +138,90 @@ export default function CustomChessBoard({
     </div>
   );
 }
+
+export function LatestChessBoard({
+  className = '',
+  initialFen,
+  pgn,
+  color = 'w',
+}: CustomChessBoardProps & { color?: 'w' | 'b' }) {
+  const [chess] = useState(() => new Chess());
+  const [fen, setFen] = useState<string>('');
+  const [lastMove, setLastMove] = useState<[Square, Square] | undefined>();
+
+  useEffect(() => {
+    chess.reset();
+
+    if (initialFen) {
+      try {
+        chess.load(initialFen);
+      } catch (e) {
+        console.error('Invalid FEN:', e);
+      }
+    }
+
+    if (pgn && pgn.trim() !== '') {
+      try {
+        chess.loadPgn(pgn);
+        const history = chess.history({ verbose: true });
+        if (history.length > 0) {
+          const lastMoveData = history[history.length - 1];
+          setLastMove([lastMoveData.from as Square, lastMoveData.to as Square]);
+        }
+      } catch (e) {
+        console.error('Invalid PGN:', e);
+      }
+    }
+
+    setFen(chess.fen());
+  }, [chess, initialFen, pgn]);
+
+  const onMove = (from: Square, to: Square) => {
+    try {
+      const move = chess.move({ from, to });
+      if (move) {
+        setLastMove([from, to]);
+        setFen(chess.fen());
+      }
+    } catch (error) {
+      console.error('Invalid move:', error);
+    }
+  };
+
+  if (!fen)
+    return (
+      <div
+        className={`${className} w-full aspect-square bg-amber-100 dark:bg-slate-700`}
+      ></div>
+    );
+
+  return (
+    <div
+      className={`chess-board-container ${className} dark:ring-1 dark:ring-amber-700/30`}
+    >
+      <div className="relative w-full aspect-square pointer-events-none">
+        <Chessground
+          width="100%"
+          height="100%"
+          fen={fen}
+          onMove={onMove}
+          lastMove={lastMove}
+          turnColor={chess.turn() === 'w' ? 'white' : 'black'}
+          orientation={color === 'w' ? 'white' : 'black'}
+          movable={{
+            free: false,
+            color: 'both',
+            dests: calcMovable(chess),
+          }}
+          animation={{ enabled: false }}
+          coordinates={true}
+          highlight={{
+            lastMove: true,
+            check: true,
+          }}
+          className="dark:bg-slate-800"
+        />
+      </div>
+    </div>
+  );
+}

@@ -4,39 +4,127 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Chess } from 'chess.js';
 import type { Square } from 'chess.js';
 import ComputerGamePane from '@/components/ComputerGamePane';
-import LoadingScreen from '@/components/LoadingScreen';
+import UnauthorizedPage from '@/components/Unauthorized';
+import ErrorPage from '@/components/Error';
 import { toast } from 'sonner';
 import { testEngine, getBestMove } from '@/lib/engine';
+import {
+  updateGamePgn,
+  updateGameStatus,
+  getGame,
+} from '@/app/actions/gameActions';
+import { getUserInfo } from '@/lib/auth/googleAuth';
+import { GameStatus } from '@prisma/client';
+import { useSearchParams } from 'next/navigation';
 
 export default function ComputerGame() {
+  const searchParams = useSearchParams();
+  const gameId = searchParams.get('game_id');
+  const colorParam = searchParams.get('color');
+
   const [chess] = useState(new Chess());
   const [fen, setFen] = useState(chess.fen());
   const [lastMove, setLastMove] = useState<[Square, Square]>();
   const [selectVisible, setSelectVisible] = useState(false);
   const [pendingMove, setPendingMove] = useState<[Square, Square]>();
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [gameOver, setGameOver] = useState(false);
-  const [playingAs, setPlayingAs] = useState<'w' | 'b'>('w');
   const [engineStatus, setEngineStatus] = useState<
     'connected' | 'degraded' | 'disconnected' | 'pending'
   >('pending');
   const [isThinking, setIsThinking] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const moveHistory = useRef<string[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSuccessRef = useRef<number | null>(null);
 
+  const userInfo = getUserInfo();
+  const username = userInfo?.email?.split('@')[0] || 'anonymous';
+
+  const playingAs: 'w' | 'b' = colorParam === 'b' ? 'b' : 'w';
+
   useEffect(() => {
-    const params =
-      typeof window !== 'undefined'
-        ? new URLSearchParams(window.location.search)
-        : null;
-    const color = params?.get('color');
-    if (color === 'w' || color === 'b') setPlayingAs(color);
-    setIsLoading(false);
-  }, []);
+    if (!gameId) {
+      toast.error('No game ID provided');
+      setIsLoading(false);
+      return;
+    }
+
+    if (colorParam !== 'w' && colorParam !== 'b') {
+      toast.error('Invalid color parameter');
+      setIsLoading(false);
+      return;
+    }
+
+    const initializeGame = async () => {
+      try {
+        const gameResult = await getGame(gameId);
+
+        if (!gameResult.success || !gameResult.game) {
+          toast.error('Failed to load game');
+          setHasError(true);
+          setIsLoading(false);
+          return;
+        }
+
+        const game = gameResult.game;
+        const userIsWhite = game.white === username;
+        const userIsBlack = game.black === username;
+        const computerIsWhite = game.white === 'computer';
+        const computerIsBlack = game.black === 'computer';
+
+        const isAuthorizedPlayer =
+          (colorParam === 'w' && userIsWhite && computerIsBlack) ||
+          (colorParam === 'b' && userIsBlack && computerIsWhite);
+
+        if (!isAuthorizedPlayer) {
+          toast.error('You are not authorized to play this game');
+          setIsAuthorized(false);
+          setIsLoading(false);
+          return;
+        }
+
+        setIsAuthorized(true);
+
+        if (game.pgn) {
+          try {
+            chess.loadPgn(game.pgn);
+            moveHistory.current = chess.history();
+
+            const history = chess.history({ verbose: true });
+            if (history.length > 0) {
+              const last = history[history.length - 1];
+              setLastMove([last.from as Square, last.to as Square]);
+            }
+
+            setFen(chess.fen());
+          } catch (err) {
+            setHasError(true);
+            setIsLoading(false);
+            console.error('Error: ', err);
+            return;
+          }
+        }
+
+        if (game.status !== 'ONGOING') {
+          setGameOver(true);
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        toast.error('Error loading game');
+        console.error(error);
+        setHasError(true);
+        setIsLoading(false);
+      }
+    };
+
+    initializeGame();
+  }, [gameId, colorParam, username, chess]);
 
   useEffect(() => {
     const updateStatusByAge = () => {
@@ -54,7 +142,7 @@ export default function ComputerGame() {
         setEngineStatus('disconnected');
         setError('Chess engine unreachable (timeout)');
         toast.error('Engine disconnected', {
-          description: 'No response from engine for over 60 s',
+          description: 'No response from engine for over 60 s',
         });
       } else if (age >= 30000) {
         if (engineStatus !== 'degraded') {
@@ -101,8 +189,28 @@ export default function ComputerGame() {
 
   const updateState = useCallback(() => {
     setFen(chess.fen());
-    setGameOver(chess.isGameOver());
-  }, [chess]);
+
+    if (gameId) {
+      const pgn = chess.pgn();
+      updateGamePgn(gameId, pgn).catch(() => {});
+    }
+
+    const ended = chess.isGameOver();
+    setGameOver((prev) => prev || ended);
+
+    if (ended && gameId) {
+      let status: GameStatus = 'ONGOING';
+
+      if (chess.isCheckmate()) {
+        status = chess.turn() === 'w' ? 'BLACK_WINS' : 'WHITE_WINS';
+      } else if (chess.isDraw()) {
+        status = 'DRAW';
+      }
+
+      if (status !== 'ONGOING')
+        updateGameStatus(gameId, status).catch(() => {});
+    }
+  }, [chess, gameId]);
 
   const makeComputerMove = useCallback(async () => {
     if (gameOver || chess.turn() === playingAs || isThinking) return;
@@ -184,10 +292,10 @@ export default function ComputerGame() {
   );
 
   useEffect(() => {
-    if (!isLoading && playingAs === 'b') {
+    if (!isLoading && isAuthorized && playingAs === 'b') {
       makeComputerMove();
     }
-  }, [isLoading, playingAs, makeComputerMove]);
+  }, [isLoading, isAuthorized, playingAs, makeComputerMove]);
 
   const previewMove = useCallback((i: number) => {
     setPreviewIndex(i >= moveHistory.current.length ? null : i);
@@ -200,7 +308,7 @@ export default function ComputerGame() {
   const handlePrevious = useCallback(() => {
     if (previewIndex === null) {
       if (moveHistory.current.length)
-        setPreviewIndex(moveHistory.current.length - 1);
+        setPreviewIndex(moveHistory.current.length - 2);
     } else if (previewIndex > 0) {
       setPreviewIndex(previewIndex - 1);
     }
@@ -225,6 +333,10 @@ export default function ComputerGame() {
   }, [previewIndex, chess]);
 
   const handleTakeBack = useCallback(() => {
+    if (previewIndex !== null) {
+      setPreviewIndex(null);
+      return;
+    }
     if (gameOver || moveHistory.current.length < 2) return;
     chess.undo();
     chess.undo();
@@ -238,13 +350,31 @@ export default function ComputerGame() {
       setLastMove(undefined);
     }
     updateState();
-  }, [chess, gameOver, updateState]);
+  }, [chess, gameOver, updateState, previewIndex]);
 
   const handleResign = useCallback(() => {
     if (gameOver) return;
     setGameOver(true);
+
+    if (gameId) {
+      const status: GameStatus =
+        playingAs === 'w' ? 'BLACK_WINS' : 'WHITE_WINS';
+      updateGameStatus(gameId, status).catch(() => {});
+    }
+
     toast.info('Game ended', { description: 'You resigned the game' });
-  }, [gameOver]);
+  }, [gameOver, gameId, playingAs]);
+
+  const handleAbort = useCallback(() => {
+    if (gameOver) return;
+    setGameOver(true);
+
+    if (gameId) {
+      updateGameStatus(gameId, 'ABORTED').catch(() => {});
+    }
+
+    toast.info('Game aborted', { description: 'This game has been aborted' });
+  }, [gameOver, gameId]);
 
   const handleRetry = useCallback(() => {
     if (engineStatus !== 'disconnected') return;
@@ -291,9 +421,22 @@ export default function ComputerGame() {
     handleTakeBack,
     handleResign,
     handleRetry,
+    handleAbort,
   };
 
-  if (isLoading) return <LoadingScreen />;
+  if (isLoading) {
+    return null;
+  }
+
+  if (hasError) {
+    return (
+      <ErrorPage message="There was a problem loading this game" code="500" />
+    );
+  }
+
+  if (!isAuthorized) {
+    return <UnauthorizedPage />;
+  }
 
   return (
     <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">

@@ -7,8 +7,17 @@ import SocketGamePane from '@/components/SocketGamePane';
 import { SocketService } from '@/lib/socketService';
 import LoadingScreen from '@/components/LoadingScreen';
 import { toast } from 'sonner';
-import type { GameOutcome } from '@/types/socket-types';
+import { GameOutcome } from '@/types/shared';
 import { getUserInfo } from '@/lib/auth/googleAuth';
+import {
+  updateGamePgn,
+  updateGameStatus,
+  getGame,
+} from '@/app/actions/gameActions';
+import { GameStatus } from '@prisma/client';
+import ErrorPage from '@/components/Error';
+import UnauthorizedPage from '@/components/Unauthorized';
+import { useSearchParams } from 'next/navigation';
 
 export default function SocketGame() {
   const [chess] = useState(new Chess());
@@ -23,113 +32,232 @@ export default function SocketGame() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [gameOver, setGameOver] = useState(false);
-  const [gameOutcome, setGameOutcome] = useState<GameOutcome | undefined>(
-    undefined
-  );
-  const [gameId, setGameId] = useState('');
-  const [playingAs, setPlayingAs] = useState<'w' | 'b'>('w');
+  const [gameOutcome, setGameOutcome] = useState<
+    GameOutcome | 'Draw' | undefined
+  >(undefined);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   const lastLocalMoveRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('game_id');
-      const role = params.get('playas');
-      if (id) setGameId(id);
-      if (role === 'w' || role === 'b') setPlayingAs(role);
-    }
-  }, []);
+  const searchParams = useSearchParams();
+  const gameId = searchParams.get('game_id') || '';
+  const roleParam = searchParams.get('playas');
+  const playingAs: 'w' | 'b' =
+    roleParam === 'w' || roleParam === 'b' ? (roleParam as 'w' | 'b') : 'w';
 
   useEffect(() => {
     if (error) {
-      if (gameOutcome != undefined) {
+      if (gameOutcome !== undefined) {
         toast.success('Server closed, Game Completed');
       } else {
         toast.error(error);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error]);
+  }, [error, gameOutcome]);
 
   const userInfo = getUserInfo();
   const userId = userInfo?.email?.split('@')[0] || 'anonymous';
 
   const updateState = useCallback(() => {
     setFen(chess.fen());
+
+    if (gameId) {
+      const pgn = chess.pgn();
+      updateGamePgn(gameId, pgn).catch((err) => {
+        console.error('Failed to update game PGN:', err);
+      });
+    }
+
     if (chess.isGameOver() || chess.isDraw()) {
       setGameOver(true);
+
+      let status: GameStatus = 'ONGOING';
+
       if (chess.isCheckmate()) {
         const winner = chess.turn() === 'w' ? 'b' : 'w';
-        setGameOutcome({ type: 'Decisive', winner });
-      } else {
-        setGameOutcome({ type: 'Draw' });
+        if (winner === 'w') {
+          setGameOutcome({ Decisive: { winner: 'White' } });
+          status = 'WHITE_WINS';
+        } else {
+          setGameOutcome({ Decisive: { winner: 'Black' } });
+          status = 'BLACK_WINS';
+        }
+      } else if (chess.isDraw()) {
+        setGameOutcome('Draw');
+        status = 'DRAW';
+      }
+
+      if (status !== 'ONGOING' && gameId) {
+        updateGameStatus(gameId, status).catch((err) => {
+          console.error('Failed to update game status:', err);
+        });
       }
     }
-  }, [chess]);
+  }, [chess, gameId]);
 
   useEffect(() => {
-    const socketService = SocketService.getInstance();
-
-    socketService.onConnect(() => {
-      setIsConnected(true);
+    if (!gameId) {
       setIsLoading(false);
-      setError(null);
-    });
+      setError('No game ID provided');
+      return;
+    }
 
-    socketService.onMove((moveStr) => {
-      if (lastLocalMoveRef.current === moveStr) {
-        lastLocalMoveRef.current = null;
-        return;
-      }
+    const initializeGame = async () => {
       try {
-        const move = chess.move(moveStr);
-        if (move) {
-          setLastMove([move.from as Square, move.to as Square]);
-          updateState();
-        }
-      } catch (error) {
-        console.error('Invalid move received from socket:', error);
-      }
-    });
+        const gameResult = await getGame(gameId);
 
-    socketService.onHistory((moves) => {
-      chess.reset();
-      moves.forEach((moveStr) => {
+        if (!gameResult.success || !gameResult.game) {
+          console.error('Failed to load game data:', gameResult.error);
+          toast.error('Failed to load game');
+          setIsAuthorized(false);
+          setIsLoading(false);
+          setHasError(true);
+          return;
+        }
+
+        const game = gameResult.game;
+        const userIsWhite = game.white === userId;
+        const userIsBlack = game.black === userId;
+
+        const isAuthorizedPlayer =
+          (playingAs === 'w' && userIsWhite) ||
+          (playingAs === 'b' && userIsBlack);
+
+        if (!isAuthorizedPlayer) {
+          toast.error('You are not authorized to play this game');
+          setIsAuthorized(false);
+          setIsLoading(false);
+          return;
+        }
+
+        setIsAuthorized(true);
+
+        if (game.pgn) {
+          try {
+            const movesOnly = game.pgn
+              .replace(/^(\[.*\][\r\n]*)*/gm, '')
+              .trim();
+            chess.loadPgn(movesOnly);
+            const history = chess.history({ verbose: true });
+            if (history.length > 0) {
+              const last = history[history.length - 1];
+              setLastMove([last.from as Square, last.to as Square]);
+            }
+            setFen(chess.fen());
+          } catch (err) {
+            console.error('Error loading PGN:', err);
+            setHasError(true);
+            return;
+          }
+        }
+
+        if (game.status !== 'ONGOING') {
+          setGameOver(true);
+
+          if (game.status === 'WHITE_WINS') {
+            setGameOutcome({ Decisive: { winner: 'White' } });
+          } else if (game.status === 'BLACK_WINS') {
+            setGameOutcome({ Decisive: { winner: 'Black' } });
+          } else if (game.status === 'DRAW') {
+            setGameOutcome('Draw');
+          }
+        }
+      } catch (err) {
+        console.error('Error initializing game:', err);
+        toast.error('Error loading game');
+        setHasError(true);
+      }
+
+      const socketService = SocketService.getInstance();
+      let retries = 0;
+      const maxRetries = 3;
+      const retryDelay = 5000;
+
+      socketService.onConnect(() => {
+        setIsConnected(true);
+        setIsLoading(false);
+        setError(null);
+      });
+
+      socketService.onMove((moveStr) => {
+        if (lastLocalMoveRef.current === moveStr) {
+          lastLocalMoveRef.current = null;
+          return;
+        }
         try {
-          chess.move(moveStr);
+          const move = chess.move(moveStr);
+          if (move) {
+            setLastMove([move.from as Square, move.to as Square]);
+            updateState();
+          }
         } catch (error) {
-          console.error('Invalid move in history:', error);
+          console.error('Invalid move received from socket:', error);
         }
       });
-      if (moves.length > 0) {
-        const lastMoveObj = chess.history({ verbose: true }).pop();
-        if (lastMoveObj) {
-          setLastMove([lastMoveObj.from as Square, lastMoveObj.to as Square]);
+
+      socketService.onHistory((moves) => {
+        chess.reset();
+        moves.forEach((moveStr) => {
+          try {
+            chess.move(moveStr);
+          } catch (error) {
+            console.error('Invalid move in history:', error);
+          }
+        });
+        if (moves.length > 0) {
+          const lastMoveObj = chess.history({ verbose: true }).pop();
+          if (lastMoveObj) {
+            setLastMove([lastMoveObj.from as Square, lastMoveObj.to as Square]);
+          }
         }
-      }
-      updateState();
-    });
+        updateState();
+      });
 
-    socketService.onGameEnd((outcome) => {
-      setGameOver(true);
-      if (outcome === 'Draw') {
-        setGameOutcome({ type: 'Draw' });
-      } else {
-        setGameOutcome(outcome as GameOutcome);
-      }
-    });
+      socketService.onGameEnd((outcome) => {
+        setGameOver(true);
 
-    socketService.onError((errorMsg) => {
-      setError(errorMsg);
-      if (!isConnected) {
-        setIsLoading(false);
-      }
-    });
+        let status: GameStatus = 'ONGOING';
 
-    socketService.connect(gameId, userId);
+        if (outcome === 'Draw') {
+          setGameOutcome('Draw');
+          status = 'DRAW';
+        } else if ('Decisive' in outcome) {
+          setGameOutcome(outcome);
+          status =
+            outcome.Decisive?.winner === 'White' ? 'WHITE_WINS' : 'BLACK_WINS';
+        }
+
+        if (gameId && status !== 'ONGOING') {
+          updateGameStatus(gameId, status).catch((err) => {
+            console.error('Failed to update game status on server event:', err);
+          });
+        }
+      });
+
+      socketService.onError((errorMsg) => {
+        retries += 1;
+        if (!isConnected && retries < maxRetries) {
+          setTimeout(() => {
+            socketService.connect(gameId, userId);
+          }, retryDelay);
+        } else if (!isConnected) {
+          setIsLoading(false);
+          toast.error(
+            'Unable to connect to game server. Please try again later'
+          );
+          console.error(errorMsg);
+        }
+      });
+
+      socketService.connect(gameId, userId);
+    };
+
+    setIsLoading(true);
+    initializeGame();
 
     return () => {
+      const socketService = SocketService.getInstance();
       socketService.onConnect(() => {});
       socketService.onMove(() => {});
       socketService.onHistory(() => {});
@@ -137,7 +265,7 @@ export default function SocketGame() {
       socketService.onError(() => {});
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chess, gameId, userId]);
+  }, [gameId, userId, isConnected]);
 
   const onMove = useCallback(
     (from: Square, to: Square) => {
@@ -261,6 +389,20 @@ export default function SocketGame() {
 
   if (isLoading) {
     return <LoadingScreen />;
+  }
+
+  if (!gameId) {
+    return <ErrorPage message="No game ID provided" code="400" />;
+  }
+
+  if (!isAuthorized) {
+    return <UnauthorizedPage />;
+  }
+
+  if (hasError) {
+    return (
+      <ErrorPage message="There was a problem loading this game" code="500" />
+    );
   }
 
   return (

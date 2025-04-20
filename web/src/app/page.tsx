@@ -264,7 +264,7 @@ export default function HomePage() {
               </div>
               <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
                 Written from scratch to efficiently leverage multiple CPU cores
-                and your GPU for lightning-fast gameplay analysis.
+                and multiple instances for lightning-fast gameplay performance.
               </p>
             </div>
 
@@ -293,7 +293,7 @@ export default function HomePage() {
                 </h3>
               </div>
               <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
-                Chat with teammates, analyze games together, and share your
+                Collaborate gameing experiecne together, and share your
                 strategies and projects. All included.
               </p>
             </div>

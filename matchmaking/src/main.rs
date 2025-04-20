@@ -4,12 +4,16 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use axum::{http::{header, Method, StatusCode}, routing::post, Json, Router};
+use axum::{
+    http::{header, Method, StatusCode},
+    routing::post,
+    Json, Router,
+};
 use dotenvy::dotenv;
 use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 use tokio::sync::{mpsc, oneshot};
-use tower_http::cors::{CorsLayer, AllowOrigin};
+use tower_http::cors::{AllowOrigin, CorsLayer};
 use ts_rs::TS;
 
 const MAX_CHANNEL_SIZE: usize = 4096;
@@ -91,7 +95,7 @@ async fn matcher(
             let game_id = uuid::Uuid::new_v4();
 
             if let Err(e) = sqlx::query!(
-                "INSERT INTO ActiveGames (GameID, Black, White) VALUES ($1, $2, $3)",
+                r#"INSERT INTO GameState (GameID, Black, White, PGN) VALUES ($1, $2, $3, '')"#,
                 game_id,
                 player2.user_id,
                 player1.user_id
@@ -194,14 +198,15 @@ async fn main() {
         ])
         .allow_credentials(false);
 
-    let app = Router::new().route(
-        "/match",
-        post({
-            let cloned_queue = player_queue.clone();
-            move |body| post_match(notify_tx, cloned_queue, body)
-        }),
-    )
-    .layer(cors);
+    let app = Router::new()
+        .route(
+            "/match",
+            post({
+                let cloned_queue = player_queue.clone();
+                move |body| post_match(notify_tx, cloned_queue, body)
+            }),
+        )
+        .layer(cors);
 
     tokio::spawn(matcher(notify_rx, player_queue.clone(), pool));
 
