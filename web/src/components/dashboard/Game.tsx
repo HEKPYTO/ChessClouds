@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +19,7 @@ export default function GamesTab({ username }: { username: string }) {
   const [resultFilter, setResultFilter] = useState('All');
   const [games, setGames] = useState<gamestate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchInputFocused, setSearchInputFocused] = useState(false);
 
   const itemsPerPage = 25;
 
@@ -44,6 +43,19 @@ export default function GamesTab({ username }: { username: string }) {
 
     fetchGames();
   }, [username]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (searchInputFocused) {
+        e.stopPropagation();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown, true);
+    };
+  }, [searchInputFocused]);
 
   const getGameResult = (game: gamestate): string => {
     if (game.status === 'DRAW') return '½-½';
@@ -254,7 +266,9 @@ export default function GamesTab({ username }: { username: string }) {
                   placeholder="Search opponent"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8 bg-amber-50/80 dark:bg-slate-700/80 border-amber-200 dark:border-slate-600 focus:border-amber-500 dark:focus:border-amber-400"
+                  onFocus={() => setSearchInputFocused(true)}
+                  onBlur={() => setSearchInputFocused(false)}
+                  className="pl-8 bg-amber-50/80 dark:bg-slate-700/80 border-amber-200 dark:border-slate-600 focus:border-amber-400 dark:focus:border-amber-400"
                 />
                 <MagnifyingGlassIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-amber-700 dark:text-amber-300" />
               </div>
