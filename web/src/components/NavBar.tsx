@@ -276,30 +276,57 @@ export default function Navbar() {
 
           {/* Dashboard / Sign up */}
           <div className="hidden md:block">
-            <Button
-              variant="outline"
-              className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] ${
-                pressedKey === (isDashboardPage || isGamePage ? 'h' : 'd')
-                  ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
-                  : ''
-              }`}
-              onClick={
-                isGamePage ? handleHomeClick : handleDashboardSignUpClick
-              }
-              onMouseUp={() => setPressedKey(null)}
-            >
-              {isGamePage ? 'Home' : isDashboardPage ? 'Home' : 'Dashboard'}
-              <span
-                className={`ml-1 text-xs px-1 rounded ${
-                  pressedKey === (isDashboardPage || isGamePage ? 'h' : 'd')
-                    ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
-                    : 'bg-amber-100 dark:bg-slate-800'
+            {
+              isAuthenticated() ? (
+                  <Button
+                  variant="outline"
+                  className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] ${
+                    pressedKey === (isDashboardPage || isGamePage ? 'h' : 'd')
+                      ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                      : ''
+                  }`}
+                  onClick={
+                    isGamePage ? handleHomeClick : handleDashboardSignUpClick
+                  }
+                  onMouseUp={() => setPressedKey(null)}
+                >
+                  {isGamePage ? 'Home' : isDashboardPage ? 'Home' : 'Dashboard'}
+                  <span
+                    className={`ml-1 text-xs px-1 rounded ${
+                      pressedKey === (isDashboardPage || isGamePage ? 'h' : 'd')
+                        ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
+                        : 'bg-amber-100 dark:bg-slate-800'
+                    }`}
+                  >
+                    {' '}
+                    {isDashboardPage || isGamePage ? 'H' : 'D'}{' '}
+                  </span>
+                </Button>
+              ) : (
+                <Button
+                variant="outline"
+                className={`h-9 text-sm border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569] ${
+                  pressedKey === 's'
+                    ? 'transform translate-y-[3px] shadow-none bg-amber-100 dark:bg-slate-800'
+                    : ''
                 }`}
+                onClick={handleDashboardSignUpClick}
+                onMouseUp={() => setPressedKey(null)}
               >
-                {' '}
-                {isDashboardPage || isGamePage ? 'H' : 'D'}{' '}
-              </span>
-            </Button>
+                Sign Up
+                <span
+                  className={`ml-1 text-xs px-1 rounded ${
+                    pressedKey === 's'
+                      ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
+                      : 'bg-amber-100 dark:bg-slate-800'
+                  }`}
+                >
+                  {'S'}
+                </span>
+              </Button>
+              )
+            }
+
           </div>
 
           {/* Play/Cancel */}
@@ -341,7 +368,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="xl:hidden flex items-center justify-center h-9 w-9 border border-amber-300 text-amber-800 hover:bg-amber-50 hover:text-amber-900 rounded-md transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
+            className="xl:hidden flex items-center justify-center h-9 w-9 border border-amber-300 bg-white text-amber-800 hover:bg-amber-50 hover:text-amber-900 rounded-md transition-all shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_1px_0_0_#fcd34d] hover:translate-y-[2px] dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50 dark:shadow-[0_3px_0_0_#475569] dark:hover:shadow-[0_1px_0_0_#475569]"
             onClick={toggleMobileMenu}
             disabled={animating}
             aria-label="Menu"
