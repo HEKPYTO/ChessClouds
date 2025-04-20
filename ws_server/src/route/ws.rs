@@ -1,4 +1,4 @@
-use std::{clone, sync::Arc, time::Duration};
+use std::{sync::Arc, time::Duration};
 
 use axum::{
     extract::{
@@ -135,15 +135,15 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                     .active_games
                     .remove(&cloned_game_id)
                     .expect("game should exist");
-                if let Err(e) = sqlx::query!(
-                    "DELETE FROM ActiveGames WHERE GameID = $1",
-                    Uuid::parse_str(&cloned_game_id).expect("game_id should be a valid UUID")
-                )
-                .execute(&cloned_state.pool)
-                .await
-                {
-                    tracing::error!("removing active game failed: {e}");
-                }
+                // if let Err(e) = sqlx::query!(
+                //     "UPDATE GameState SET Status = 'Abort' WHERE GameID = $1",
+                //     Uuid::parse_str(&cloned_game_id).expect("game_id should be a valid UUID")
+                // )
+                // .execute(&cloned_state.pool)
+                // .await
+                // {
+                //     tracing::error!("removing active game failed: {e}");
+                // }
             });
 
             state
@@ -205,7 +205,7 @@ async fn auth_socket(socket: &mut SplitStream<WebSocket>, state: &AppState) -> R
                     };
 
                     let row = sqlx::query!(
-                        "SELECT GameID, Black, White FROM ActiveGames WHERE GameId = $1",
+                        r#"SELECT GameID, Black, White FROM GameState WHERE GameId = $1 AND Status = 'On Going'"#,
                         game_uuid
                     )
                     .fetch_one(&state.pool)

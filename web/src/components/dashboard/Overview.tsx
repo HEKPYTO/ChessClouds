@@ -1,134 +1,71 @@
 'use client';
 
+import { getUserHistoryGames } from '@/app/actions/gameActions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getLastTime } from '@/lib/time';
 import { DashboardTabProps } from '@/types/dashboard-props';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import LoadingScreen from '../LoadingScreen';
 
-const HISTORY_PER_PAGE = 10;
-const FRIEND_PER_PAGE = 5;
+const HISTORY_LIMIT = 10;
+// const FRIEND_PER_PAGE = 5;
 
-const mockGameHistory = [
-  {
-    id: 1,
-    opponent: 'martin-xiii',
-    opponentRating: 1800,
-    playerRating: 659,
-    result: '1-0',
-    date: '3/4/2025',
-    moves: 83,
-  },
-  {
-    id: 2,
-    opponent: 'dj-ron-passano',
-    opponentRating: 1350,
-    playerRating: 659,
-    result: '1-0',
-    date: '2/26/2025',
-    moves: 69,
-  },
-  {
-    id: 3,
-    opponent: 'Jdomenusrex',
-    opponentRating: 446,
-    playerRating: 292,
-    result: '0-1',
-    date: '2/18/2025',
-    moves: 34,
-  },
-  {
-    id: 4,
-    opponent: 'Jdomenusrex',
-    opponentRating: 446,
-    playerRating: 292,
-    result: '1-0',
-    date: '2/18/2025',
-    moves: 35,
-  },
-  {
-    id: 5,
-    opponent: 'knight_rider',
-    opponentRating: 550,
-    playerRating: 456,
-    result: '1-0',
-    date: '2/15/2025',
-    moves: 42,
-  },
-  {
-    id: 6,
-    opponent: 'chess_lover99',
-    opponentRating: 700,
-    playerRating: 659,
-    result: '½-½',
-    date: '2/10/2025',
-    moves: 67,
-  },
-  {
-    id: 7,
-    opponent: 'tactical_genius',
-    opponentRating: 625,
-    playerRating: 456,
-    result: '0-1',
-    date: '2/5/2025',
-    moves: 51,
-  },
-  {
-    id: 8,
-    opponent: 'queen_gambit',
-    opponentRating: 520,
-    playerRating: 292,
-    result: '1-0',
-    date: '2/1/2025',
-    moves: 29,
-  },
-  {
-    id: 9,
-    opponent: 'pawn_star',
-    opponentRating: 830,
-    playerRating: 659,
-    result: '0-1',
-    date: '1/28/2025',
-    moves: 64,
-  },
-  {
-    id: 10,
-    opponent: 'rook_roller',
-    opponentRating: 490,
-    playerRating: 456,
-    result: '½-½',
-    date: '1/25/2025',
-    moves: 78,
-  },
-];
-
-const mockFriends = [
-  { id: 1, name: 'martin-xiii', rating: 1800, status: 'online' },
-  { id: 2, name: 'dj-ron-passano', rating: 1350, status: 'offline' },
-  { id: 3, name: 'Jdomenusrex', rating: 446, status: 'playing' },
-  { id: 4, name: 'knight_rider', rating: 550, status: 'online' },
-  { id: 5, name: 'chess_lover99', rating: 700, status: 'offline' },
-];
-
-export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
+export default function OverviewTab({
+  setActiveTab,
+  username,
+}: DashboardTabProps) {
   const handleViewGames = () => {
     setActiveTab('games');
   };
 
-  const handleViewFriends = () => {
-    setActiveTab('friends');
-  };
+  // const handleViewFriends = () => {
+  //   setActiveTab('friends');
+  // };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'online':
-        return 'bg-green-600';
-      case 'playing':
-        return 'bg-amber-600';
-      case 'offline':
-        return 'bg-slate-400';
-      default:
-        return 'bg-slate-400';
-    }
-  };
+  // const getStatusColor = (status: string) => {
+  //   switch (status) {
+  //     case 'online':
+  //       return 'bg-green-600';
+  //     case 'playing':
+  //       return 'bg-amber-600';
+  //     case 'offline':
+  //       return 'bg-slate-400';
+  //     default:
+  //       return 'bg-slate-400';
+  //   }
+  // };
+
+  const [gameHistory, setGameHistory] = useState<
+    Awaited<ReturnType<typeof getUserHistoryGames>>['games']
+  >([]);
+  const [loadingGameHistory, setLoadingGameHistory] = useState(true);
+
+  useEffect(() => {
+    const fetchGameHistory = async () => {
+      try {
+        setLoadingGameHistory(true);
+        const { success, games = [] } = await getUserHistoryGames(username);
+        if (success) {
+          setGameHistory(games);
+        } else {
+          toast.error('Failed to load game history');
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error('Error loading game history');
+      } finally {
+        setLoadingGameHistory(false);
+      }
+    };
+
+    if (username) fetchGameHistory();
+  }, [username]);
+
+  if (loadingGameHistory) {
+    return <LoadingScreen />;
+  }
 
   return (
     <>
@@ -143,7 +80,26 @@ export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             <div className="flex flex-col items-center bg-amber-50/80 dark:bg-slate-700/50 p-4 rounded-lg border border-amber-200/40 dark:border-amber-800/20">
               <div className="text-2xl sm:text-3xl font-bold text-amber-900 dark:text-amber-100">
-                1682
+                {gameHistory === undefined
+                  ? 500
+                  : Math.max(
+                      100,
+                      500 -
+                        gameHistory.filter(
+                          (g) =>
+                            (g.status === 'WHITE_WINS' &&
+                              g.black === username) ||
+                            (g.status === 'BLACK_WINS' && g.white === username)
+                        ).length *
+                          10 +
+                        gameHistory.filter(
+                          (g) =>
+                            (g.status === 'WHITE_WINS' &&
+                              g.white === username) ||
+                            (g.status === 'BLACK_WINS' && g.black === username)
+                        ).length *
+                          10
+                    )}
               </div>
               <div className="text-sm text-amber-700 dark:text-amber-300">
                 Rating
@@ -152,7 +108,7 @@ export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
 
             <div className="flex flex-col items-center bg-amber-50/80 dark:bg-slate-700/50 p-4 rounded-lg border border-amber-200/40 dark:border-amber-800/20">
               <div className="text-2xl sm:text-3xl font-bold text-amber-900 dark:text-amber-100">
-                152
+                {gameHistory?.length ?? 0}
               </div>
               <div className="text-sm text-amber-700 dark:text-amber-300">
                 Games Played
@@ -161,7 +117,21 @@ export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
 
             <div className="flex flex-col items-center bg-amber-50/80 dark:bg-slate-700/50 p-4 rounded-lg border border-amber-200/40 dark:border-amber-800/20">
               <div className="text-2xl sm:text-3xl font-bold text-amber-900 dark:text-amber-100">
-                62%
+                {gameHistory === undefined
+                  ? 0
+                  : gameHistory.length
+                  ? Math.round(
+                      (100 *
+                        gameHistory.filter(
+                          (g) =>
+                            (g.status === 'WHITE_WINS' &&
+                              g.white === username) ||
+                            (g.status === 'BLACK_WINS' && g.black === username)
+                        ).length) /
+                        gameHistory.length
+                    )
+                  : 0}
+                %
               </div>
               <div className="text-sm text-amber-700 dark:text-amber-300">
                 Win Rate
@@ -170,7 +140,18 @@ export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
 
             <div className="flex flex-col items-center bg-amber-50/80 dark:bg-slate-700/50 p-4 rounded-lg border border-amber-200/40 dark:border-amber-800/20">
               <div className="text-2xl sm:text-3xl font-bold text-amber-900 dark:text-amber-100">
-                3
+                {gameHistory === undefined
+                  ? 0
+                  : ((i) => (i === -1 ? gameHistory.length : i))(
+                      gameHistory.findIndex(
+                        (g) =>
+                          !(
+                            (g.status === 'WHITE_WINS' &&
+                              g.white === username) ||
+                            (g.status === 'BLACK_WINS' && g.black === username)
+                          )
+                      )
+                    )}
               </div>
               <div className="text-sm text-amber-700 dark:text-amber-300">
                 Current Streak
@@ -209,9 +190,6 @@ export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
                       <tr>
                         <th className="text-left py-2 px-2">Opponent</th>
                         <th className="text-left py-2 px-2">Result</th>
-                        <th className="hidden sm:table-cell text-center py-2 px-2">
-                          Type
-                        </th>
                         <th className="hidden md:table-cell text-left py-2 px-2">
                           Date
                         </th>
@@ -219,39 +197,51 @@ export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
                       </tr>
                     </thead>
                     <tbody>
-                      {mockGameHistory
-                        .slice(0, HISTORY_PER_PAGE)
-                        .map((game, i) => (
+                      {gameHistory !== undefined &&
+                        gameHistory.slice(0, HISTORY_LIMIT).map((game, i) => (
                           <tr
                             key={i}
-                            className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 hover:text-amber-900 dark:hover:bg-slate-700/30 transition-colors"
+                            className="border-b border-amber-100/50 dark:border-slate-700/30 hover:bg-amber-50 hover:text-amber-900 dark:hover:text-slate-100/80 dark:hover:bg-slate-700/30 transition-colors"
                           >
                             <td className="py-2 px-2 font-medium truncate max-w-[100px] sm:max-w-none">
-                              {game.opponent}
+                              {game.black === username
+                                ? game.white
+                                : game.black}
                             </td>
                             <td
                               className={`py-2 px-2 font-medium ${
-                                game.result === '1-0'
+                                (game.status === 'WHITE_WINS' &&
+                                  game.white === username) ||
+                                (game.status === 'BLACK_WINS' &&
+                                  game.black === username)
                                   ? 'text-green-600 dark:text-green-400'
-                                  : game.result === '0-1'
-                                  ? 'text-red-600 dark:text-red-400'
-                                  : 'text-amber-600 dark:text-amber-400'
+                                  : game.status === 'DRAW'
+                                  ? 'text-amber-600 dark:text-amber-400'
+                                  : 'text-red-600 dark:text-red-400'
                               }`}
                             >
-                              {game.result}
-                            </td>
-                            <td className="hidden sm:table-cell py-2 px-2 text-center">
-                              {game.playerRating >= 600
-                                ? 'Rapid'
-                                : game.playerRating >= 400
-                                ? 'Blitz'
-                                : 'Bullet'}
+                              {game.status === 'DRAW'
+                                ? '½-½'
+                                : (game.status === 'WHITE_WINS' &&
+                                    game.white === username) ||
+                                  (game.status === 'BLACK_WINS' &&
+                                    game.black === username)
+                                ? '1-0'
+                                : '0-1'}
                             </td>
                             <td className="hidden md:table-cell py-2 px-2">
-                              {game.date}
+                              {game.createdat
+                                ? getLastTime(game.createdat)
+                                : '—'}
                             </td>
-                            <td className="py-2 px-2 text-center">
-                              {game.moves}
+                            <td className="text-center py-2 px-2">
+                              {game.pgn
+                                ? (
+                                    game.pgn.match(
+                                      /\b([PNBRQK]?[a-h]?[1-8]?x?[a-h][1-8](?:=[NBRQ])?|O-O(?:-O)?|[a-h][1-8])\b/g
+                                    ) || []
+                                  ).length
+                                : 0}
                             </td>
                           </tr>
                         ))}
@@ -264,7 +254,7 @@ export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
         </div>
 
         {/* Friends */}
-        <div className="w-full xl:w-80 flex-shrink-0">
+        {/* <div className="w-full xl:w-80 flex-shrink-0">
           <Card className="w-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-amber-200/50 dark:border-amber-800/30 shadow-md">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold text-amber-900 dark:text-amber-100 flex justify-between items-center">
@@ -334,7 +324,7 @@ export default function OverviewTab({ setActiveTab }: DashboardTabProps) {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
       </div>
     </>
   );
