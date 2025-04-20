@@ -23,7 +23,10 @@ export class SocketService {
   private serverUrl: string;
 
   constructor(serverUrl?: string) {
-    this.serverUrl = serverUrl || process.env.NEXT_PUBLIC_WS_SERVER_URL || 'ws://localhost:8000/ws';
+    this.serverUrl =
+      serverUrl ||
+      process.env.NEXT_PUBLIC_WS_SERVER_URL ||
+      'ws://localhost:8000/ws';
   }
 
   static getInstance(
