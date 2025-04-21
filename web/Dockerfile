@@ -2,6 +2,9 @@ FROM oven/bun:1 AS builder
 WORKDIR /app
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+RUN apt-get update && \
+    apt-get install -y openssl && \
+    rm -rf /var/lib/apt/lists/*
 RUN touch bun.lockb                         
 RUN bun install                                 
 RUN bun add tailwindcss @tailwindcss/postcss postcss autoprefixer
