@@ -19,7 +19,7 @@ ENV NEXT_PUBLIC_MATCHMAKING_SERVER_URL=${NEXT_PUBLIC_MATCHMAKING_SERVER_URL}
 ENV DATABASE_URL=${DATABASE_URL}
 
 RUN bunx prisma generate
-RUN bun run build                               
+RUN bun run build
 
 FROM oven/bun:1 AS runner
 WORKDIR /app
