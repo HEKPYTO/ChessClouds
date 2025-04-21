@@ -8,7 +8,6 @@ RUN apt-get update && \
 RUN touch bun.lockb                         
 RUN bun install                                 
 RUN bun add tailwindcss @tailwindcss/postcss postcss autoprefixer
-
 RUN bunx prisma generate
 RUN bun run build
 
@@ -25,11 +24,19 @@ COPY --from=builder /app/bun.lockb ./bun.lockb
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma/client ./node_modules/.prisma/client
 
-COPY --from=builder /app/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+ARG NEXT_PUBLIC_GOOGLE_AUTH_ENDPOINT
+ARG NEXT_PUBLIC_ENGINE_API_URL
+ARG NEXT_PUBLIC_WS_SERVER_URL
+ARG NEXT_PUBLIC_MATCHMAKING_SERVER_URL
+ARG DATABASE_URL
+
+ENV NEXT_PUBLIC_GOOGLE_AUTH_ENDPOINT=${NEXT_PUBLIC_GOOGLE_AUTH_ENDPOINT}
+ENV NEXT_PUBLIC_ENGINE_API_URL=${NEXT_PUBLIC_ENGINE_API_URL}
+ENV NEXT_PUBLIC_WS_SERVER_URL=${NEXT_PUBLIC_WS_SERVER_URL}
+ENV NEXT_PUBLIC_MATCHMAKING_SERVER_URL=${NEXT_PUBLIC_MATCHMAKING_SERVER_URL}
+ENV DATABASE_URL=${DATABASE_URL}
 
 RUN bun install --production
 ARG PORT
 EXPOSE ${PORT:-3000}
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["bun", "start"]
