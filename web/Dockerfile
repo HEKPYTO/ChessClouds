@@ -25,7 +25,11 @@ COPY --from=builder /app/bun.lockb ./bun.lockb
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma/client ./node_modules/.prisma/client
 
+COPY --from=builder /app/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 RUN bun install --production
 ARG PORT
 EXPOSE ${PORT:-3000}
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["bun", "start"]
