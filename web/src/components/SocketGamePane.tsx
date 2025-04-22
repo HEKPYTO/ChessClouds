@@ -396,7 +396,10 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
                     {!isConnected && reconnect && (
                       <Button
                         size="sm"
-                        className="h-7 text-xs bg-amber-600"
+                        className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white rounded-md transition-all 
+                          shadow-[0_2px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[1px]
+                          dark:bg-amber-500 dark:hover:bg-amber-600
+                          dark:shadow-[0_2px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
                         onClick={(e) => {
                           e.stopPropagation();
                           reconnect();
@@ -473,7 +476,13 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
             <Card className="bg-white dark:bg-slate-700 border border-amber-200/50 dark:border-slate-600/50 shadow-none">
               <CardContent className="text-center">
                 <div className="font-medium text-base text-amber-800 dark:text-amber-200">
-                  Player A (1600) - Player B (1600)
+                  {playingAs === 'w'
+                  ? `${gameProps.white || 'You'} vs ${
+                      gameProps.black || 'Opponent'
+                    }`
+                  : `${gameProps.white || 'Opponent'} vs ${
+                      gameProps.black || 'You'
+                    }`}
                 </div>
                 <div className="text-sm text-amber-600 dark:text-amber-300">
                   {gameStatus}

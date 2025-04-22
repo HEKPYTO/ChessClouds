@@ -68,6 +68,7 @@ export default function SocketGameComponent({
   const userInfo = getUserInfo();
   const userId = userInfo?.email?.split('@')[0] || 'anonymous';
 
+  // ADD get game to verify game access
   useEffect(() => {
     const verifyGameAccess = async () => {
       try {
@@ -105,35 +106,7 @@ export default function SocketGameComponent({
           });
         }
 
-        if (game.pgn) {
-          try {
-            const movesOnly = game.pgn
-              .replace(/^(\\[.*\\][\\r\\n]*)*/gm, '')
-              .trim();
-            chess.loadPgn(movesOnly);
-            const history = chess.history({ verbose: true });
-            if (history.length > 0) {
-              const last = history[history.length - 1];
-              setLastMove([last.from as Square, last.to as Square]);
-            }
-            setFen(chess.fen());
-          } catch (err) {
-            console.error(err);
-            setHasError(true);
-          }
-        }
-
-        if (game.status !== 'ONGOING') {
-          setGameOver(true);
-
-          if (game.status === 'WHITE_WINS') {
-            setGameOutcome({ Decisive: { winner: 'White' } });
-          } else if (game.status === 'BLACK_WINS') {
-            setGameOutcome({ Decisive: { winner: 'Black' } });
-          } else if (game.status === 'DRAW') {
-            setGameOutcome('Draw');
-          }
-        }
+        // RM these below confusion mistakes
 
         setIsAuthChecking(false);
       } catch (err) {

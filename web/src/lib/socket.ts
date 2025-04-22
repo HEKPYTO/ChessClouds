@@ -65,7 +65,7 @@ export default function useSocket(
           onError(`disconnect:normal:${event.reason || 'Game session ended'}`);
       } else {
         if (onError)
-          onError(`disconnect:error:${event.reason || 'Connection lost'}`);
+          onError(`disconnect:error:${event.reason || 'Disconnected'}`);
       }
     };
 
