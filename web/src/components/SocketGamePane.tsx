@@ -293,7 +293,7 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
           <div className="bg-amber-50 dark:bg-slate-800 rounded-lg border border-amber-200/50 dark:border-amber-800/30 overflow-hidden shadow-md flex flex-col h-[300px]">
             <div
               ref={moveListRef}
-              className="overflow-y-auto flex-grow max-h-[300px] px-4 font-mono text-sm"
+              className="overflow-y-auto flex-grow max-h-[285px] px-4 font-mono text-sm"
             >
               <div className="pt-2" />
               <table className="w-full table-fixed">
@@ -663,7 +663,10 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
                       {!isConnected && reconnect && (
                         <Button
                           size="sm"
-                          className="h-7 text-xs bg-amber-600"
+                          className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white rounded-md transition-all 
+                          shadow-[0_2px_0_0_#b45309] hover:shadow-[0_1px_0_0_#92400e] hover:translate-y-[1px]
+                          dark:bg-amber-500 dark:hover:bg-amber-600
+                          dark:shadow-[0_2px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]"
                           onClick={(e) => {
                             e.stopPropagation();
                             reconnect();

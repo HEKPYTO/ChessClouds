@@ -32,21 +32,26 @@ export default function useSocket(
   const socket_ref = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<SocketStatus>('connecting');
 
+  console.log(`gameID: ${gameId}, userId: ${userId}`);
+
   useEffect(() => {
     const socket = new WebSocket(url);
 
     socket_ref.current = socket;
 
     socket.onopen = () => {
+      console.log('socket open');
       const authMsg: ClientMessage = {
         kind: 'Auth',
         value: { game_id: gameId, user_id: userId },
       };
+      console.log(authMsg);
       socket.send(JSON.stringify(authMsg));
     };
 
-    socket.onerror = () => {
+    socket.onerror = (event) => {
       setStatus('closed');
+      console.error('Websocket error:', event);
       if (onError) {
         onError('Connection closed due to an error');
       }
@@ -54,6 +59,7 @@ export default function useSocket(
 
     socket.onclose = (event) => {
       setStatus('closed');
+      // Add closure condition for end game displays
       const normalClosure =
         event.code === 1000 || event.code === 1001 || event.code === 1005;
       const gameRelatedMessage =
@@ -72,6 +78,7 @@ export default function useSocket(
     socket.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data) as ServerMessage;
+        console.log('Socket received message:', message);
 
         switch (message.kind) {
           case 'Move':
@@ -101,6 +108,7 @@ export default function useSocket(
             break;
         }
       } catch (error) {
+        console.error('Error parsing message:', error, event.data);
         if (onError) {
           onError('Failed to parse server message');
           console.error(error);
@@ -115,7 +123,9 @@ export default function useSocket(
 
   const move = (move: string) => {
     const moveMsg: ClientMessage = { kind: 'Move', value: move };
+    console.log(`Sending move: ${move}`);
     if (!socket_ref.current) {
+      console.error('socket is null');
       return;
     }
     socket_ref.current.send(JSON.stringify(moveMsg));
@@ -123,6 +133,7 @@ export default function useSocket(
 
   const disconnect = () => {
     if (!socket_ref.current) {
+      console.error('socket is null');
       return;
     }
     socket_ref.current.close(1000, 'Disconnected by user');
