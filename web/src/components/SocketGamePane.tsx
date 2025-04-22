@@ -477,12 +477,12 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
               <CardContent className="text-center">
                 <div className="font-medium text-base text-amber-800 dark:text-amber-200">
                   {playingAs === 'w'
-                  ? `${gameProps.white || 'You'} vs ${
-                      gameProps.black || 'Opponent'
-                    }`
-                  : `${gameProps.white || 'Opponent'} vs ${
-                      gameProps.black || 'You'
-                    }`}
+                    ? `${gameProps.white || 'You'} vs ${
+                        gameProps.black || 'Opponent'
+                      }`
+                    : `${gameProps.white || 'Opponent'} vs ${
+                        gameProps.black || 'You'
+                      }`}
                 </div>
                 <div className="text-sm text-amber-600 dark:text-amber-300">
                   {gameStatus}
