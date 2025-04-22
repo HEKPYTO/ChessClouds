@@ -5,10 +5,9 @@ import UnauthorizedPage from '@/components/Unauthorized';
 export default async function SocketPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const gameId = searchParams.game_id;
-  const playAs = searchParams.playas;
+  const { game_id: gameId, playas: playAs } = await searchParams;
 
   if (!gameId) {
     return <ErrorPage message="No game ID provided" code="400" />;
