@@ -132,9 +132,9 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                 tracing::info!("cleaning up state for {}", cloned_game_id);
 
                 // NO RM games from active_games map
-                // Only updating the database status to 'Abort' and NOTHING ELSE !!
+                // Only updating the database status to 'Abort' if current status is 'On Going'
                 if let Err(e) = sqlx::query!(
-                    "UPDATE GameState SET Status = 'Abort' WHERE GameID = $1",
+                    "UPDATE GameState SET Status = 'Abort' WHERE GameID = $1 AND Status = 'On Going'",
                     Uuid::parse_str(&cloned_game_id).expect("game_id should be a valid UUID")
                 )
                 .execute(&cloned_state.pool)
