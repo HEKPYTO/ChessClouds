@@ -131,10 +131,8 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
 
                 tracing::info!("cleaning up state for {}", cloned_game_id);
 
-                cloned_state
-                    .active_games
-                    .remove(&cloned_game_id)
-                    .expect("game should exist");
+                // NO RM games from active_games map
+                // Only updating the database status to 'Abort' and NOTHING ELSE !!
                 if let Err(e) = sqlx::query!(
                     "UPDATE GameState SET Status = 'Abort' WHERE GameID = $1",
                     Uuid::parse_str(&cloned_game_id).expect("game_id should be a valid UUID")
@@ -142,7 +140,7 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                 .execute(&cloned_state.pool)
                 .await
                 {
-                    tracing::error!("removing active game failed: {e}");
+                    tracing::error!("updating game status to Abort failed: {e}");
                 }
             });
 
