@@ -19,6 +19,8 @@ export type SocketResponse = {
   disconnect: () => void;
 };
 
+const pingInterval = 10000;
+
 export default function useSocket(
   url: string | URL,
   gameId: string,
@@ -29,15 +31,16 @@ export default function useSocket(
   onHistory?: HistoryCallback,
   onMove?: MoveCallback
 ): SocketResponse {
-  const socket_ref = useRef<WebSocket | null>(null);
+  const socketRef = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<SocketStatus>('connecting');
+  const intervalRef = useRef<number | null>(null);
 
   console.log(`gameID: ${gameId}, userId: ${userId}`);
 
   useEffect(() => {
     const socket = new WebSocket(url);
 
-    socket_ref.current = socket;
+    socketRef.current = socket;
 
     socket.onopen = () => {
       console.log('socket open');
@@ -47,10 +50,20 @@ export default function useSocket(
       };
       console.log(authMsg);
       socket.send(JSON.stringify(authMsg));
+      intervalRef.current = setInterval(() => {
+        const pingMsg: ClientMessage = {
+          kind: 'Ping',
+        };
+        console.log('Sending ping message');
+        socket.send(JSON.stringify(pingMsg));
+      }, pingInterval);
     };
 
     socket.onerror = (event) => {
       setStatus('closed');
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
       console.error('Websocket error:', event);
       if (onError) {
         onError('Connection closed due to an error');
@@ -59,6 +72,9 @@ export default function useSocket(
 
     socket.onclose = (event) => {
       setStatus('closed');
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
       // Add closure condition for end game displays
       const normalClosure =
         event.code === 1000 || event.code === 1001 || event.code === 1005;
@@ -117,6 +133,9 @@ export default function useSocket(
     };
 
     return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
       socket.close();
     };
   }, [url, gameId, userId, onAuth, onError, onGameEnd, onHistory, onMove]);
@@ -124,19 +143,19 @@ export default function useSocket(
   const move = (move: string) => {
     const moveMsg: ClientMessage = { kind: 'Move', value: move };
     console.log(`Sending move: ${move}`);
-    if (!socket_ref.current) {
+    if (!socketRef.current) {
       console.error('socket is null');
       return;
     }
-    socket_ref.current.send(JSON.stringify(moveMsg));
+    socketRef.current.send(JSON.stringify(moveMsg));
   };
 
   const disconnect = () => {
-    if (!socket_ref.current) {
+    if (!socketRef.current) {
       console.error('socket is null');
       return;
     }
-    socket_ref.current.close(1000, 'Disconnected by user');
+    socketRef.current.close(1000, 'Disconnected by user');
     setStatus('closed');
   };
 

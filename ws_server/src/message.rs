@@ -16,6 +16,7 @@ pub enum Error {
 pub enum ClientMessage {
     Auth { game_id: String, user_id: String },
     Move(String),
+    Ping,
 }
 
 #[derive(Serialize, Deserialize, TS)]
@@ -52,6 +53,7 @@ pub enum ServerMessage {
     Error(Error),
     AuthSuccess,
     MoveHistory(Vec<String>),
+    Pong,
 }
 
 impl ServerMessage {

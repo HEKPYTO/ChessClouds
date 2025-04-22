@@ -256,75 +256,83 @@ async fn handle_socket_read(
             }
         };
 
-        if let ClientMessage::Move(san_str) = client_msg {
-            // check if is current player turn
-            if !state
-                .read(&connection.game_id, |_, v| {
-                    connection.color == v.board.turn()
-                })
-                .expect("game should exist")
-            // game existence is validated from auth step
-            {
-                let _ = tx_local
-                    .send(ServerMessage::Error(Error::InvalidTurn))
-                    .await;
-                tracing::error!("invalid turn");
-                continue;
-            }
-
-            let san: San = match san_str.parse() {
-                Ok(san) => san,
-                Err(_) => {
+        match client_msg {
+            ClientMessage::Move(san_str) => {
+                // check if is current player turn
+                if !state
+                    .read(&connection.game_id, |_, v| {
+                        connection.color == v.board.turn()
+                    })
+                    .expect("game should exist")
+                // game existence is validated from auth step
+                {
                     let _ = tx_local
-                        .send(ServerMessage::Error(Error::InvalidMove))
+                        .send(ServerMessage::Error(Error::InvalidTurn))
                         .await;
-                    tracing::error!("invalid move");
+                    tracing::error!("invalid turn");
                     continue;
                 }
-            };
 
-            let m = match state
-                .read(&connection.game_id, |_, v| san.to_move(&v.board))
-                .expect("game should exist")
-            {
-                Ok(m) => m,
-                Err(_) => {
-                    let _ = tx_local
-                        .send(ServerMessage::Error(Error::InvalidMove))
-                        .await;
-                    tracing::error!("invalid move");
-                    continue;
-                }
-            };
+                let san: San = match san_str.parse() {
+                    Ok(san) => san,
+                    Err(_) => {
+                        let _ = tx_local
+                            .send(ServerMessage::Error(Error::InvalidMove))
+                            .await;
+                        tracing::error!("invalid move");
+                        continue;
+                    }
+                };
 
-            state
-                .get(&connection.game_id)
-                .expect("game should exist")
-                .board
-                .play_unchecked(&m); // move is already validated when calling `san.to_move`
+                let m = match state
+                    .read(&connection.game_id, |_, v| san.to_move(&v.board))
+                    .expect("game should exist")
+                {
+                    Ok(m) => m,
+                    Err(_) => {
+                        let _ = tx_local
+                            .send(ServerMessage::Error(Error::InvalidMove))
+                            .await;
+                        tracing::error!("invalid move");
+                        continue;
+                    }
+                };
 
-            tracing::info!("broadcasting move {san_str}");
-            connection
-                .tx_broadcast
-                .send(ServerMessage::Move(san_str.clone()))
-                .unwrap();
+                state
+                    .get(&connection.game_id)
+                    .expect("game should exist")
+                    .board
+                    .play_unchecked(&m); // move is already validated when calling `san.to_move`
 
-            state
-                .get(&connection.game_id)
-                .expect("game should exist")
-                .moves
-                .push(san_str.clone());
-
-            let outcome = state
-                .read(&connection.game_id, |_, v| v.board.outcome())
-                .expect("game should exist");
-
-            if let Some(outcome) = outcome {
+                tracing::info!("broadcasting move {san_str}");
                 connection
                     .tx_broadcast
-                    .send(ServerMessage::GameEnd(outcome))
+                    .send(ServerMessage::Move(san_str.clone()))
                     .unwrap();
-                tracing::info!("game ended {} {}", connection.game_id, outcome);
+
+                state
+                    .get(&connection.game_id)
+                    .expect("game should exist")
+                    .moves
+                    .push(san_str.clone());
+
+                let outcome = state
+                    .read(&connection.game_id, |_, v| v.board.outcome())
+                    .expect("game should exist");
+
+                if let Some(outcome) = outcome {
+                    connection
+                        .tx_broadcast
+                        .send(ServerMessage::GameEnd(outcome))
+                        .unwrap();
+                    tracing::info!("game ended {} {}", connection.game_id, outcome);
+                }
+            }
+            ClientMessage::Ping => {
+                tx_local.send(ServerMessage::Pong).await.unwrap();
+            }
+            _ => {
+                continue;
             }
         }
     }

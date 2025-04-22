@@ -23,14 +23,16 @@ export type ErrorType =
 
 export type ClientMessage =
   | { kind: 'Auth'; value: { game_id: string; user_id: string } }
-  | { kind: 'Move'; value: string };
+  | { kind: 'Move'; value: string }
+  | { kind: 'Ping' };
 
 export type ServerMessage =
   | { kind: 'Move'; value: string }
   | { kind: 'GameEnd'; value: GameOutcome | 'Draw' }
-  | { kind: 'Error'; value: ErrorType | string }
+  | { kind: 'Error'; value: Error }
   | { kind: 'AuthSuccess' }
-  | { kind: 'MoveHistory'; value: string[] };
+  | { kind: 'MoveHistory'; value: Array<string> }
+  | { kind: 'Pong' };
 
 export type MoveCallback = (move: string) => void;
 export type AuthCallback = () => void;

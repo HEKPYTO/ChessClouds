@@ -2,4 +2,4 @@
 import type { Error } from "./Error";
 import type { Outcome } from "./Outcome";
 
-export type ServerMessage = { "kind": "Move", "value": string } | { "kind": "GameEnd", "value": Outcome } | { "kind": "Error", "value": Error } | { "kind": "AuthSuccess" } | { "kind": "MoveHistory", "value": Array<string> };
+export type ServerMessage = { "kind": "Move", "value": string } | { "kind": "GameEnd", "value": Outcome } | { "kind": "Error", "value": Error } | { "kind": "AuthSuccess" } | { "kind": "MoveHistory", "value": Array<string> } | { "kind": "Pong" };
