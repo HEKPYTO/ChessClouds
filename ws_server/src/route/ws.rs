@@ -131,7 +131,6 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
 
                 tracing::info!("cleaning up state for {}", cloned_game_id);
 
-                // NO RM games from active_games map
                 // Only updating the database status to 'Abort' if current status is 'On Going'
                 if let Err(e) = sqlx::query!(
                     "UPDATE GameState SET Status = 'Abort' WHERE GameID = $1 AND Status = 'On Going'",
@@ -142,6 +141,19 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                 {
                     tracing::error!("updating game status to Abort failed: {e}");
                 }
+                
+                // After both players disconnect or game ends
+                let game_id_clone = cloned_game_id.clone();
+                let state_clone = cloned_state.clone();
+                tokio::spawn(async move {
+                    // Wait some time before cleaning up
+                    tokio::time::sleep(Duration::from_secs(30)).await;
+
+                    // Remove game from active_games map
+                    state_clone.active_games.lock().await.remove(&game_id_clone);
+
+                    tracing::info!("Removed game {} from active_games map", game_id_clone);
+                });
             });
 
             state
