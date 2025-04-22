@@ -1,27 +1,16 @@
-# === Rust ===
 **/target/
 **/*.rs.bk
 Cargo.lock
-
-# === Docker ===
 *.tar
-
-# === Logs / Runtime files ===
 *.log
 *.pid
 *.seed
 *.sock
-
-# === Editor/IDE ===
 .vscode/
 .idea/
 *.sw?
 *~
 *.bak
-
-# === macOS / Linux / Windows OS files ===
 .DS_Store
 Thumbs.db
-
-# === Project-specific ===
 *repomix-output.xml

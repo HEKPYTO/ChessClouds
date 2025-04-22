@@ -1,26 +1,8 @@
 services:
-  stockfish:
+  stockfish-api:
     build:
-      context: ./stockfish
+      context: .
       dockerfile: Dockerfile
-    container_name: stockfish
+    container_name: stockfish-api
     ports:
-      - "4001:4001"
-    networks:
-      - engine
-      
-  hyper:
-    build:
-      context: ./hyper
-      dockerfile: Dockerfile
-    container_name: hyper
-    ports:
-      - "4000:4000"
-    depends_on:
-      - stockfish
-    networks:
-      - engine
-
-networks:
-  engine:
-    driver: bridge
+      - "80:80"

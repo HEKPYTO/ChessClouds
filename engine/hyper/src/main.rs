@@ -41,8 +41,9 @@ struct ErrorResponse {
 
 #[tokio::main]
 async fn main() {
+    let addr = ([0, 0, 0, 0], 80).into();
+    println!("Starting server on http://{}", addr);
     let make_svc = make_service_fn(|_conn| async { Ok::<_, Infallible>(service_fn(handle_request)) });
-    let addr = ([0, 0, 0, 0], 4000).into();
     let server = Server::bind(&addr).serve(make_svc);
     if let Err(e) = server.await {
         eprintln!("Server error: {}", e);
@@ -182,7 +183,7 @@ fn err_resp(msg: &str) -> ErrorResponse {
 }
 
 fn connect_to_stockfish() -> Result<TcpStream, std::io::Error> {
-    let stream = TcpStream::connect("stockfish:4001")?;
+    let stream = TcpStream::connect("127.0.0.1:4001")?;
     stream.set_read_timeout(Some(Duration::from_secs(10)))?;
     stream.set_write_timeout(Some(Duration::from_secs(10)))?;
     Ok(stream)
