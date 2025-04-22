@@ -150,7 +150,7 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                     tokio::time::sleep(Duration::from_secs(30)).await;
 
                     // Remove game from active_games map
-                    state_clone.active_games.lock().await.remove(&game_id_clone);
+                    state_clone.active_games.remove(&game_id_clone);
 
                     tracing::info!("Removed game {} from active_games map", game_id_clone);
                 });
