@@ -38,6 +38,8 @@ interface GameProps {
   gameOver?: boolean;
   gameOutcome?: GameOutcome | 'Draw';
   reconnect?: () => void;
+  white?: string;
+  black?: string;
 }
 
 interface PaneProps {
@@ -198,7 +200,13 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
           <Card className="bg-white dark:bg-slate-700 border border-amber-200/50 dark:border-slate-600/50 shadow-none">
             <CardContent className="text-center">
               <div className="font-medium text-base text-amber-800 dark:text-amber-200">
-                Player A (1600) - Player B (1600)
+                {playingAs === 'w'
+                  ? `${gameProps.white || 'You'} vs ${
+                      gameProps.black || 'Opponent'
+                    }`
+                  : `${gameProps.white || 'Opponent'} vs ${
+                      gameProps.black || 'You'
+                    }`}
               </div>
               <div className="text-sm text-amber-600 dark:text-amber-300">
                 {gameStatus}

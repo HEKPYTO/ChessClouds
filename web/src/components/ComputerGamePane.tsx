@@ -264,7 +264,12 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
                 promotion={promotion}
                 previewIndex={previewIndex}
                 chess={chess}
-                viewOnly={gameOver || previewIndex !== null || isThinking}
+                viewOnly={
+                  gameOver ||
+                  previewIndex !== null ||
+                  isThinking ||
+                  engineStatus === 'disconnected'
+                }
               />
             </div>
           </div>
@@ -347,7 +352,7 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-slate-700 dark:text-green-400 dark:bg-green-700 hover:dark:bg-green-800 dark:border-green-700 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
+                className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-green-700 dark:text-green-400 dark:bg-green-700 hover:dark:bg-green-800 dark:border-green-700 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
                 onClick={handleHome}
                 aria-label="Play Again"
               >
@@ -378,7 +383,7 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-slate-700 dark:text-green-400 dark:border-green-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
+                className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-green-700 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-600 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
                 onClick={handleRetry}
                 aria-label="Retry"
               >
@@ -469,7 +474,12 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
                 promotion={promotion}
                 previewIndex={previewIndex}
                 chess={chess}
-                viewOnly={gameOver || previewIndex !== null}
+                viewOnly={
+                  gameOver ||
+                  previewIndex !== null ||
+                  isThinking ||
+                  engineStatus === 'disconnected'
+                }
               />
             </div>
           </div>
@@ -690,7 +700,7 @@ export default function ComputerGamePane({ playingAs, gameProps }: PaneProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-slate-700 dark:text-green-400 dark:border-green-700 dark:hover:bg-slate-600 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
+                      className="w-10 h-10 p-1 bg-green-100 text-green-800 border-green-300 hover:bg-green-200 dark:bg-green-700 dark:text-green-400 dark:border-green-700 dark:hover:bg-green-600 shadow-[0_3px_0_0_#86efac] hover:shadow-[0_1px_0_0_#86efac] hover:translate-y-[1px] dark:shadow-[0_3px_0_0_#166534] dark:hover:shadow-[0_1px_0_0_#14532d]"
                       onClick={handleRetry}
                       aria-label="Retry"
                     >

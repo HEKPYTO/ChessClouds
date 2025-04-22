@@ -16,7 +16,6 @@ export default function Dashboard() {
   const searchParams = useSearchParams();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-  // Get active tab from URL query parameter
   const activeTab = searchParams.get('tab') || 'overview';
 
   useEffect(() => {

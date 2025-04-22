@@ -1,28 +1,36 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Chess } from 'chess.js';
 import type { Square } from 'chess.js';
 import SocketGamePane from '@/components/SocketGamePane';
 import LoadingScreen from '@/components/LoadingScreen';
 import { toast } from 'sonner';
-import { AuthCallback, ErrorCallback, GameEndCallback, GameOutcome, HistoryCallback, MoveCallback } from '@/types/shared';
+import {
+  AuthCallback,
+  ErrorCallback,
+  GameEndCallback,
+  GameOutcome,
+  HistoryCallback,
+  MoveCallback,
+} from '@/types/shared';
 import { getUserInfo } from '@/lib/auth/googleAuth';
 import {
   updateGamePgn,
   updateGameStatus,
-  // getGame,
+  getGame,
 } from '@/app/actions/gameActions';
 import { GameStatus } from '@prisma/client';
 import ErrorPage from '@/components/Error';
-// import UnauthorizedPage from '@/components/Unauthorized';
+import UnauthorizedPage from '@/components/Unauthorized';
 import useSocket from '@/lib/socket';
 
 export default function SocketGameComponent({
-  gameId, playingAs
+  gameId,
+  playingAs,
 }: {
-  gameId: string,
-  playingAs: 'b' | 'w'
+  gameId: string;
+  playingAs: 'b' | 'w';
 }) {
   const [chess] = useState(new Chess());
   const [fen, setFen] = useState(chess.fen());
@@ -37,8 +45,13 @@ export default function SocketGameComponent({
   const [gameOutcome, setGameOutcome] = useState<
     GameOutcome | 'Draw' | undefined
   >(undefined);
-  // const [isAuthorized, setIsAuthorized] = useState(false);
-  // const [hasError, setHasError] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [gameInfo, setGameInfo] = useState<{
+    white: string;
+    black: string;
+  } | null>(null);
 
   const lastLocalMoveRef = useRef<string | null>(null);
 
@@ -52,9 +65,87 @@ export default function SocketGameComponent({
     }
   }, [error, gameOutcome]);
 
-  // const userId = useMemo(() => { const userInfo = getUserInfo(); return userInfo?.email?.split('@')[0] || 'anonymous' }, []);
   const userInfo = getUserInfo();
-  const userId = userInfo?.email?.split('@')[0] || 'anonymous'
+  const userId = userInfo?.email?.split('@')[0] || 'anonymous';
+
+  useEffect(() => {
+    const verifyGameAccess = async () => {
+      try {
+        setIsAuthChecking(true);
+        const gameResult = await getGame(gameId);
+
+        if (!gameResult.success || !gameResult.game) {
+          toast.error('Failed to load game');
+          setHasError(true);
+          setIsAuthChecking(false);
+          return;
+        }
+
+        const game = gameResult.game;
+        const userIsWhite = game.white === userId;
+        const userIsBlack = game.black === userId;
+
+        const isAuthorizedPlayer =
+          (playingAs === 'w' && userIsWhite) ||
+          (playingAs === 'b' && userIsBlack);
+
+        if (!isAuthorizedPlayer) {
+          toast.error('You are not authorized to play this game');
+          setIsAuthorized(false);
+          setIsAuthChecking(false);
+          return;
+        }
+
+        setIsAuthorized(true);
+
+        if (gameResult.success && gameResult.game) {
+          setGameInfo({
+            white: gameResult.game.white,
+            black: gameResult.game.black,
+          });
+        }
+
+        if (game.pgn) {
+          try {
+            const movesOnly = game.pgn
+              .replace(/^(\\[.*\\][\\r\\n]*)*/gm, '')
+              .trim();
+            chess.loadPgn(movesOnly);
+            const history = chess.history({ verbose: true });
+            if (history.length > 0) {
+              const last = history[history.length - 1];
+              setLastMove([last.from as Square, last.to as Square]);
+            }
+            setFen(chess.fen());
+          } catch (err) {
+            console.error(err);
+            setHasError(true);
+          }
+        }
+
+        if (game.status !== 'ONGOING') {
+          setGameOver(true);
+
+          if (game.status === 'WHITE_WINS') {
+            setGameOutcome({ Decisive: { winner: 'White' } });
+          } else if (game.status === 'BLACK_WINS') {
+            setGameOutcome({ Decisive: { winner: 'Black' } });
+          } else if (game.status === 'DRAW') {
+            setGameOutcome('Draw');
+          }
+        }
+
+        setIsAuthChecking(false);
+      } catch (err) {
+        toast.error('Error loading game');
+        console.error(err);
+        setHasError(true);
+        setIsAuthChecking(false);
+      }
+    };
+
+    verifyGameAccess();
+  }, [gameId, userId, playingAs, chess]);
 
   const updateState = useCallback(() => {
     setFen(chess.fen());
@@ -97,151 +188,96 @@ export default function SocketGameComponent({
     setError(null);
   }, []);
 
-  const socketOnGameEnd = useCallback<GameEndCallback>((outcome) => {
-    setGameOver(true);
+  const socketOnGameEnd = useCallback<GameEndCallback>(
+    (outcome) => {
+      setGameOver(true);
 
-    let status: GameStatus = 'ONGOING';
+      let status: GameStatus = 'ONGOING';
 
-    if (outcome === 'Draw') {
-      setGameOutcome('Draw');
-      status = 'DRAW';
-    } else if ('Decisive' in outcome) {
-      setGameOutcome(outcome);
-      status =
-        outcome.Decisive?.winner === 'White' ? 'WHITE_WINS' : 'BLACK_WINS';
-    }
-
-    if (gameId && status !== 'ONGOING') {
-      updateGameStatus(gameId, status).catch((err) => {
-        console.error('Failed to update game status on server event:', err);
-      });
-    }
-  }, [gameId]);
-
-  const socketOnMove = useCallback<MoveCallback>((moveStr) => {
-    if (lastLocalMoveRef.current === moveStr) {
-      lastLocalMoveRef.current = null;
-      return;
-    }
-    try {
-      const move = chess.move(moveStr);
-      if (move) {
-        setLastMove([move.from as Square, move.to as Square]);
-        updateState();
+      if (outcome === 'Draw') {
+        setGameOutcome('Draw');
+        status = 'DRAW';
+      } else if ('Decisive' in outcome) {
+        setGameOutcome(outcome);
+        status =
+          outcome.Decisive?.winner === 'White' ? 'WHITE_WINS' : 'BLACK_WINS';
       }
-    } catch (error) {
-      console.error('Invalid move received from socket:', error);
-    }
-  }, [chess, updateState]);
 
-  const socketOnHistory = useCallback<HistoryCallback>((moves) => {
-    chess.reset();
-    moves.forEach((moveStr) => {
+      if (gameId && status !== 'ONGOING') {
+        updateGameStatus(gameId, status).catch((err) => {
+          console.error('Failed to update game status on server event:', err);
+        });
+      }
+    },
+    [gameId]
+  );
+
+  const socketOnMove = useCallback<MoveCallback>(
+    (moveStr) => {
+      if (lastLocalMoveRef.current === moveStr) {
+        lastLocalMoveRef.current = null;
+        return;
+      }
       try {
-        chess.move(moveStr);
+        const move = chess.move(moveStr);
+        if (move) {
+          setLastMove([move.from as Square, move.to as Square]);
+          updateState();
+        }
       } catch (error) {
-        console.error('Invalid move in history:', error);
+        console.error('Invalid move received from socket:', error);
       }
-    });
-    if (moves.length > 0) {
-      const lastMoveObj = chess.history({ verbose: true }).pop();
-      if (lastMoveObj) {
-        setLastMove([lastMoveObj.from as Square, lastMoveObj.to as Square]);
+    },
+    [chess, updateState]
+  );
+
+  const socketOnHistory = useCallback<HistoryCallback>(
+    (moves) => {
+      chess.reset();
+      moves.forEach((moveStr) => {
+        try {
+          chess.move(moveStr);
+        } catch (error) {
+          console.error('Invalid move in history:', error);
+        }
+      });
+      if (moves.length > 0) {
+        const lastMoveObj = chess.history({ verbose: true }).pop();
+        if (lastMoveObj) {
+          setLastMove([lastMoveObj.from as Square, lastMoveObj.to as Square]);
+        }
       }
-    }
-    updateState();
-  }, [chess, updateState]);
+      updateState();
+    },
+    [chess, updateState]
+  );
 
   const socketOnError = useCallback<ErrorCallback>((errorMsg) => {
-    toast.error(
-      `Unable to connect to game server. Please try again later ${errorMsg}`
-    );
-    console.error(errorMsg);
+    if (errorMsg.startsWith('disconnect:normal:')) {
+      const message = errorMsg.replace('disconnect:normal:', '');
+      toast.info(message);
+    } else if (errorMsg.startsWith('disconnect:error:')) {
+      const message = errorMsg.replace('disconnect:error:', '');
+      toast.warning(message);
+    } else {
+      toast.error(errorMsg);
+    }
+    setError(errorMsg);
   }, []);
 
-  const { status, move } = useSocket(process.env.NEXT_PUBLIC_WS_SERVER_URL ||
-    'ws://localhost:8000/ws', gameId, userId, socketOnError, socketOnAuth, socketOnGameEnd, socketOnHistory, socketOnMove);
+  const { status, move } = useSocket(
+    process.env.NEXT_PUBLIC_WS_SERVER_URL || 'ws://localhost:8000/ws',
+    gameId,
+    userId,
+    socketOnError,
+    socketOnAuth,
+    socketOnGameEnd,
+    socketOnHistory,
+    socketOnMove
+  );
 
   const isLoading = status === 'connecting';
   const isConnected = status === 'authenticated';
-
-  // TODO: Handle finished game PGN / validate
-
-  // useEffect(() => {
-  //   const initializeGame = async () => {
-  //     try {
-  //       const gameResult = await getGame(gameId);
-  //
-  //       if (!gameResult.success || !gameResult.game) {
-  //         console.error('Failed to load game data:', gameResult.error);
-  //         toast.error('Failed to load game');
-  //         setIsAuthorized(false);
-  //         setIsLoading(false);
-  //         setHasError(true);
-  //         return;
-  //       }
-  //
-  //       const game = gameResult.game;
-  //       const userIsWhite = game.white === userId;
-  //       const userIsBlack = game.black === userId;
-  //
-  //       const isAuthorizedPlayer =
-  //         (playingAs === 'w' && userIsWhite) ||
-  //         (playingAs === 'b' && userIsBlack);
-  //
-  //       if (!isAuthorizedPlayer) {
-  //         toast.error('You are not authorized to play this game');
-  //         setIsAuthorized(false);
-  //         setIsLoading(false);
-  //         return;
-  //       }
-  //
-  //       setIsAuthorized(true);
-  //
-  //       if (game.pgn) {
-  //         try {
-  //           const movesOnly = game.pgn
-  //             .replace(/^(\[.*\][\r\n]*)*/gm, '')
-  //             .trim();
-  //           chess.loadPgn(movesOnly);
-  //           const history = chess.history({ verbose: true });
-  //           if (history.length > 0) {
-  //             const last = history[history.length - 1];
-  //             setLastMove([last.from as Square, last.to as Square]);
-  //           }
-  //           setFen(chess.fen());
-  //         } catch (err) {
-  //           console.error('Error loading PGN:', err);
-  //           setHasError(true);
-  //           return;
-  //         }
-  //       }
-  //
-  //       if (game.status !== 'ONGOING') {
-  //         setGameOver(true);
-  //
-  //         if (game.status === 'WHITE_WINS') {
-  //           setGameOutcome({ Decisive: { winner: 'White' } });
-  //         } else if (game.status === 'BLACK_WINS') {
-  //           setGameOutcome({ Decisive: { winner: 'Black' } });
-  //         } else if (game.status === 'DRAW') {
-  //           setGameOutcome('Draw');
-  //         }
-  //       }
-  //     } catch (err) {
-  //       console.error('Error initializing game:', err);
-  //       toast.error('Error loading game');
-  //       setHasError(true);
-  //     }
-  //   };
-  //
-  //   initializeGame();
-  //
-  //   return () => {
-  //
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [gameId, userId, isConnected]);
 
   const onMove = useCallback(
     (from: Square, to: Square) => {
@@ -335,7 +371,7 @@ export default function SocketGameComponent({
   }, [previewIndex, chess]);
 
   const reconnect = useCallback(() => {
-    // TODO: to be implemented, simply reload page?
+    window.location.reload();
   }, []);
 
   const gameProps = {
@@ -359,9 +395,11 @@ export default function SocketGameComponent({
     gameOver,
     gameOutcome,
     reconnect,
+    white: gameInfo?.white,
+    black: gameInfo?.black,
   };
 
-  if (isLoading) {
+  if (isLoading || isAuthChecking) {
     return <LoadingScreen />;
   }
 
@@ -369,15 +407,15 @@ export default function SocketGameComponent({
     return <ErrorPage message="No game ID provided" code="400" />;
   }
 
-  // if (!isAuthorized) {
-  //   return <UnauthorizedPage />;
-  // }
-  //
-  // if (hasError) {
-  //   return (
-  //     <ErrorPage message="There was a problem loading this game" code="500" />
-  //   );
-  // }
+  if (!isAuthorized) {
+    return <UnauthorizedPage />;
+  }
+
+  if (hasError) {
+    return (
+      <ErrorPage message="There was a problem loading this game" code="500" />
+    );
+  }
 
   return (
     <div className="mx-auto px-12 py-8">
@@ -385,4 +423,3 @@ export default function SocketGameComponent({
     </div>
   );
 }
-
