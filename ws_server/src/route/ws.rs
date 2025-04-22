@@ -140,20 +140,13 @@ async fn handle_socket(socket: WebSocket, state: AppState) {
                 .await
                 {
                     tracing::error!("updating game status to Abort failed: {e}");
+                    return;
                 }
-                
-                // After both players disconnect or game ends
-                let game_id_clone = cloned_game_id.clone();
-                let state_clone = cloned_state.clone();
-                tokio::spawn(async move {
-                    // Wait some time before cleaning up
-                    tokio::time::sleep(Duration::from_secs(30)).await;
 
-                    // Remove game from active_games map
-                    state_clone.active_games.remove(&game_id_clone);
+                // Remove game from active_games map
+                cloned_state.active_games.remove(&cloned_game_id);
 
-                    tracing::info!("Removed game {} from active_games map", game_id_clone);
-                });
+                tracing::info!("Removed game {} from active_games map", cloned_game_id);
             });
 
             state
