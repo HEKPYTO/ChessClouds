@@ -293,7 +293,7 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
           <div className="bg-amber-50 dark:bg-slate-800 rounded-lg border border-amber-200/50 dark:border-amber-800/30 overflow-hidden shadow-md flex flex-col h-[300px]">
             <div
               ref={moveListRef}
-              className="overflow-y-auto flex-grow max-h-[285px] px-4 font-mono text-sm"
+              className="overflow-y-auto flex-grow max-h-[300px] px-4 font-mono text-sm"
             >
               <div className="pt-2" />
               <table className="w-full table-fixed">
@@ -492,7 +492,7 @@ export default function SocketGamePane({ playingAs, gameProps }: PaneProps) {
             <div className="flex-1 bg-amber-50 dark:bg-slate-800 rounded-lg border border-amber-200/50 dark:border-amber-800/30 overflow-hidden shadow-md flex flex-col h-[400px]">
               <div
                 ref={moveListRef}
-                className="overflow-y-auto flex-grow max-h-[365px] px-4 font-mono text-sm"
+                className="overflow-y-auto flex-grow max-h-[325px] px-4 font-mono text-sm"
               >
                 <div className="pt-2" />
                 <table className="w-full table-fixed">
