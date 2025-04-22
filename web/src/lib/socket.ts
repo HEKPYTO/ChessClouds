@@ -50,7 +50,7 @@ export default function useSocket(
       };
       console.log(authMsg);
       socket.send(JSON.stringify(authMsg));
-      intervalRef.current = setInterval(() => {
+      intervalRef.current = window.setInterval(() => {
         const pingMsg: ClientMessage = {
           kind: 'Ping',
         };
