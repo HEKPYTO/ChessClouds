@@ -39,12 +39,11 @@ export default function HomePage() {
 
       if (e.key.toLowerCase() === 'p') {
         setPressedKey('p');
-
         handlePlayNow();
-      } else if (e.key.toLowerCase() === 's') {
-        setPressedKey('s');
+      } else if (e.key.toLowerCase() === (authenticated ? 'h' : 's')) {
+        setPressedKey(authenticated ? 'h' : 's');
         setTimeout(() => {
-          router.push('/signup');
+          router.push(authenticated ? '/home' : '/signup');
           setPressedKey(null);
         }, 150);
       }
@@ -64,12 +63,12 @@ export default function HomePage() {
       window.removeEventListener('keyup', handleKeyUp);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, pressedKey, isMatchmaking, playCooldownState]);
+  }, [router, pressedKey, isMatchmaking, playCooldownState, authenticated]);
 
   const handleSignUp = () => {
-    setPressedKey('s');
+    setPressedKey(authenticated ? 'h' : 's');
     setTimeout(() => {
-      router.push('/signup');
+      router.push(authenticated ? '/home' : '/signup');
       setPressedKey(null);
     }, 150);
   };
@@ -210,21 +209,22 @@ export default function HomePage() {
               dark:bg-slate-800/70 dark:border-slate-700 dark:text-amber-200 dark:hover:bg-slate-800/50
               dark:shadow-[0_4px_0_0_#475569] dark:hover:shadow-[0_2px_0_0_#475569]
               ${
-                pressedKey === 's'
+                pressedKey === (authenticated ? 'h' : 's')
                   ? 'transform translate-y-[4px] shadow-none bg-amber-100 dark:bg-slate-800'
                   : ''
               }`}
               onClick={handleSignUp}
             >
-              <DocumentDuplicateIcon className="mr-2 h-5 w-5" /> Sign up
+              <DocumentDuplicateIcon className="mr-2 h-5 w-5" />{' '}
+              {authenticated ? 'Home' : 'Sign up'}
               <span
                 className={`ml-1 text-xs px-1 rounded transition-colors ${
-                  pressedKey === 's'
+                  pressedKey === (authenticated ? 'h' : 's')
                     ? 'bg-amber-200 text-amber-900 dark:bg-slate-700 dark:text-amber-100'
                     : 'bg-amber-100 dark:bg-slate-800'
                 }`}
               >
-                S
+                {authenticated ? 'H' : 'S'}
               </span>
             </Button>
           </div>
@@ -322,24 +322,24 @@ export default function HomePage() {
                     className={`bg-amber-600 hover:bg-amber-700 text-white transition-all 
                     shadow-[0_4px_0_0_#b45309] hover:shadow-[0_2px_0_0_#92400e] hover:translate-y-[2px]
                     dark:bg-amber-500 dark:hover:bg-amber-600
-                    dark:shadow-[0_4px_0_0_#92400e] dark:hover:shadow-[0_2px_0_0_#78350f]
+                    dark:shadow-[0_4px_0_0_#92400e] dark:hover:shadow-[0_1px_0_0_#78350f]
                     ${
-                      pressedKey === 's'
+                      pressedKey === (authenticated ? 'h' : 's')
                         ? 'transform translate-y-[4px] shadow-none bg-amber-700 dark:bg-amber-600'
                         : ''
                     }`}
                     onClick={handleSignUp}
                   >
-                    Sign up free
+                    {authenticated ? 'Go to Home' : 'Sign up free'}
                     <ChevronRightIcon className="ml-2 h-4 w-4" />
                     <span
                       className={`ml-1 text-xs px-1 rounded transition-colors ${
-                        pressedKey === 's'
+                        pressedKey === (authenticated ? 'h' : 's')
                           ? 'bg-amber-800 dark:bg-amber-700'
                           : 'bg-amber-700 dark:bg-amber-600'
                       }`}
                     >
-                      S
+                      {authenticated ? 'H' : 'S'}
                     </span>
                   </Button>
                   <Button
