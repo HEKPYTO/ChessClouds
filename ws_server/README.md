@@ -1,25 +1,25 @@
 # ChessClouds WebSocket Server
 
-The WebSocket Server is the real-time communication backbone of ChessClouds, handling game sessions and move synchronization between players.
+The WebSocket Server provides real-time communication for ChessClouds, handling game sessions and move synchronization between players.
 
 ## Features
 
-- **Real-time bidirectional communication** - Instant move updates to both players
-- **Game state management** - Track game progress and handle state transitions
-- **Reconnection support** - Players can reconnect to ongoing games
-- **Move validation** - Ensures all moves are legal according to chess rules
-- **Game outcome determination** - Detects checkmates, stalemates, and other game endings
-- **Game persistence** - Stores game data in PostgreSQL database
+- Real-time bidirectional communication
+- Game state management
+- Reconnection support
+- Move validation
+- Game outcome determination
+- Game persistence
 
 ## Architecture
 
 The WebSocket server is built in Rust using:
 
-- **Axum** - Web framework for handling WebSocket connections
-- **Tokio** - Asynchronous runtime
-- **SQLx** - Database connectivity
-- **Shakmaty** - Chess rule implementation and move validation
-- **SCC** - Concurrent data structures for game state management
+- **Axum** web framework
+- **Tokio** asynchronous runtime
+- **SQLx**
+- **Shakmaty** for Chess rule implementation and move validation
+- **SCC** for concurrent HashMap
 
 ## Protocol
 
@@ -50,7 +50,7 @@ type ServerMessage =
 
 1. **Connection** - Client connects to WebSocket endpoint
 2. **Authentication** - Client sends Auth message with game_id and user_id
-3. **Game State** - Server responds with move history for the game
+3. **Game State** - Server responds with move history for the game (for reconnection)
 4. **Gameplay** - Clients exchange moves through the server
 5. **Game End** - Server detects end of game and broadcasts result
 6. **Disconnection** - Server handles graceful disconnections and reconnections
@@ -59,28 +59,15 @@ type ServerMessage =
 
 ### Prerequisites
 
-- Rust 1.65+
+- Rust
 - PostgreSQL database
 
 ### Local Development
 
-1. Navigate to the ws_server directory
-```bash
-cd ws_server
-```
+1. Create an `.env` file with a `DATABASE_URL` variable.
 
-2. Set up environment variables
-```bash
-cp template.env .env
-# Edit .env with your database connection string
-```
+2. Run the server
 
-3. Run database migrations
-```bash
-cargo sqlx migrate run
-```
-
-4. Run the server
 ```bash
 cargo run
 ```
@@ -112,7 +99,7 @@ CREATE TABLE gamestate (
 The project includes test clients for simulating various game scenarios:
 
 ```bash
-# Run a test game with two players
+# Run a test game ending in checkmate with two players
 cargo run --bin client
 
 # Test client disconnection handling
@@ -121,3 +108,4 @@ cargo run --bin client_disconnect
 # Run test suite
 cargo run --bin test
 ```
+
