@@ -21,8 +21,8 @@ ChessClouds is a next-generation chess platform designed for high-performance ga
   - [Chess Engine](/engine/README.md)
   - [WebSocket Server](/ws_server/README.md)
   - [Matchmaking Service](/matchmaking/README.md)
+  - [Infrastructure](/terraform/README.md)
 - [Development](#development)
-- [Terraform](#terraform)
 - [License](#license)
 
 ## Overview
@@ -59,6 +59,7 @@ ChessClouds is built with a microservices architecture:
   - **Matchmaking Service**: Player matchmaking
   - **Chess Engine API**: Stockfish integration
 - **Database**: PostgreSQL for game state persistence
+- **Infrastructure**: AWS-based deployment using Terraform
 
 <p align="center">
   <img src="./resources/overview-arch.jpg" width="800" alt="ChessClouds Architecture Overview">
@@ -94,33 +95,21 @@ docker-compose up -d
 
 5. Access the web application at http://localhost:3000
 
-## Terraform
+## Deployment
 
-Deploying Matchmaking, Websocket and ChessEngine via Terraform
+ChessClouds can be deployed to AWS using the Terraform configurations in the [terraform](/terraform) directory.
 
-### Prerequisites
-
-- AWS CLI
-- Terraform
-
-### Setup
-
-1. Configure AWS Access Key and Secret Key
+1. Copy and configure the Terraform variables
 ```bash
-aws configure
-AWS Access Key ID [****************AAUB]:
-AWS Secret Access Key [****************3adc]:
-Default region name [ap-southeast-1]:
-Default output format [None]:
+cp terraform/template.tfvars terraform/terraform.tfvars
+# Edit terraform.tfvars with your specific values
 ```
 
-2. Initialize Terraform
+2. Deploy the infrastructure
 ```bash
-cd Terraform
+cd terraform
 terraform init
+terraform apply -var-file=terraform.tfvars
 ```
 
-3. Apply Terraform
-```bash
-terraform apply
-```
+See the [Infrastructure documentation](/terraform/README.md) for more detailed deployment instructions.
