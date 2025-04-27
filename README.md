@@ -1,9 +1,13 @@
 # ChessClouds
 
-<div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
-  <img src="./web/public/icon/chess-cloud-light.ico" width="150" alt="ChessClouds Light Logo">
-  <img src="./web/public/icon/chess-cloud-dark.ico" width="150" alt="ChessClouds Dark Logo">
-</div>
+<p align="center">
+  <img src="./web/public/icon/chess-cloud-light.ico"
+       width="150"
+       alt="ChessClouds Light Logo" />
+  <img src="./web/public/icon/chess-cloud-dark.ico"
+       width="150"
+       alt="ChessClouds Dark Logo" />
+</p>
 
 ChessClouds is a next-generation chess platform designed for high-performance gameplay with players worldwide. It offers a modern, intuitive interface and powerful backend systems for real-time multiplayer matches and computer opponents.
 
