@@ -18,6 +18,7 @@ ChessClouds is a next-generation chess platform designed for high-performance ga
   - [WebSocket Server](/ws_server/README.md)
   - [Matchmaking Service](/matchmaking/README.md)
 - [Development](#development)
+- [Terraform](#terraform)
 - [License](#license)
 
 ## Overview
@@ -88,3 +89,34 @@ docker-compose up -d
 ```
 
 5. Access the web application at http://localhost:3000
+
+## Terraform
+
+Deploying Matchmaking, Websocket and ChessEngine via Terraform
+
+### Prerequisites
+
+- AWS CLI
+- Terraform
+
+### Setup
+
+1. Configure AWS Access Key and Secret Key
+```bash
+aws configure
+AWS Access Key ID [****************AAUB]:
+AWS Secret Access Key [****************3adc]:
+Default region name [ap-southeast-1]:
+Default output format [None]:
+```
+
+2. Initialize Terraform
+```bash
+cd Terraform
+terraform init
+```
+
+3. Apply Terraform
+```bash
+terraform apply
+```
