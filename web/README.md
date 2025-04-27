@@ -62,7 +62,7 @@ bun install
 
 2. Set up environment variables
 ```bash
-cp .env.example .env.local
+cp .env.template .env.local
 ```
 
 3. Generate Prisma client
