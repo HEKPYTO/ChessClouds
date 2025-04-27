@@ -1,0 +1,127 @@
+---
+services:
+  postgres:
+    container_name: chessclouds_postgres
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - chessclouds_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - chess_network
+
+  web:
+    container_name: chessclouds_web
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    # env_file:
+    #   - .env
+    environment:
+      - NEXT_PUBLIC_GOOGLE_AUTH_ENDPOINT=${NEXT_PUBLIC_GOOGLE_AUTH_ENDPOINT}
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXT_PUBLIC_ENGINE_API_URL=${NEXT_PUBLIC_ENGINE_API_URL}
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - chess_network
+
+  migrate:
+    image: oven/bun:1-slim
+    container_name: chessclouds_migrater
+    working_dir: /app
+    volumes:
+      - ./web:/app
+    env_file:
+      - .env
+    networks:
+      - chess_network                                     
+    entrypoint:
+      - sh
+      - -c
+      - |
+        apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*  
+        bunx prisma migrate deploy                     
+        bunx prisma generate
+        bunx prisma studio
+    ports:
+      - '5555:5555'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ws-server:
+    container_name: chessclouds_socket_server
+    build:
+      context: ./ws_server
+      dockerfile: Dockerfile
+      args:
+        SQLX_OFFLINE: "true"
+        DATABASE_URL: ${DATABASE_URL}
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - '8000:8000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      web:
+        condition: service_started
+    networks:
+      - chess_network
+
+  matchmaking:
+    container_name: chessclouds_matchmaker
+    build:
+      context: ./matchmaking
+      dockerfile: Dockerfile
+      args:
+        SQLX_OFFLINE: "true"
+        DATABASE_URL: ${DATABASE_URL}
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - '8001:8001'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      web:
+        condition: service_started
+    networks:
+      - chess_network
+
+  engine:
+    container_name: chessclouds_engine
+    build:
+      context: ./engine
+      dockerfile: Dockerfile
+    ports:
+      - '4000:4000'
+    networks:
+      - chess_network
+
+networks:
+  chess_network:
+    driver: bridge
+
+volumes:
+  chessclouds_data:

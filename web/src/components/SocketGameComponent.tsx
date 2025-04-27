@@ -54,12 +54,22 @@ export default function SocketGameComponent({
   } | null>(null);
 
   const lastLocalMoveRef = useRef<string | null>(null);
+  const initialConnectionPhaseRef = useRef(true);
+  const connectionAttemptsRef = useRef(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      initialConnectionPhaseRef.current = false;
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (error) {
       if (gameOutcome !== undefined) {
         toast.success('Server closed, Game Completed');
-      } else {
+      } else if (!initialConnectionPhaseRef.current) {
         toast.error(error);
       }
     }
@@ -68,7 +78,6 @@ export default function SocketGameComponent({
   const userInfo = getUserInfo();
   const userId = userInfo?.email?.split('@')[0] || 'anonymous';
 
-  // ADD get game to verify game access
   useEffect(() => {
     const verifyGameAccess = async () => {
       try {
@@ -105,8 +114,6 @@ export default function SocketGameComponent({
             black: gameResult.game.black,
           });
         }
-
-        // RM these below confusion mistakes
 
         setIsAuthChecking(false);
       } catch (err) {
@@ -159,6 +166,7 @@ export default function SocketGameComponent({
 
   const socketOnAuth = useCallback<AuthCallback>(() => {
     setError(null);
+    initialConnectionPhaseRef.current = false;
   }, []);
 
   const socketOnGameEnd = useCallback<GameEndCallback>(
@@ -226,12 +234,27 @@ export default function SocketGameComponent({
   );
 
   const socketOnError = useCallback<ErrorCallback>((errorMsg) => {
+    if (
+      errorMsg.includes('Connection closed due to an error') ||
+      errorMsg.includes('disconnect:error:')
+    ) {
+      connectionAttemptsRef.current += 1;
+    }
+
+    if (
+      initialConnectionPhaseRef.current &&
+      connectionAttemptsRef.current < 4
+    ) {
+      setError(errorMsg);
+      return;
+    }
+
     if (errorMsg.startsWith('disconnect:normal:')) {
       const message = errorMsg.replace('disconnect:normal:', '');
       toast.info(message);
     } else if (errorMsg.startsWith('disconnect:error:')) {
-      const message = errorMsg.replace('disconnect:error:', '');
-      toast.warning(message);
+      // const message = errorMsg.replace('disconnect:error:', '');
+      // toast.warning(message);
     } else {
       toast.error(errorMsg);
     }
@@ -249,7 +272,7 @@ export default function SocketGameComponent({
     socketOnMove
   );
 
-  const isLoading = status === 'connecting';
+  // const isLoading = status === 'connecting';
   const isConnected = status === 'authenticated';
 
   const onMove = useCallback(
@@ -372,7 +395,7 @@ export default function SocketGameComponent({
     black: gameInfo?.black,
   };
 
-  if (isLoading || isAuthChecking) {
+  if (isAuthChecking) {
     return <LoadingScreen />;
   }
 

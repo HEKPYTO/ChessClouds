@@ -20,6 +20,7 @@ export type SocketResponse = {
 };
 
 const pingInterval = 10000;
+const MAX_SILENT_RETRIES = 3;
 
 export default function useSocket(
   url: string | URL,
@@ -34,117 +35,224 @@ export default function useSocket(
   const socketRef = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<SocketStatus>('connecting');
   const intervalRef = useRef<number | null>(null);
-
-  console.log(`gameID: ${gameId}, userId: ${userId}`);
+  const connectionAttemptsRef = useRef(0);
+  const isInitialConnectPhaseRef = useRef(true);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const socket = new WebSocket(url);
-
-    socketRef.current = socket;
-
-    socket.onopen = () => {
-      console.log('socket open');
-      const authMsg: ClientMessage = {
-        kind: 'Auth',
-        value: { game_id: gameId, user_id: userId },
-      };
-      console.log(authMsg);
-      socket.send(JSON.stringify(authMsg));
-      intervalRef.current = window.setInterval(() => {
-        const pingMsg: ClientMessage = {
-          kind: 'Ping',
-        };
-        console.log('Sending ping message');
-        socket.send(JSON.stringify(pingMsg));
-      }, pingInterval);
-    };
-
-    socket.onerror = (event) => {
-      setStatus('closed');
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      console.error('Websocket error:', event);
-      if (onError) {
-        onError('Connection closed due to an error');
-      }
-    };
-
-    socket.onclose = (event) => {
-      setStatus('closed');
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      // Add closure condition for end game displays
-      const normalClosure =
-        event.code === 1000 || event.code === 1001 || event.code === 1005;
-      const gameRelatedMessage =
-        event.reason &&
-        (event.reason.includes('game') || event.reason.includes('complete'));
-
-      if (normalClosure || gameRelatedMessage) {
-        if (onError)
-          onError(`disconnect:normal:${event.reason || 'Game session ended'}`);
-      } else {
-        if (onError)
-          onError(`disconnect:error:${event.reason || 'Disconnected'}`);
-      }
-    };
-
-    socket.onmessage = (event) => {
+    // Create connection function to allow retries
+    const createConnection = () => {
       try {
-        const message = JSON.parse(event.data) as ServerMessage;
-        console.log('Socket received message:', message);
+        connectionAttemptsRef.current += 1;
+        const socket = new WebSocket(url);
+        socketRef.current = socket;
 
-        switch (message.kind) {
-          case 'Move':
-            if (onMove) onMove(message.value);
-            break;
+        socket.onopen = () => {
+          isInitialConnectPhaseRef.current = false;
+          const authMsg: ClientMessage = {
+            kind: 'Auth',
+            value: { game_id: gameId, user_id: userId },
+          };
+          socket.send(JSON.stringify(authMsg));
 
-          case 'AuthSuccess':
-            setStatus('authenticated');
-            if (onAuth) onAuth();
-            break;
+          intervalRef.current = window.setInterval(() => {
+            const pingMsg: ClientMessage = {
+              kind: 'Ping',
+            };
+            socket.send(JSON.stringify(pingMsg));
+          }, pingInterval);
+        };
 
-          case 'MoveHistory':
-            if (onHistory) onHistory(message.value);
-            break;
+        socket.onerror = () => {
+          // Only report errors once we've exhausted silent retries or if we've already connected once
+          const shouldReportError =
+            !isInitialConnectPhaseRef.current ||
+            connectionAttemptsRef.current > MAX_SILENT_RETRIES;
 
-          case 'GameEnd':
-            if (onGameEnd) onGameEnd(message.value);
-            break;
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+          }
 
-          case 'Error':
-            if (onError)
+          if (status === 'authenticated') {
+            setStatus('closed');
+          }
+
+          if (shouldReportError && onError) {
+            onError('Connection closed due to an error');
+          }
+
+          // Try to reconnect silently during initial connection phase
+          if (
+            isInitialConnectPhaseRef.current &&
+            connectionAttemptsRef.current <= MAX_SILENT_RETRIES
+          ) {
+            if (reconnectTimeoutRef.current) {
+              clearTimeout(reconnectTimeoutRef.current);
+            }
+
+            reconnectTimeoutRef.current = setTimeout(() => {
+              if (socketRef.current) {
+                try {
+                  socketRef.current.close();
+                } catch (e) {
+                  // Ignore errors closing an already closed socket
+                  console.error(e);
+                }
+              }
+              createConnection();
+            }, 1000);
+          }
+        };
+
+        socket.onclose = (event) => {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+          }
+
+          // Only update status if we were previously authenticated
+          if (status === 'authenticated') {
+            setStatus('closed');
+          }
+
+          // Add closure condition for end game displays
+          const normalClosure =
+            event.code === 1000 || event.code === 1001 || event.code === 1005;
+          const gameRelatedMessage =
+            event.reason &&
+            (event.reason.includes('game') ||
+              event.reason.includes('complete'));
+
+          // Only report non-game-related closures if we've already connected once
+          // or if we've exhausted silent retries
+          const shouldReportError =
+            !isInitialConnectPhaseRef.current ||
+            connectionAttemptsRef.current > MAX_SILENT_RETRIES;
+
+          if (normalClosure || gameRelatedMessage) {
+            if (shouldReportError && onError) {
               onError(
-                typeof message.value === 'string'
-                  ? message.value
-                  : String(message.value)
+                `disconnect:normal:${event.reason || 'Game session ended'}`
               );
-            break;
-        }
+            }
+          } else {
+            // Silent retry during initial connection phase
+            if (
+              isInitialConnectPhaseRef.current &&
+              connectionAttemptsRef.current <= MAX_SILENT_RETRIES
+            ) {
+              if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
+              }
+
+              reconnectTimeoutRef.current = setTimeout(() => {
+                createConnection();
+              }, 1000);
+            }
+          }
+        };
+
+        socket.onmessage = (event) => {
+          try {
+            const message = JSON.parse(event.data) as ServerMessage;
+
+            switch (message.kind) {
+              case 'Move':
+                if (onMove) onMove(message.value);
+                break;
+
+              case 'AuthSuccess':
+                isInitialConnectPhaseRef.current = false;
+                setStatus('authenticated');
+                if (onAuth) onAuth();
+                break;
+
+              case 'MoveHistory':
+                if (onHistory) onHistory(message.value);
+                break;
+
+              case 'GameEnd':
+                if (onGameEnd) onGameEnd(message.value);
+                break;
+
+              case 'Error':
+                if (onError)
+                  onError(
+                    typeof message.value === 'string'
+                      ? message.value
+                      : String(message.value)
+                  );
+                break;
+            }
+          } catch (error) {
+            if (!isInitialConnectPhaseRef.current && onError) {
+              onError('Failed to parse server message');
+            }
+            console.error(error);
+          }
+        };
       } catch (error) {
-        console.error('Error parsing message:', error, event.data);
-        if (onError) {
-          onError('Failed to parse server message');
+        // Only report errors if we've exhausted silent retries
+        if (connectionAttemptsRef.current > MAX_SILENT_RETRIES && onError) {
+          onError('Failed to create WebSocket connection');
+        }
+
+        // Try to reconnect silently during initial connection phase
+        if (
+          isInitialConnectPhaseRef.current &&
+          connectionAttemptsRef.current <= MAX_SILENT_RETRIES
+        ) {
+          if (reconnectTimeoutRef.current) {
+            clearTimeout(reconnectTimeoutRef.current);
+          }
+
+          reconnectTimeoutRef.current = setTimeout(() => {
+            createConnection();
+          }, 1000);
+        }
+
+        console.error(error);
+      }
+    };
+
+    // Start initial connection
+    createConnection();
+
+    // Cleanup function
+    return () => {
+      isInitialConnectPhaseRef.current = false;
+
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+
+      if (socketRef.current) {
+        try {
+          socketRef.current.close();
+        } catch (error) {
+          // Ignore errors when closing during cleanup
           console.error(error);
         }
       }
     };
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      socket.close();
-    };
-  }, [url, gameId, userId, onAuth, onError, onGameEnd, onHistory, onMove]);
+  }, [
+    url,
+    gameId,
+    userId,
+    onAuth,
+    onError,
+    onGameEnd,
+    onHistory,
+    onMove,
+    status,
+  ]);
 
   const move = (move: string) => {
     const moveMsg: ClientMessage = { kind: 'Move', value: move };
-    console.log(`Sending move: ${move}`);
-    if (!socketRef.current) {
-      console.error('socket is null');
+    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       return;
     }
     socketRef.current.send(JSON.stringify(moveMsg));
@@ -152,7 +260,6 @@ export default function useSocket(
 
   const disconnect = () => {
     if (!socketRef.current) {
-      console.error('socket is null');
       return;
     }
     socketRef.current.close(1000, 'Disconnected by user');
