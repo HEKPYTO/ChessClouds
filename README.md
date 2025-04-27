@@ -1,6 +1,6 @@
 # ChessClouds
 
-<p align="center">
+<p align="center" style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
   <img src="./web/public/icon/chess-cloud-light.ico"
        width="150"
        alt="ChessClouds Light Logo" />
