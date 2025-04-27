@@ -35,6 +35,6 @@ RUN echo "[program:stockfish]" > /etc/supervisor.d/stockfish.ini && \
     echo "autostart=true" >> /etc/supervisor.d/stockfish.ini && \
     echo "autorestart=true" >> /etc/supervisor.d/stockfish.ini
 
-EXPOSE 80
+EXPOSE 4000
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

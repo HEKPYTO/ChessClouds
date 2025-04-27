@@ -1,32 +1,101 @@
-# 这是一个使用 [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) 引导的 [Next.js](https://nextjs.org) 项目。
+# ChessClouds Web Frontend
 
-## 开始使用
+<p align="center">
+  <img src="../resources/engine.png" width="600" alt="ChessClouds Dashboard">
+</p>
 
-首先，运行开发服务器：
+The web frontend for ChessClouds is built with Next.js and React, providing a modern, responsive user interface for playing chess.
 
+## Features
+
+- **Responsive UI** - Beautiful interface that works on desktop and mobile
+- **Real-time gameplay** - Play chess with live opponents via WebSockets
+- **Computer play** - Challenge the Stockfish engine with different play styles
+- **Authentication** - Secure login with Google OAuth
+- **Dark/Light mode** - Easy on the eyes in any environment
+- **Game history** - Track your progress and review past games
+- **Interactive board** - Drag and drop pieces with move suggestions
+
+<img src="../resources/home_games.png" alt="Home Games Light Mode">
+
+<img src="../resources/home_games_dark.png" alt="Home Games Dark Mode">
+
+## Tech Stack
+
+- **Next.js** - React framework with server-side rendering
+- **TypeScript** - Static typing for better code quality
+- **TailwindCSS** - Utility-first CSS framework
+- **Prisma** - Database ORM for PostgreSQL
+- **Bun** - JavaScript runtime for development and building
+
+## Project Structure
+
+```
+web/
+├── prisma/                 # Database schema and migrations
+├── src/
+│   ├── app/                # Next.js app router pages
+│   ├── components/         # React components
+│   ├── lib/                # Utility functions and services
+│   ├── types/              # TypeScript type definitions
+│   └── ...
+├── public/                 # Static assets
+├── next.config.ts          # Next.js configuration
+├── tailwind.config.js      # TailwindCSS configuration
+└── ...
+```
+
+## Setup and Development
+
+### Prerequisites
+
+- Node.js 18+ or Bun
+- PostgreSQL database
+
+### Local Development
+
+1. Install dependencies
 ```bash
-pnpm dev
-# 或
+cd web
+bun install
+```
+
+2. Set up environment variables
+```bash
+cp .env.example .env.local
+```
+
+3. Generate Prisma client
+```bash
+bunx prisma generate
+```
+
+4. Run development server
+```bash
 bun dev
 ```
 
-使用浏览器打开 [http://localhost:3000](http://localhost:3000) 查看结果。
+5. Open http://localhost:3000 in your browser
 
-你可以通过修改 `app/page.tsx` 来开始编辑页面。当你编辑文件时，页面会自动更新。
+### Building for Production
 
-此项目使用 [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) 自动优化并加载 [Geist](https://vercel.com/font)，这是 Vercel 的一个新字体系列。
+```bash
+bun run build
+```
 
-## 了解更多
+## API Integrations
 
-要了解有关 Next.js 的更多信息，请查看以下资源：
+The web frontend integrates with the following services:
 
-- [Next.js 文档](https://nextjs.org/docs) - 了解 Next.js 的功能和 API。
-- [学习 Next.js](https://nextjs.org/learn) - 一个交互式 Next.js 教程。
+- **WebSocket Server** - Real-time game communication
+- **Matchmaking Service** - Finding opponents
+- **Chess Engine API** - Computer opponent moves
 
-你可以查看 [Next.js GitHub 仓库](https://github.com/vercel/next.js) - 欢迎你的反馈和贡献！
+## Authentication
 
-## 部署在 Vercel 上
+Authentication is handled via Google OAuth flow:
 
-部署 Next.js 应用的最简单方法是使用来自 Next.js 创建者的 [Vercel 平台](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)。
-
-查看我们的 [Next.js 部署文档](https://nextjs.org/docs/app/building-your-application/deploying) 了解更多详情。
+1. User initiates login
+2. Redirected to Google authentication
+3. Google redirects back with JWT token
+4. Token is validated and user session established

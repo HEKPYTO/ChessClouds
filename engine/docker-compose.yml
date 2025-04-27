@@ -5,4 +5,4 @@ services:
       dockerfile: Dockerfile
     container_name: stockfish-api
     ports:
-      - "80:80"
+      - "4000:4000"

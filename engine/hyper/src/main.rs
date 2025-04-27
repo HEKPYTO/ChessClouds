@@ -41,7 +41,7 @@ struct ErrorResponse {
 
 #[tokio::main]
 async fn main() {
-    let addr = ([0, 0, 0, 0], 80).into();
+    let addr = ([0, 0, 0, 0], 4000).into();
     println!("Starting server on http://{}", addr);
     let make_svc = make_service_fn(|_conn| async { Ok::<_, Infallible>(service_fn(handle_request)) });
     let server = Server::bind(&addr).serve(make_svc);
